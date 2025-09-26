@@ -1,0 +1,57 @@
+﻿<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <!-- لوگو سمت چپ -->
+        <a class="navbar-brand fs-4 text-white" href="#">فروشگاه ماد وین</a>
+
+        <!-- دکمه همبرگر برای موبایل -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="باز کردن منو">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- آیتم‌های منو -->
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link text-white fs-5 active hover-shadow" href="#">صفحه اصلی</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fs-5 hover-shadow" href="#">انواع پرده</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fs-5 hover-shadow" href="#">ثبت پرده سفارشی</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fs-5 hover-shadow" href="#">درباره ما</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fs-5 hover-shadow" href="#">بلاگ</a>
+                </li>
+                @if(User.Identity.IsAuthenticated)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-white fs-5 hover-shadow" href="/UserPanel">@User.Identity.Name خوش آمدید.</a>
+                        </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger fs-5 hover-shadow" asp-controller="Account" asp-action="Logout"> خروج </a>
+                        </li>
+                }
+                else
+                {
+                 <li class="nav-item">
+                    <a class="nav-link text-white fs-5 hover-shadow" asp-controller="Account" asp-action="Register">ثبت نام</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fs-5 hover-shadow" asp-controller="Account" asp-action="Login">ورود</a>
+                </li>
+                }
+            </ul>
+
+            <!-- دکمه سمت راست -->
+            <ul class="navbar-nav mb-2 mb-lg-0 ms-auto">
+                <li class="nav-item mt-2 mt-lg-0">
+                    @await Component.InvokeAsync("CartBadgeComponent")
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
