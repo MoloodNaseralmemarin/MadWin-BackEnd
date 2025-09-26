@@ -15,7 +15,14 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         _dbSet = context.Set<T>();
     }
 
-    public async Task AddAsync(T entity) => await _dbSet.AddAsync(entity);
+    public async Task AddAsync(T entity)
+    {
+        entity.LastUpdateDate = DateTime.UtcNow;
+        entity.CreateDate = DateTime.UtcNow;
+        entity.IsDelete = false;
+        entity.Description = "تغییرات اعمال شد.";
+        await _dbSet.AddAsync(entity);
+    }
     public async Task<T> GetByIdAsync(int id) => await _dbSet.FindAsync(id);
     public async Task<IEnumerable<T>> GetAllAsync() => await _dbSet.ToListAsync();
     public void Remove(T entity) => _dbSet.Remove(entity);

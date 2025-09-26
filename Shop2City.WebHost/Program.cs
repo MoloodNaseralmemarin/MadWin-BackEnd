@@ -120,6 +120,8 @@ builder.Services.AddScoped<IProductImageService, ProductImageService>();
 builder.Services.AddScoped<IPropertyTechnicalProductService, PropertyTechnicalProductService>();
 builder.Services.AddScoped<ICommissionRateRepository, CommissionRateRepository>();
 builder.Services.AddScoped<ICurtainComponentRepository, CurtainComponentRepository>();
+builder.Services.AddScoped<ICommissionRatesService, CommissionRatesService>();
+builder.Services.AddScoped<ICurtainComponentService, CurtainComponentService>();
 builder.Services.AddScoped<IPropertyService, PropertyService>();
 builder.Services.AddScoped<IPropertyTitleService, PropertyTitleService>();
 builder.Services.AddScoped<IPropertyTechnicalService, PropertyTechnicalService>();
