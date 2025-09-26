@@ -1,0 +1,31 @@
+﻿@using MadWin.Application.Services
+@using Shop2City.Core.Convertors
+@inject IUserPanelService _userPanelService;
+@{
+    var UserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var user =await _userPanelService.GetSideBarUserPanelDataAsync(int.Parse(UserId));
+}
+
+<aside id="sidebar" class="col-md-3 d-none d-md-block bg-light p-3 rounded">
+    <div class="text-center mb-4">
+        <img src="http://Shop2Citypc.ir/useravatar/@user.imageName" alt="تصویر پروفایل" class="img-fluid rounded-circle mb-2" style="max-width:120px;">
+        <h5 class="mb-1">@user.fullName</h5>
+        <small class="text-muted">عضویت: @user.registerDate.ToShamsi()</small>
+    </div>
+    <hr />
+    <h3 class="h5 mb-3">میز کار</h3>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <a asp-controller="UserPanel" asp-action="EditProfile" class="text-decoration-none d-block">ویرایش حساب کاربری</a>
+        </li>
+        <li class="list-group-item">
+            <a asp-controller="UserPanel" asp-action="ChangePassword" class="text-decoration-none d-block">تغییر رمز عبور</a>
+        </li>
+        <li class="list-group-item">
+            <a href="/UserPanel/Orders/ShowOrder" class="text-decoration-none d-block">لیست فاکتورها</a>
+        </li>
+        <li class="list-group-item">
+            <a asp-controller="Account" asp-action="Logout" class="text-decoration-none d-block text-danger">خروج از حساب کاربری</a>
+        </li>
+    </ul>
+</aside>

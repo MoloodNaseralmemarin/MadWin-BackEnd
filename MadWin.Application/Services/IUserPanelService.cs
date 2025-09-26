@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using MadWin.Core.DTOs.Account;
 
-namespace Shop2City.Core.Services.UserPanel
+namespace MadWin.Application.Services
 {
     public interface IUserPanelService
     {

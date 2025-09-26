@@ -19,7 +19,6 @@ using Shop2City.Core.Services.PropertyTechnicals;
 using Shop2City.Core.Services.PropertyTitles;
 using Shop2City.Core.Services.SlideShows;
 using Shop2City.Core.Services.Transactions;
-using Shop2City.Core.Services.UserPanel;
 using System.Collections.ObjectModel;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -93,6 +92,7 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<INumberRoundingService, NumberRoundingService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserPanelService, UserPanelService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderWidthPartRepository, OrderWidthPartRepository>();
@@ -109,7 +109,6 @@ builder.Services.AddScoped<IFactorService, FactorService>();
 builder.Services.AddScoped<IFactorDetailRepository, FactorDetailRepository>();
 builder.Services.AddScoped<IFactorDetailService, FactorDetailService>();
 builder.Services.AddScoped<IUserDiscountCodeRepository, UserDiscountCodeRepository>();
-builder.Services.AddScoped<IUserPanelService, UserPanelService>();
 builder.Services.AddScoped<IViewRenderService, RenderViewToString>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IProductService, ProductService>();

@@ -1,0 +1,75 @@
+﻿@using MadWin.Core.DTOs.Account
+@model EditProfileViewModel
+@{
+    ViewData["Title"] = "ویرایش حساب کاربری";
+}
+
+    <div class="container">
+        <!-- Breadcrumb Start-->
+        <ul class="breadcrumb">
+            <li><a asp-controller="Home" asp-action="Index"><i class="fa fa-home"></i></a></li>
+            <li><a asp-area="UserPanel" asp-controller="Home" asp-action="Index">پنل کاربری</a></li>
+            <li class="active">ویرایش پروفایل</li>
+        </ul>
+        <!-- Breadcrumb End-->
+        <div class="row">
+            <partial name="_SideBar" />
+            <!--Middle Part Start-->
+            <div class="col-sm-9" id="content">
+                <h1 class="title">ویرایش حساب کاربری</h1>
+                <form class="form-horizontal" asp-action="EditProfile" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="userAvatarImageName" />
+                    <fieldset id="account">
+                        <legend>اطلاعات شخصی شما</legend>
+                        <div class="form-group">
+                            <label asp-for="userName" class="col-sm-4 control-label"></label>
+                            <div class="col-sm-6">
+                                <input type="text" asp-for="userName" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="cellPhone" class="col-sm-4 control-label"></label>
+                            <div class="col-sm-6">
+                                <input type="text" asp-for="cellPhone" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="telPhone" class="col-sm-4 control-label"></label>
+                            <div class="col-sm-6">
+                                <input type="text" asp-for="telPhone" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="address" class="col-sm-4 control-label"></label>
+                            <div class="col-sm-6">
+                                <input type="text" asp-for="address" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="email" class="col-sm-4 control-label"></label>
+                            <div class="col-sm-6">
+                                <input asp-for="email" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="userAvatarFileName" class="col-sm-4 control-label"></label>
+                            <div class="col-sm-6">
+
+                                <input type="file" asp-for="userAvatarFileName" class="form-control">
+                                <p class="help-block">لطفاً فقط تصویر انتخاب کنید.</p>
+                                <img class="rounded mx-auto d-block" src="/images/useravatar/@Model.userAvatarImageName" width="150" />
+                            </div>
+                        </div>
+                    </fieldset>
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="buttons">
+                        <div class="pull-right">
+                            <button class="btn btn-primary">ویرایش اطلاعات</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!--Middle Part End -->
+        </div>
+    </div>
+

@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Shop2City.Core.Services.Products;
-using Shop2City.Core.Services.UserPanel;
 using Shop2City.WebHost.ViewModels.Orders;
 using System.Security.Claims;
 
@@ -28,7 +27,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
 
         public OrdersController(
             IUserService userService,
-            IUserPanelService userPanelService,
+           
             IProductService productService,
             IOrderService orderService,
             IOrderRepository orderRepository,
@@ -89,7 +88,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
         {
             int orderId = 0;
             #region بدست اوردن userId
-            var UserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!int.TryParse(UserId, out int userId))
             {
                 return Unauthorized(); // یا هر رفتار مناسب

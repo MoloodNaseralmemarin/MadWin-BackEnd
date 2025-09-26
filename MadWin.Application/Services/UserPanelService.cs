@@ -1,22 +1,17 @@
-﻿using MadWin.Application.Services;
-using MadWin.Core.DTOs.Account;
+﻿using MadWin.Core.DTOs.Account;
 using MadWin.Core.Interfaces;
-using MadWin.Infrastructure.Context;
-using Microsoft.EntityFrameworkCore;
 using Shop2City.Core.Generator;
-using Shop2City.Core.Security;
 
-namespace Shop2City.Core.Services.UserPanel
+
+namespace MadWin.Application.Services
 {
     public class UserPanelService : IUserPanelService
     {
         private readonly IUserService _userService;
         private readonly IUserRepository _userRepository;
-        private readonly MadWinDBContext _context;
-        public UserPanelService(IUserService userServic, MadWinDBContext context, IUserRepository userRepository)
+        public UserPanelService(IUserService userServic, IUserRepository userRepository)
         {
             _userService = userServic;
-            _context = context;
             _userRepository = userRepository;
         }
         public async Task<InformationUserViewModel> GetInformationUser(string username)
@@ -34,18 +29,19 @@ namespace Shop2City.Core.Services.UserPanel
 
         public async Task<SideBarUserPanelViewModel> GetSideBarUserPanelDataAsync(int id)
         {
-            var user = await _context.Users
+            var users = await _userRepository.GetAllAsync(); // فرضا Task<List<User>>
+
+            var user = users
                 .Where(u => u.Id == id)
                 .Select(u => new SideBarUserPanelViewModel
                 {
                     fullName = $"{u.FirstName} {u.LastName}",
                     registerDate = u.CreateDate
                 })
-                .SingleOrDefaultAsync();
+                .SingleOrDefault();
 
             if (user == null)
             {
-                // مدیریت در صورت عدم وجود کاربر
                 return new SideBarUserPanelViewModel
                 {
                     fullName = "کاربر یافت نشد",
@@ -55,6 +51,7 @@ namespace Shop2City.Core.Services.UserPanel
 
             return user;
         }
+
 
 
         public async Task EditProfile(string userName, EditProfileViewModel editProfile)
@@ -91,29 +88,31 @@ namespace Shop2City.Core.Services.UserPanel
 
         public EditProfileViewModel GetDataForEditProfileUser(string userName)
         {
-            return _context.Users
-                .Where(u => u.UserName == userName)
-                .Select(u => new EditProfileViewModel
-                {
-                    telPhone = u.TelPhone,
-                    cellPhone = u.CellPhone,
-                    address = u.Address,
-                    userName = u.UserName
-                }).Single();
+            return null;// _context.Users
+            //    .Where(u => u.UserName == userName)
+            //    .Select(u => new EditProfileViewModel
+            //    {
+            //        telPhone = u.TelPhone,
+            //        cellPhone = u.CellPhone,
+            //        address = u.Address,
+            //        userName = u.UserName
+            //    }).Single();
         }
 
         public async Task ChangeUserPassword(string userName, string newPassword)
         {
-            var user =await _userService.GetUserByUserName(userName);
-            user.Password = PasswordHelper.EncodePasswordMd5(newPassword);
-            _userRepository.Update(user);
+          
+            //var user =await _userService.GetUserByUserName(userName);
+            //user.Password = PasswordHelper.EncodePasswordMd5(newPassword);
+            //_userRepository.Update(user);
         }
 
         public bool CompareOldPassword(string userName, string oldPassword)
         {
-            string hashOldPassword = PasswordHelper.EncodePasswordMd5(oldPassword);
-            return _context.Users
-                .Any(u => u.UserName == userName && u.Password == hashOldPassword);
+            return false;
+            //string hashOldPassword = PasswordHelper.EncodePasswordMd5(oldPassword);
+            //return _context.Users
+            //    .Any(u => u.UserName == userName && u.Password == hashOldPassword);
         }
 
         InformationUserViewModel IUserPanelService.GetInformationUser(string userName)
