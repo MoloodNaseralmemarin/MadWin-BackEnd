@@ -19,6 +19,8 @@ namespace MadWin.Application.Services
         Task UpdateFactorSumAsync(int factorId);
         decimal GetSubtotal(int factorId);
 
+        Task<int> CountFactors();
+
     }
 }
 

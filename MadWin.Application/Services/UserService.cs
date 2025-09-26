@@ -103,6 +103,13 @@ namespace MadWin.Application.Services
         {
             return await _userRepository.GetCellPhoneByUserIdAsync(userId);
         }
+
+        public async Task<int> CountUserActive()
+        {
+            var usersIsActive = await _userRepository.GetAllAsync();
+            return usersIsActive.Where(u => !u.IsDelete).Count();
+                
+        }
     }
 }
 

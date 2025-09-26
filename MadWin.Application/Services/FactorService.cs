@@ -115,5 +115,10 @@ namespace MadWin.Application.Services
             return _factorDetailRepository.GetSubtotalByFactorId(factorId);
         }
 
+        public async Task<int> CountFactors()
+        {
+            var countFactors = await _factorRepository.GetAllAsync();
+            return countFactors.Count();
+        }
     }
 }

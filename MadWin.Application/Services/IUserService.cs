@@ -25,5 +25,7 @@ namespace MadWin.Application.Services
 
         Task<string> GetCellPhoneByUserIdAsync(int userId);
 
+        Task<int> CountUserActive();
+
     }
 }

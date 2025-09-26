@@ -1,4 +1,19 @@
-﻿<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+﻿@using System.Security.Claims
+@using MadWin.Core.DTOs.Account
+@using Shop2City.Core.Services.Permissions
+@using Shop2City.Core.Services.UserPanel
+@inject IUserPanelService UserPanelService
+@inject IPermissionService PermissionService
+@{
+    int userId = 0;
+    SideBarUserPanelViewModel user = null;
+    if (int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out userId) && userId > 0)
+    {
+      user = await UserPanelService.GetSideBarUserPanelDataAsync(userId);
+    }
+
+}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
         <!-- لوگو سمت چپ -->
         <a class="navbar-brand fs-4 text-white" href="#">فروشگاه ماد وین</a>
@@ -26,24 +41,45 @@
                 <li class="nav-item">
                     <a class="nav-link text-white fs-5 hover-shadow" href="#">بلاگ</a>
                 </li>
-                @if(User.Identity.IsAuthenticated)
+                @if (User.Identity.IsAuthenticated)
                 {
-                    <li class="nav-item">
-                        <a class="nav-link text-white fs-5 hover-shadow" href="/UserPanel">@User.Identity.Name خوش آمدید.</a>
+                    if (await PermissionService.CheckPermissionAsync(1, userId)) // یعنی Admin
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-white fs-5 hover-shadow" asp-controller="Admin" asp-action="Index">
+                                @User.Identity.Name خوش آمدید.
+                            </a>
                         </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-danger fs-5 hover-shadow" asp-controller="Account" asp-action="Logout"> خروج </a>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-white fs-5 hover-shadow" href="/UserPanel">
+                                @User.Identity.Name خوش آمدید.
+                            </a>
                         </li>
+                    }
+
+                    <li class="nav-item">
+                        <a class="nav-link text-danger fs-5 hover-shadow"
+                           asp-controller="Account"
+                           asp-action="Logout">خروج</a>
+                    </li>
                 }
                 else
                 {
-                 <li class="nav-item">
-                    <a class="nav-link text-white fs-5 hover-shadow" asp-controller="Account" asp-action="Register">ثبت نام</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white fs-5 hover-shadow" asp-controller="Account" asp-action="Login">ورود</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fs-5 hover-shadow"
+                           asp-controller="Account"
+                           asp-action="Register">ثبت نام</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fs-5 hover-shadow"
+                           asp-controller="Account"
+                           asp-action="Login">ورود</a>
+                    </li>
                 }
+
             </ul>
 
             <!-- دکمه سمت راست -->

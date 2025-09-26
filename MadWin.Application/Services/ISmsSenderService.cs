@@ -13,9 +13,9 @@
 
         Task<bool> SendSMSForgotPasswordForCustomer(string cellPhone,string password);
 
-
-
         Task SaveSmsAsync(string phoneNumber, string template, string message, string contact, int smsCount, string status, int? orderId = null, int? factorId = null);
-        }
+
+        Task<int> CountSendSms();
+    }
     }
 

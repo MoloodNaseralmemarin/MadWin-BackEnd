@@ -328,6 +328,12 @@ namespace MadWin.Application.Services
             }
 
         }
+
+        public async Task<int> CountSendSms()
+        {
+            var sendSms = await _smsRepository.GetAllAsync();
+            return sendSms.Count();
+        }
     }
 }
 
