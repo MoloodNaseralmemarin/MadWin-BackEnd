@@ -7,12 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ghasedak.Core" Version="1.1.4.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0-preview.4.25258.110" />
+    <Compile Remove="DTOs\DeliveryMethods\**" />
+    <EmbeddedResource Remove="DTOs\DeliveryMethods\**" />
+    <None Remove="DTOs\DeliveryMethods\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\DeliveryMethods\" />
+    <PackageReference Include="Ghasedak.Core" Version="1.1.4.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0-preview.4.25258.110" />
   </ItemGroup>
 </Project>

@@ -12,14 +12,11 @@ using Shop2City.Core.Services.UserPanel;
 using Shop2City.WebHost.ViewModels.Orders;
 using System.Security.Claims;
 
-
 namespace Shop2City.Web.Areas.UserPanel.Controllers
 {
     [Authorize]
     public class OrdersController : Controller
     {
-        private readonly IUserPanelService _userPanelService;
-        private readonly IUserService _userService;
         private readonly IProductService _productService;
         private readonly IOrderService _orderService;
         private readonly ICurtainComponentDetailService _curtainComponentDetailService;
@@ -27,19 +24,22 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
         private readonly ILogger<OrdersController> _logger;
         private readonly IDiscountService _disCountService;
         private readonly ICommissionRateRepository _commissionRateRepository;
-
         private readonly ICurtainComponentRepository _curtainComponentRepository;
 
-        public OrdersController(IUserService userService, IUserPanelService userPanelService, IProductService productService, IOrderService orderService, IOrderRepository orderRepository,
+        public OrdersController(
+            IUserService userService,
+            IUserPanelService userPanelService,
+            IProductService productService,
+            IOrderService orderService,
+            IOrderRepository orderRepository,
             ICurtainComponentDetailService curtainComponentDetailService,
             IDeliveryMethodService deliveryMethodService,
             ILogger<OrdersController> logger,
             IDiscountService disCountService,
-            ICommissionRateRepository commissionRateRepository
+            ICommissionRateRepository commissionRateRepository,
+            ICurtainComponentRepository curtainComponentRepository
            )
         {
-            _userService = userService;
-            _userPanelService = userPanelService;
             _productService = productService;
             _curtainComponentDetailService = curtainComponentDetailService;
             _orderService = orderService;
@@ -47,18 +47,39 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             _logger = logger;
             _disCountService = disCountService;
             _commissionRateRepository = commissionRateRepository;
+            _curtainComponentRepository = curtainComponentRepository;
 
 
         }
         public IActionResult CreateOrder()
         {
-            var category = _productService.GetCategoryForManageProduct(1);
-            ViewData["Categories"] = new SelectList(category, "Value", "Text");
+            // گرفتن دسته‌ها
+            var categories = _productService.GetCategoryForManageProduct(1) ?? Enumerable.Empty<SelectListItem>();
 
-            var subCategory = _productService.GetSubCategoryForManageProduct(int.Parse(category.First().Value));
-            ViewData["SubCategories"] = new SelectList(subCategory, "Value", "Text");
-            return View();
+            // گرفتن زیر دسته‌ها بر اساس دسته اول
+            var firstCategoryId = categories.FirstOrDefault()?.Value;
+            var subCategories = new List<SelectListItem>();
+            if (int.TryParse(firstCategoryId, out int categoryId))
+            {
+                subCategories = _productService.GetSubCategoryForManageProduct(categoryId)?.ToList() ?? new List<SelectListItem>();
+            }
+
+            var model = new OrderViewModel
+            {
+                Categories = new SelectList(categories, "Value", "Text"),
+                SubCategories = new SelectList(subCategories, "Value", "Text")
+            };
+
+            return View(model);
         }
+        public IActionResult GetSubCategories(int categoryId)
+        {
+            var subCategories = _productService.GetSubCategoryForManageProduct(categoryId) ?? Enumerable.Empty<SelectListItem>();
+            return Json(subCategories.Select(s => new { s.Value, s.Text }));
+        }
+
+
+
 
         #region محاسبات
 
@@ -410,21 +431,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
         }
         #endregion
   
-          public async Task<IActionResult> GetOrderSummary(int orderId)
-        {
-            var orderSummary = await _orderService.GetOrderSummaryByOrderIdAsync(orderId);  // از پارامتر استفاده شد
-            var deliveryMethods = await _deliveryMethodService.GetDeliveryMethodInfoAsync();
-            if (orderSummary == null)
-                return NotFound();
-
-            var viewModel = new OrderSummaryViewModel
-            {
-                OrderSummary = orderSummary,
-                DeliveryMethods = deliveryMethods
-            };
-
-            return View(viewModel);
-        }
+        
         #region کد تخفیف
         public async Task<IActionResult> UseDiscountAsync(int orderId, string discountCode)
         {

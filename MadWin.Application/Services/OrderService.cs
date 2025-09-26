@@ -14,11 +14,12 @@ namespace MadWin.Application.Services
         private readonly IOrderRepository _orderRepository;
         private readonly IOrderWidthPartRepository _orderWidthPartRepository;
         private readonly ICurtainComponentProductGroupRepository _curtainComponentProductGroupRepository;
-        public OrderService(ILogger<OrderService> logger, IOrderRepository orderRepository, IOrderWidthPartRepository orderWidthPartRepository)
+        public OrderService(ILogger<OrderService> logger, IOrderRepository orderRepository, IOrderWidthPartRepository orderWidthPartRepository, ICurtainComponentProductGroupRepository curtainComponentProductGroupRepository)
         {
             _logger = logger;
             _orderRepository = orderRepository;
             _orderWidthPartRepository= orderWidthPartRepository;
+            _curtainComponentProductGroupRepository= curtainComponentProductGroupRepository;
 
         }
         public async Task<int> CreateOrderInitialAsync(CreateOrderInitialDto dto, int userId, decimal basePrice)

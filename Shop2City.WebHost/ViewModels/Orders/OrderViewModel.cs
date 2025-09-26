@@ -1,47 +1,45 @@
 ﻿using MadWin.Core.Common;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace Shop2City.WebHost.ViewModels.Orders
 {
     public class OrderViewModel
     {
-        [Display(Name = "گروه اصلی")]
-        [Required(ErrorMessage = "انتخاب گروه اصلی الزامی می باشد")]
-        public int CategoryId { get; set; }
+        [Display(Name = "دسته‌بندی")]
+        [Required(ErrorMessage = "لطفاً یک دسته‌بندی انتخاب کنید.")]
+        public int? CategoryId { get; set; }
 
-        [Display(Name = "گروه فرعی")]
-        [Required(ErrorMessage = "انتخاب گروه فرعی الزامی می باشد")]
-        public int SubCategoryId { get; set; }
+        [Display(Name = "زیر دسته‌بندی")]
+        [Required(ErrorMessage = "لطفاً یک زیر دسته‌بندی انتخاب کنید.")]
+        public int? SubCategoryId { get; set; }
+
+        public SelectList Categories { get; set; } = new SelectList(Enumerable.Empty<SelectListItem>());
+        public SelectList SubCategories { get; set; } = new SelectList(Enumerable.Empty<SelectListItem>());
 
         [Display(Name = "ارتفاع")]
-        [Required(ErrorMessage = "وارد کردن اندازه ارتفاع الزامی می باشد")]
-        [Range(0, 400, ErrorMessage = ErrorMessage.Range)]
+        [Required(ErrorMessage = "ارتفاع را وارد کنید.")]
+        [Range(1, int.MaxValue, ErrorMessage = "مقدار ارتفاع باید بیشتر از صفر باشد.")]
         public int Height { get; set; }
 
         [Display(Name = "عرض")]
-        [Required(ErrorMessage = "وارد کردن اندازه عرض الزامی می باشد")]
-        [Range(0, 400, ErrorMessage = ErrorMessage.Range)]
-
+        [Required(ErrorMessage = "عرض را وارد کنید.")]
+        [Range(1, int.MaxValue, ErrorMessage = "مقدار عرض باید بیشتر از صفر باشد.")]
         public int Width { get; set; }
 
         [Display(Name = "تعداد")]
-
-        [Range(1, 400, ErrorMessage = ErrorMessage.Range)]
+        [Required(ErrorMessage = "تعداد را وارد کنید.")]
+        [Range(1, int.MaxValue, ErrorMessage = "مقدار تعداد باید بیشتر از صفر باشد.")]
         public int Count { get; set; }
 
-        /// <summary>
-        /// تعداد تکه
-        /// </summary>
+        // برای تقسیم‌بندی
         public int PartCount { get; set; }
-        /// <summary>
-        /// آیا مساوی اند
-        /// </summary>
         public bool IsEqualParts { get; set; }
-        /// <summary>
-        /// مبلغ کارمزد
-        /// </summary>
-        public decimal CommissionAmount { get; set; }
 
-        public List<float> WidthParts { get; set; }
+        public string DivisionType { get; set; }
+
+        // عرض بخش‌های جداگانه
+        public List<int> WidthParts { get; set; } = new List<int>();
     }
+
 }

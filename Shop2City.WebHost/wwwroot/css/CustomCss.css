@@ -1,15 +1,17 @@
 ﻿
+
 @font-face {
     font-family: 'WYekan';
     src: url('../fonts/WYekan.eot?#') format('eot'), url('../fonts/WYekan.ttf') format('truetype');
 }
+
 @font-face {
-    font-family: 'IRANSansWeb';
-    src: url('../fonts/IRANSansWeb.eot?#') format('eot'), url('../fonts/IRANSansWeb.ttf') format('truetype');
+    font-family: 'IRANSans';
+    src: url('../fonts/IRANSans.eot?#') format('eot'), url('../fonts/IRANSans.ttf') format('truetype');
 }
+
 * {
-    font-family: "WYekan";
-    font-size: 1rem;
+    font-family: 'IRANSans';
 }
 
 body {

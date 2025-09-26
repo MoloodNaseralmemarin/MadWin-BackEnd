@@ -36,39 +36,6 @@ namespace Shop2City.WebHost.Controllers
             return View();
         }
 
-        #region GetCategory
-
-        //گروه اصلی
-        public IActionResult GetCategory(int id)
-        {
-            List<SelectListItem> list = new List<SelectListItem>()
-            {
-                new SelectListItem() {Text = "گروه اصلی را انتخاب کنید", Value = ""}
-            };
-            list.AddRange(_productService.GetCategoryForManageProduct(id));
-            return Json(new SelectList(list, "Value", "Text"));
-        }
-
-        #endregion
-
-        #region GetSubCategory
-
-        public IActionResult GetSubCategory(int id)
-        {
-            List<SelectListItem> list = new List<SelectListItem>()
-            {
-                new SelectListItem() {Text = "گروه فرعی را انتخاب کنید", Value = ""}
-            };
-            list.AddRange(_productService.GetSubCategoryForManageProduct(id));
-
-            return Json(new SelectList(list, "Value", "Text"));
-        }
-
-        #endregion
-
-
-
-
         [HttpGet]
         public async Task<IActionResult> GetDeliveryPriceAsync(int deliveryId)
         {

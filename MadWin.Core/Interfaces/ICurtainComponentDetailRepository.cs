@@ -1,9 +1,5 @@
-﻿using MadWin.Core.Entities.CurtainComponents;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MadWin.Core.DTOs.Calculations;
+using MadWin.Core.Entities.CurtainComponents;
 
 namespace MadWin.Core.Interfaces
 {

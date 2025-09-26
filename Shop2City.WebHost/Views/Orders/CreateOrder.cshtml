@@ -1,9 +1,11 @@
-﻿@using MadWin.Application.Services
-@using MadWin.Core.DTOs.Orders
+﻿
+@using Shop2City.WebHost.ViewModels.Orders
 @model OrderViewModel
+
 @{
-    ViewData["Title"] = "پنل کاربری " + User.Identity?.Name;
+  
 }
+
 <div class="container my-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -27,8 +29,9 @@
                 سفارش با اندازه دلخواه
             </button>
 
-            <!--سفارشهای امروز-->
+            <!-- سفارش‌های امروز -->
             @await Component.InvokeAsync("OrderSummaryComponent")
+
             <div class="modal fade" id="customSizeModal" tabindex="-1" aria-labelledby="customSizeModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
                     <div class="modal-content">
@@ -40,21 +43,17 @@
                             <form asp-action="CreateOrder" method="post" class="needs-validation" novalidate id="customSizeForm">
                                 <input type="hidden" id="PartCount" name="PartCount" />
                                 <input type="hidden" id="IsEqualParts" name="IsEqualParts" />
-                                <input type="hidden" name="DivisionType" id="DivisionType" />
+                                <input type="hidden" id="DivisionType" name="DivisionType" />
 
-                                <!-- دسته بندی و زیر دسته -->
+                                <!-- دسته‌بندی و زیر دسته -->
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label asp-for="CategoryId" class="form-label"></label>
-                                        <select asp-for="CategoryId" asp-items="@(ViewData["Categories"] as SelectList)"
-                                                class="form-select" required></select>
-                                        <div class="invalid-feedback">انتخاب دسته‌بندی الزامی است.</div>
+                                        <select asp-for="CategoryId" class="form-select" asp-items="Model.Categories" required id="CategoryId"></select>
                                     </div>
                                     <div class="col-md-6">
                                         <label asp-for="SubCategoryId" class="form-label"></label>
-                                        <select asp-for="SubCategoryId" asp-items="@(ViewData["SubCategory"] as SelectList)"
-                                                class="form-select" required></select>
-                                        <div class="invalid-feedback">انتخاب زیر دسته الزامی است.</div>
+                                        <select asp-for="SubCategoryId" class="form-select" asp-items="Model.SubCategories" required id="SubCategoryId"></select>
                                     </div>
                                 </div>
 
@@ -77,7 +76,7 @@
                                     </div>
                                 </div>
 
-                                <!-- تقسیم‌بندی با استایل بهتر -->
+                                <!-- تقسیم‌بندی -->
                                 <div class="mb-3 custom-radio-group d-flex gap-2 flex-wrap">
                                     <label class="form-label w-100">تقسیم‌بندی عرض پرده <span class="text-danger">*</span></label>
 
@@ -123,9 +122,9 @@
 </div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>
         $(function(){
+
             const $form = $("#customSizeForm");
             const $submit = $("#submitOrder");
             const $category = $("#CategoryId");
@@ -134,25 +133,28 @@
 
             $submit.prop("disabled", true);
 
+            // لود زیر دسته‌ها با AJAX
             function loadSubCategories(categoryId, callback){
                 if(!categoryId) return;
-                $.getJSON(`/home/GetSubCategory/${categoryId}`, function(data){
+                $.getJSON('@Url.Action("GetSubCategories", "Orders")', { categoryId: categoryId }, function(data){
                     $subCategory.empty();
-                    data.forEach(item => $subCategory.append(new Option(item.text, item.value)));
+                    $subCategory.append($('<option>', { value: "", text: "انتخاب کنید" }));
+                    $.each(data, function(i, item){
+                        $subCategory.append($('<option>', { value: item.value, text: item.text }));
+                    });
                     if(callback) callback();
                 });
             }
 
+            // بررسی اعتبار فرم
             function checkForm(){
                 let valid = true;
                 $form.find("input[required], select[required]").each(function(){
                     if(!$(this).val()) valid = false;
                 });
-
                 let sum = 0;
                 $(".width-input").each(function(){ sum += parseFloat($(this).val()) || 0; });
                 if($(".width-input").length && sum !== (parseFloat($width.val())||0)) valid = false;
-
                 $submit.prop("disabled", !valid);
             }
 
@@ -165,10 +167,14 @@
                 $(this).find("input[type=radio]").prop("checked", true).trigger("change");
             });
 
-            // هنگام باز شدن مودال، SubCategory و WidthParts بروزرسانی شوند
+            // وقتی دسته تغییر می‌کند، زیر دسته‌ها بروزرسانی شوند
+            $category.on("change", function(){
+                loadSubCategories($(this).val(), checkForm);
+            });
+
+            // هنگام باز شدن مودال، زیر دسته‌ها لود شوند
             $('#customSizeModal').on('shown.bs.modal', function(){
                 loadSubCategories($category.val(), function(){
-                    // اگر یک رادیو تقسیم‌بندی انتخاب شده بود، WidthParts را بروزرسانی کن
                     const selected = $("input[name=division]:checked");
                     if(selected.length){
                         const parts = selected.val().split('-');
@@ -177,9 +183,10 @@
                     checkForm();
                 });
             });
+
         });
 
-        // تقسیم‌بندی
+        // تقسیم‌بندی عرض
         function updateInputs(count, type){
             const totalWidth = parseFloat(document.getElementById("totalWidth").value);
             if(isNaN(totalWidth) || totalWidth <=0) return;
@@ -189,30 +196,31 @@
             document.getElementById("IsEqualParts").value = (type==="equal")?"true":"false";
 
             const container = document.getElementById("input-container");
-            container.innerHTML="";
+            container.innerHTML = "";
 
-            const labels = (count===2)?["راست","چپ"]:["راست","وسط","چپ"];
+            const labels = (count===2)? ["راست","چپ"] : ["راست","وسط","چپ"];
 
-            for(let i=0;i<count;i++){
+            for(let i=0; i<count; i++){
                 const div = document.createElement("div");
-                div.className="mb-2";
+                div.className = "mb-2";
 
                 const label = document.createElement("label");
-                label.className="mb-1";
+                label.className = "mb-1";
                 label.textContent = labels[i] || `بخش ${i+1}`;
 
                 const input = document.createElement("input");
-                input.type="number";
+                input.type = "number";
                 input.name = `WidthParts[${i}]`;
-                input.className="form-control width-input";
+                input.className = "form-control width-input";
                 input.readOnly = (type==="equal");
-                input.value = (type==="equal")? (totalWidth/count).toFixed(0) : "";
+                input.value = (type==="equal") ? (totalWidth/count).toFixed(0) : "";
                 input.oninput = function(){ $(".width-input").trigger("input"); };
 
                 div.appendChild(label);
                 div.appendChild(input);
                 container.appendChild(div);
             }
+
             $(".width-input").trigger("input");
         }
     </script>
