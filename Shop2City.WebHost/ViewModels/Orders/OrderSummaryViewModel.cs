@@ -6,9 +6,13 @@ namespace Shop2City.WebHost.ViewModels.Orders
 {
     public class OrderSummaryPageViewModel
     {
-        public PagedResult<OrderSummaryDto> Orders { get; set; }
-        public IEnumerable<DeliveryMethodInfoLookup> DeliveryMethods { get; set; }
-        public OrderSummaryDto OrderSummary { get; set; }
+        public IEnumerable<DeliveryMethodInfoLookup> DeliveryMethods { get; set; } = new List<DeliveryMethodInfoLookup>();
+
+        public PagedResult<OrderSummaryDto> OrderSummary { get; set; } = new PagedResult<OrderSummaryDto>
+        {
+            Items = new List<OrderSummaryDto>(),
+            TotalCount = 0
+        };
     }
 
 

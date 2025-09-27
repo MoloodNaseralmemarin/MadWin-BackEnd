@@ -1,4 +1,5 @@
 ﻿using MadWin.Core.DTOs.Orders;
+using MadWin.Core.Entities.CurtainComponents;
 using MadWin.Core.Entities.Orders;
 using MadWin.Core.Lookups.Orders;
 
@@ -24,5 +25,7 @@ namespace MadWin.Core.Interfaces
         Task<PagedResult<OrderSummaryDto>> GetTodayOrdersAsync(int PageNumber = 1, int PageSize = 10);
 
         Task SoftDeleteFromOrderAsync(IEnumerable<int> orderIds);
+
+        Task<IEnumerable<CurtainComponentDetail>> GetByOrderIdAsync(int orderId);
     }
 }

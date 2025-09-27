@@ -2,6 +2,7 @@
 using MadWin.Core.DTOs.Calculations;
 using MadWin.Core.DTOs.Orders;
 using MadWin.Core.Entities.Common;
+using MadWin.Core.Entities.CurtainComponents;
 using MadWin.Core.Entities.Orders;
 using MadWin.Core.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -180,6 +181,11 @@ namespace MadWin.Application.Services
             entity.IsDelete = true;
             entity.LastUpdateDate = DateTime.Now;
             entity.Description = "توسط کاربر حذف شده است.";
+        }
+
+        public async Task<IEnumerable<CurtainComponentDetail>> GetCurtainComponentDetailsByOrderIdAsync(int orderId)
+        {
+            return await _orderRepository.GetByOrderIdAsync(orderId);
         }
 
 

@@ -1,6 +1,7 @@
 ﻿using MadWin.Application.DTOs.Orders;
 using MadWin.Core.DTOs.Calculations;
 using MadWin.Core.DTOs.Orders;
+using MadWin.Core.Entities.CurtainComponents;
 using MadWin.Core.Entities.Orders;
 
 
@@ -28,5 +29,8 @@ namespace MadWin.Application.Services
         Task<PagedResult<OrderSummaryDto>> GetTodayOrdersAsync(int PageNumber = 1, int PageSize = 10);
 
         Task SoftDeleteFromOrderAsync(IEnumerable<int> orderIds);
+
+        Task<IEnumerable<CurtainComponentDetail>> GetCurtainComponentDetailsByOrderIdAsync(int orderId);
+
     }
 }

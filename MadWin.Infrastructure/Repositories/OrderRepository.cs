@@ -1,6 +1,7 @@
 ﻿using MadWin.Application.Services;
 using MadWin.Core.DTOs.Orders;
 using MadWin.Core.Entities.Common;
+using MadWin.Core.Entities.CurtainComponents;
 using MadWin.Core.Entities.Orders;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Lookups.Orders;
@@ -348,14 +349,14 @@ namespace MadWin.Infrastructure.Repositories
 
         public async Task<PagedResult<OrderSummaryDto>> GetTodayOrdersAsync(int PageNumber = 1, int PageSize = 10)
         {
-            var today = DateTime.Today;
-            var tomorrow = today.AddDays(1);
+            var today = DateTime.Today.Date;
+            var tomorrow = today.AddDays(1).Date;
 
             var query = _context.Orders
                 .Include(o => o.OrderCategory)
                 .Include(o => o.OrderSubCategory)
                 .Include(o => o.User)
-                .Where(o => o.CreateDate >= today && o.CreateDate < tomorrow)
+                //.Where(o => o.CreateDate.Date >= today && o.CreateDate.Date < tomorrow)
                 .AsQueryable();
 
             int totalCount = await query.CountAsync();
@@ -452,6 +453,17 @@ namespace MadWin.Infrastructure.Repositories
             entity.IsDelete = true;
             entity.LastUpdateDate = DateTime.Now;
             entity.Description = "توسط کاربر حذف شده است.";
+        }
+
+
+        public async Task<IEnumerable<CurtainComponentDetail>> GetByOrderIdAsync(int orderId)
+        {
+            return await _context.CurtainComponentDetails
+                .Include(cd => cd.CurtainComponent)
+                .Where(od => od.OrderId == orderId)
+
+                .ToListAsync();
+
         }
     }
 }

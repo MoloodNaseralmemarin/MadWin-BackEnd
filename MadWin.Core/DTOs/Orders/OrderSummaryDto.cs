@@ -38,6 +38,8 @@
         /// </summary>
         public decimal PriceWithFee { get; set; }
 
+        public decimal BasePrice { get; set; }
+
         /// <summary>
         /// جمع کل + تعداد
         /// </summary>
