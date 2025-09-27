@@ -1,0 +1,76 @@
+﻿
+@using MadWin.Core.Entities.Discounts
+@using Shop2City.Core.Convertors
+@model IEnumerable<Discount>
+@{
+    ViewData["Title"] = "لیست تخفیفات";
+}
+<div class="row">
+    <div class="col-lg-12">
+        <h4 class="m-t-0 header-title">لیست تخفیفات</h4>
+        <a class="btn btn-success mb-2"><i class="fa fa-plus-circle"></i>&nbsp;<span> افزودن کد تخفیف جدید</span></a>
+        @if (TempData["AlertSuccess"] != null)
+        {
+            <div class="alert alert-danger d-flex align-items-center" role="alert" id="deletedItemMessage">
+                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill" /></svg>
+                <div>
+                    @TempData["AlertSuccess"]
+                </div>
+            </div>
+        }
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>تاریخ ثبت</th>
+                    <th>عنوان</th>
+                    <th>درصد تخفیف</th>
+                    <th>کد تخفیف</th>
+                    <th>تعداد</th>
+                    <th>تاریخ شروع - تاریخ پایان</th>
+                    <th>ویرایش</th>
+                    <th>حذف</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.CreateDate.ToShamsi()</td>
+                        <td>
+                            @if (item.Item == "O")
+                            {
+                                <span>سفارش با انداره دلخواه</span>
+                            }
+                            else if (item.Item == "F")
+                            {
+                                <span>سفارش آماده</span>
+                            }
+                        </td>
+                        <td>@item.Percentage</td>
+                        <td>@item.DiscountCode</td>
+                        <td>@item.UseableCount</td>
+                        <td>@item.StartDate.ToShamsi() - @item.ExpiryDate.ToShamsi() </td>
+
+                        <td>
+                            <a href="/Admin/DisCounts/Edit/@item.Id" class="btn waves-effect waves-light btn-outline-warning">
+                                <span class="fa fa-pencil"></span>
+                            </a>
+                        </td>
+
+                        <td>
+
+                            <form method="post">
+                                <input type="hidden" asp-for="@item.Id" />
+                                <button asp-route-itemid="@item.Id" type="submit" class="btn waves-effect waves-light btn-outline-danger">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -21,6 +21,8 @@ namespace MadWin.Application.Services
 
         Task<int> CountFactors();
 
+        Task<IEnumerable<FactorSummaryDto>> GetAllFactorsAsync();
+
     }
 }
 

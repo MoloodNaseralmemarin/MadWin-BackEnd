@@ -1,11 +1,14 @@
 ﻿using MadWin.Application.Services;
 using MadWin.Core.Entities.CurtainComponents;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shop2City.WebHost.ViewModels.CurtainComponents;
 using System.Threading.Tasks;
 
-namespace Shop2City.WebHost.Controllers
+namespace Shop2City.WebHost.Areas.Admin.Controllers
 {
+    [Authorize]
+    [Area("Admin")]
     public class CurtainComponentsController : Controller
     {
         public readonly ICurtainComponentService _curtainComponentService;

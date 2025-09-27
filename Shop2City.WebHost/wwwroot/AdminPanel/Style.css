@@ -1,8 +1,8 @@
-﻿
-@font-face {
+﻿@font-face {
     font-family: 'WYekan';
     src: url('../fonts/WYekan.eot?#') format('eot'), url('../fonts/WYekan.ttf') format('truetype');
 }
+
 @font-face {
     font-family: 'IRANSans';
     src: url('../fonts/IRANSans.eot?#') format('eot'), url('../fonts/IRANSans.ttf') format('truetype');
@@ -10,6 +10,7 @@
 
 * {
     font-family: 'IRANSans';
+    font-size: 14px;
 }
 .sidebar
 {

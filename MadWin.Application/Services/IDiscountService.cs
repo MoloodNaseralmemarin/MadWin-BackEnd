@@ -1,5 +1,6 @@
 ﻿using MadWin.Application.DTOs.Discounts;
 using MadWin.Core.DTOs.Orders;
+using MadWin.Core.Entities.Discounts;
 using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
 
@@ -13,6 +14,10 @@ namespace MadWin.Application.Services
 
         Task<DiscountResultDto> ApplyDiscountForFactorAsync(int factorId, string discountCode);
         Task<DiscountUseType> UseDiscountForFactorAsync(int factorId, string code, int userId);
+
+        Task<IEnumerable<Discount>> GetAllDiscountAsync();
+
+        Task<Discount> GetByIdAsync(int id);
     }
 }
         

@@ -1,6 +1,4 @@
-﻿
-
-@font-face {
+﻿@font-face {
     font-family: 'WYekan';
     src: url('../fonts/WYekan.eot?#') format('eot'), url('../fonts/WYekan.ttf') format('truetype');
 }
@@ -112,4 +110,38 @@ body {
 
 .highlight {
     font-weight: bold;
+}
+
+
+.product-slider {
+    scroll-behavior: smooth; /* اسکرول نرم */
+    -webkit-overflow-scrolling: touch; /* اسکرول روان روی موبایل */
+}
+
+.product-card {
+    flex: 0 0 auto; /* کارت‌ها کوچک نشوند */
+    width: 100%; /* موبایل: یک کارت در سطر */
+    max-width: 250px; /* حداکثر عرض کارت */
+}
+
+/* واکنش‌گرایی */
+@media (min-width: 576px) {
+    .product-card {
+        max-width: 45%;
+    }
+    /* 2 کارت در سطر */
+}
+
+@media (min-width: 768px) {
+    .product-card {
+        max-width: 30%;
+    }
+    /* 3 کارت در سطر */
+}
+
+@media (min-width: 992px) {
+    .product-card {
+        max-width: 18%;
+    }
+    /* 5–6 کارت در سطر */
 }

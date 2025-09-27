@@ -1,0 +1,49 @@
+﻿@using MadWin.Core.DTOs.Factors
+@model IEnumerable<FactorSummaryDto>
+
+<div class="container mt-3">
+    <h4 class="mb-3">فاکتورها <span class="badge bg-primary">@Model.Count()</span></h4>
+
+    <!-- جدول دسکتاپ -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>شماره فاکتور</th>
+                    <th>نام محصول</th>
+                    <th>تعداد</th>
+                    <th>قیمت واحد</th>
+                    <th>قیمت کل</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- کارت موبایل -->
+    <div class="d-block d-md-none">
+        @foreach (var factor in Model)
+        {
+            <div class="card mb-3 shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <strong>فاکتور شماره: @factor.FactorId</strong>
+                </div>
+                <div class="card-body">
+                    @foreach (var detail in factor.FactorDetails)
+                    {
+                        <div class="row mb-2">
+                            <div class="col-6"><strong>محصول:</strong> @detail.ProductTitle</div>
+                            <div class="col-6"><strong>تعداد:</strong> @detail.Quantity</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-6"><strong>قیمت واحد:</strong> @detail.Price.ToString("N0") ریال</div>
+                            <div class="col-6"><strong>قیمت کل:</strong> @(detail.Quantity* detail.Price).ToString("N0") ریال</div>
+                        </div>
+                        <hr />
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
