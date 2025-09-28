@@ -48,8 +48,7 @@
                 <div id="collapseOneDesktop" class="accordion-collapse collapse">
                     <div class="accordion-body p-0">
                         <ul class="list-unstyled ps-3">
-                            <li><a href="#" class="d-block py-1">کاربران</a></li>
-                            <li><a href="#" class="d-block py-1">دسترسی</a></li>
+                            <li><a asp-area="Admin" asp-controller="Users" asp-action="Index" class="d-block py-1">کاربران</a></li>
                         </ul>
                     </div>
                 </div>
@@ -138,8 +137,7 @@
                     <div id="collapseOneMobile" class="accordion-collapse collapse">
                         <div class="accordion-body p-0">
                             <ul class="list-unstyled ps-3">
-                                <li><a href="#" class="d-block py-1">کاربران</a></li>
-                                <li><a href="#" class="d-block py-1">دسترسی</a></li>
+                                <li><a asp-area="Admin" asp-controller="Users" asp-action="Index" class="d-block py-1">کاربران</a></li>
                             </ul>
                         </div>
                     </div>
@@ -160,7 +158,7 @@
                                 <li><a asp-controller="CurtainComponents" asp-action="Index" class="d-block py-1">مواد مصرفی</a></li>
                                 <li><a asp-controller="CommissionRates" asp-action="Index" class="d-block py-1">کارمزد</a></li>
                                 <li><a href="#" class="d-block py-1">کد تخفیف</a></li>
-                                <li><a href="#" class="d-block py-1">محصولات</a></li>
+                                <li><a asp-area="Admin" asp-controller="Products" asp-action="Index" class="d-block py-1">محصولات</a></li>
                                 <li><a href="#" class="d-block py-1">دسته بندی محصولات</a></li>
                             </ul>
                         </div>

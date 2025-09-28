@@ -1,4 +1,5 @@
 ﻿using MadWin.Application.DTOs.Account;
+using MadWin.Core.DTOs.Users;
 using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -109,6 +110,11 @@ namespace MadWin.Application.Services
             var usersIsActive = await _userRepository.GetAllAsync();
             return usersIsActive.Where(u => !u.IsDelete).Count();
                 
+        }
+
+        public async Task<UserForAdminViewModel> GetAllUsers(int pageId = 1, string filterFirstName = "")
+        {
+            return await _userRepository.GetAllUsers(pageId,filterFirstName);
         }
     }
 }

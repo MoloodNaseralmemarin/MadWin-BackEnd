@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Areas\Admin\Views\Shared\_AdminLayout.cshtml~RF3b1d5c.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="Pages\_ViewImports.cshtml" />
     <None Include="Pages\_ViewStart.cshtml" />
   </ItemGroup>

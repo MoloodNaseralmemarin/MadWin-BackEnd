@@ -1,4 +1,5 @@
 ﻿using MadWin.Application.DTOs.Account;
+using MadWin.Core.DTOs.Users;
 using MadWin.Core.Entities.Users;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,7 @@ namespace MadWin.Application.Services
         Task<string> GetCellPhoneByUserIdAsync(int userId);
 
         Task<int> CountUserActive();
+        Task<UserForAdminViewModel> GetAllUsers(int pageId = 1, string filterFirstName = "");
 
     }
 }

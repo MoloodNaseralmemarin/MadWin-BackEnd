@@ -1,4 +1,5 @@
-﻿using MadWin.Core.Entities.SentMessages;
+﻿using MadWin.Core.DTOs.Users;
+using MadWin.Core.Entities.SentMessages;
 using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Lookups.Account;
@@ -92,6 +93,33 @@ namespace MadWin.Infrastructure.Repositories
         {
             var user = await _context.Users.SingleAsync(u => u.Id == userId);
             return user.CellPhone;
+        }
+
+        public async Task<UserForAdminViewModel> GetAllUsers(int pageId = 1, string filterFirstName = "")
+        {
+            IQueryable<User> result = GetQuery()
+                .IgnoreQueryFilters()
+                .Where(u => !u.IsDelete);
+
+            if (!string.IsNullOrEmpty(filterFirstName))
+            {
+                result = result.Where(u => u.FirstName.Contains(filterFirstName));
+            }
+
+            int take = 20;
+            int skip = (pageId - 1) * take;
+
+            var list = new UserForAdminViewModel
+            {
+                currentPage = pageId,
+                countPage = (int)Math.Ceiling(result.Count() / (double)take),
+                users = await result
+                    .OrderBy(u => u.CreateDate)
+                    .Skip(skip)
+                    .Take(take)
+                    .ToListAsync()
+            };
+            return list;
         }
     }
 }

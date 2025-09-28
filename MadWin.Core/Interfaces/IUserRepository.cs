@@ -1,4 +1,5 @@
-﻿using MadWin.Core.Entities.Users;
+﻿using MadWin.Core.DTOs.Users;
+using MadWin.Core.Entities.Users;
 using MadWin.Core.Lookups.Account;
 
 namespace MadWin.Core.Interfaces
@@ -18,5 +19,7 @@ namespace MadWin.Core.Interfaces
         Task<User?> GetUserByUsernameAsync(string username);
 
         Task<string> GetCellPhoneByUserIdAsync(int userId);
+
+        Task<UserForAdminViewModel> GetAllUsers(int pageId = 1, string filterFirstName = "");
     }
 }
