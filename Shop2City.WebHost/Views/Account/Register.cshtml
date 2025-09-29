@@ -21,7 +21,7 @@
             <form asp-action="Register"  method="post" class="card p-4 shadow-sm">
 
                 <h4 class="mb-4 text-center">ثبت اطلاعات شخصی شما</h4>
-
+                <div asp-validation-summary="All" class="text-danger mt-1"></div>
                 <div class="mb-3">
                     <label asp-for="FirstName" class="form-label">نام </label>
                     <input type="text"
@@ -29,7 +29,7 @@
                            id="firstName"
                            class="form-control form-control-md d-md-block"
                            placeholder="محمد مهدی">
-                    <div asp-validation-summary="All" class="text-danger mt-1"></div>
+                    
                 </div>
 
                 <div class="mb-3">
@@ -49,7 +49,6 @@
                            pattern="[0-9]*"
                            inputmode="numeric"
                            placeholder="081-32530608">
-                    <div asp-validation-summary="All" class="text-danger mt-1"></div>
                 </div>
                 <div class="mb-3">
                     <label asp-for="TelPhone" class="form-label">شماره همراه </label>
@@ -60,7 +59,6 @@
                            pattern="[0-9]*"
                            inputmode="numeric"
                            placeholder="09370000000">
-                    <div asp-validation-summary="All" class="text-danger mt-1"></div>
                 </div>
                 <div class="mb-3">
                     <label asp-for="Address" class="form-label">آدرس پستی</label>
@@ -69,7 +67,6 @@
                            id="address"
                            class="form-control form-control-md d-md-block"
                            placeholder="همدان -همدان">
-                    <div asp-validation-summary="All" class="text-danger mt-1"></div>
                 </div>
                 <div class="mb-3">
                     <label asp-for="Password" class="form-label">کلمه عبور</label>
@@ -78,7 +75,15 @@
                             id="password"
                            class="form-control form-control-md d-md-block"
                            placeholder="کلمه عبور">
-                    <div asp-validation-summary="All" class="text-danger mt-1"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label">تکرار کلمه عبور</label>
+                    <input type="password"
+                           asp-for="ConfirmPassword"
+                           id="password"
+                           class="form-control form-control-md d-md-block"
+                           placeholder="تکرار کلمه عبو">
                 </div>
                 <div class="mb-3">
                     <a asp-controller="Account" asp-action="Login">قبلاْ ثبت نام کرده ام</a>

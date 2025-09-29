@@ -1,6 +1,7 @@
 ﻿using MadWin.Application.Services;
 using MadWin.Application.ViewModels.Account;
 using MadWin.Core.Common;
+using MadWin.Core.DTOs.Users;
 using MadWin.Core.Entities.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -66,29 +67,19 @@ namespace Shop2City.WebHost.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([FromForm] RegisterViewModel model)
+        public async Task<IActionResult> Edit([FromForm] EditUserViewModel model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
-            if (await _userService.IsExistCellPhoneAsync(model.CellPhone))
-            {
-                ModelState.AddModelError("CellPhone", ErrorMessage.InvalidCellPhone);
-                return View(model);
-            }
-            model.Password = _passwordHasher.HashPassword(model.Password);
-            var user = new User
-            {
-                Address = model.Address,
-                CellPhone = model.CellPhone,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Password = model.Password,
-                UserName = model.CellPhone
+            await _userService.EditUserFromAdmin(model);
+            TempData["SuccessMessage"] = $"ویرایش {model.FirstName + " " +model.LastName} با موفقیت انجام شد";
 
-            };
-            await _userService.CreateUser(user);
             return RedirectToAction("Index");
 
+        }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _userService.DeleteUserFromAdmin(id);
+            return RedirectToAction("Index");
         }
     }
 }

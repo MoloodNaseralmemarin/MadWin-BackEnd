@@ -5,6 +5,9 @@
 @{
     ViewBag.Title = "لیست کاربران";
     var currentFilter = (Context.Request.Query["filterFirstName"].ToString() ?? "");
+    int visiblePages = 3; // تعداد صفحات قبل و بعد از صفحه فعلی
+    int startPage = Math.Max(Model.currentPage - visiblePages, 1);
+    int endPage = Math.Min(Model.currentPage + visiblePages, Model.countPage);
 }
 
 <div class="container-fluid my-3">
@@ -64,11 +67,12 @@
                                            class="btn btn-warning btn-sm">
                                             <i class="fa fa-edit"></i>
                                         </a>
-                                        <a href="@Url.Action("Delete", "Users", new { area = "Admin", id = user.Id })"
-                                           class="btn btn-danger btn-sm"
-                                           onclick="return confirm('آیا مطمئن هستید؟');">
+                                        <button class="btn btn-danger btn-sm"
+                                                data-id="@user.Id"
+                                                data-url="@Url.Action("Delete", "Users", new { area = "Admin" })"
+                                                data-name="@user.FirstName @user.LastName">
                                             <i class="fa fa-remove"></i>
-                                        </a>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -94,11 +98,13 @@
                                            class="btn btn-warning btn-sm me-2">
                                             <i class="fa fa-edit"></i>
                                         </a>
-                                        <a href="@Url.Action("Delete", "Users", new { area = "Admin", id = user.Id })"
-                                           class="btn btn-danger btn-sm"
-                                           onclick="return confirm('آیا مطمئن هستید؟');">
+                                                <button class="btn btn-danger btn-sm"
+                                                data-id="@user.Id"
+                                                data-url="@Url.Action("Delete", "Users", new { area = "Admin" })"
+                                                data-name="@user.FirstName @user.LastName">
                                             <i class="fa fa-remove"></i>
-                                        </a>
+                                        </button>
+
                                     </div>
                                 </div>
                             </div>
@@ -110,19 +116,66 @@
             <!-- صفحه‌بندی -->
             <nav aria-label="Page navigation">
                 <ul class="pagination pagination-sm flex-wrap justify-content-center mt-3">
-                    @for (var i = 1; i <= Model.countPage; i++)
+                    @* دکمه صفحه قبل *@
+                    <li class="page-item @(Model.currentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("Index", "Users", new { area = "Admin", pageId = Model.currentPage - 1, filterFirstName = currentFilter })">قبل</a>
+                    </li>
+
+                    @* صفحات وسطی *@
+                    @for (var i = startPage; i <= endPage; i++)
                     {
                         <li class="page-item @(i == Model.currentPage ? "active" : "")">
-                            <a class="page-link"
-                               href="@Url.Action("Index", "Users",
-                                                              new { area = "Admin", pageId = i, filterFirstName = currentFilter })">
-                            @i
-                        </a>
+                            <a class="page-link" href="@Url.Action("Index", "Users", new { area = "Admin", pageId = i, filterFirstName = currentFilter })">@i</a>
+                        </li>
+                    }
+
+                    @* دکمه صفحه بعد *@
+                    <li class="page-item @(Model.currentPage == Model.countPage ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("Index", "Users", new { area = "Admin", pageId = Model.currentPage + 1, filterFirstName = currentFilter })">بعد</a>
                     </li>
-                                        }
                 </ul>
             </nav>
         </div>
     </div>
 </div>
+<script>
+
+    
+       document.querySelectorAll(".btn-danger").forEach(function(btn){
+           
+        btn.addEventListener("click", function () {
+            const fullName = btn.dataset.name;
+            const userId = btn.dataset.id;
+            const url = btn.dataset.url + "/" + userId;
+            Swal.fire({
+                title: `آیا از حذف ${fullName} مطمئن هستید؟`,
+                text: 'این کار قابل بازگشت نیست!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'بله',
+                cancelButtonText: 'لغو',
+                heightAuto: false
+            }).then((result) => {
+                if(result.isConfirmed){
+                    fetch(url, {
+                        method: 'POST' // یا 'DELETE' بسته به کنترلر
+                    })
+                    .then(res => {
+                        if(res.ok){
+                            toastr.success(`${fullName} با موفقیت حذف شد`);
+                            // حذف ردیف جدول یا کارت
+                            btn.closest("tr")?.remove();
+                            btn.closest(".card")?.remove();
+                        } else {
+                            toastr.error('حذف انجام نشد');
+                        }
+                    })
+                    .catch(()=> toastr.error('حذف انجام نشد'));
+                }
+            });
+        });
+    });
+
+</script>
+
 

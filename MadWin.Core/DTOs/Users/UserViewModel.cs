@@ -63,8 +63,6 @@ namespace MadWin.Core.DTOs.Users
     {
         public int UserId { get; set; }
 
-
-
         [Display(Name = "نام", Prompt = "نام")]
         [Required(ErrorMessage = ErrorMessage.Required)]
         [MaxLength(100, ErrorMessage = ErrorMessage.MaxLength)]
@@ -86,7 +84,7 @@ namespace MadWin.Core.DTOs.Users
         [Display(Name = "شماره ثابت", Prompt = "شماره همراه")]
         [Required(ErrorMessage = ErrorMessage.Required)]
         [MaxLength(11, ErrorMessage = ErrorMessage.MaxLength)]
-        public string TellPhone { get; set; }
+        public string TelPhone { get; set; }
 
 
         [Display(Name = "آدرس پستی")]
@@ -98,6 +96,12 @@ namespace MadWin.Core.DTOs.Users
         [Required(ErrorMessage = ErrorMessage.Required)]
         [MaxLength(100, ErrorMessage = ErrorMessage.MaxLength)]
         public string Password { get; set; }
+
+        [Display(Name = "تکرار کلمه عبور", Prompt = "تکرار کلمه عبور")]
+        [Required(ErrorMessage = ErrorMessage.Required)]
+        [MaxLength(100, ErrorMessage = ErrorMessage.MaxLength)]
+        [Compare("Password", ErrorMessage = ErrorMessage.Compare)]
+        public string ConfirmPassword { get; set; }
     }
     #endregion
 

@@ -3,6 +3,8 @@ using MadWin.Core.DTOs.Users;
 using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
 using Microsoft.Extensions.Logging;
+using Shop2City.Core.Generator;
+using System.Reflection;
 
 namespace MadWin.Application.Services
 {
@@ -11,7 +13,7 @@ namespace MadWin.Application.Services
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher _passwordHasher;
         private readonly ISmsSenderService _smsSenderService;
-        private readonly ILogger<UserService> _logger;  
+        private readonly ILogger<UserService> _logger;
 
         public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher, ISmsSenderService smsSenderService, ILogger<UserService> logger)
         {
@@ -109,18 +111,40 @@ namespace MadWin.Application.Services
         {
             var usersIsActive = await _userRepository.GetAllAsync();
             return usersIsActive.Where(u => !u.IsDelete).Count();
-                
+
         }
 
         public async Task<UserForAdminViewModel> GetAllUsers(int pageId = 1, string filterFirstName = "")
         {
-            return await _userRepository.GetAllUsers(pageId,filterFirstName);
+            return await _userRepository.GetAllUsers(pageId, filterFirstName);
         }
 
         public async Task<EditUserViewModel> GetUserForEditAsync(int userId)
         {
             return await _userRepository.GetUserForShowEditModeAsync(userId);
         }
+
+        public async Task EditUserFromAdmin(EditUserViewModel editUser)
+        {
+            var user = await _userRepository.GetByIdAsync(editUser.UserId);
+            user.CellPhone = editUser.CellPhone;
+            user.TelPhone = editUser.TelPhone;
+            user.Address = editUser.Address;
+            user.FirstName = editUser.FirstName;
+            user.LastName = editUser.LastName;
+            if (!string.IsNullOrEmpty(editUser.Password))
+                editUser.Password = _passwordHasher.HashPassword(editUser.Password);
+            _userRepository.Update(user);
+            await _userRepository.SaveChangesAsync();
+        }
+        public async Task DeleteUserFromAdmin(int id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            user.IsDelete = true;
+            user.LastUpdateDate = DateTime.UtcNow;
+            user.Description = "توسط آقای نادری حذف شده است.";
+            _userRepository.Remove(user);
+            await _userRepository.SaveChangesAsync();
+        }
     }
 }
-

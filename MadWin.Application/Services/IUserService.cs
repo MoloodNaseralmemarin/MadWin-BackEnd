@@ -31,5 +31,9 @@ namespace MadWin.Application.Services
 
         Task<EditUserViewModel> GetUserForEditAsync(int userId);
 
+        Task EditUserFromAdmin(EditUserViewModel editUser);
+
+        Task DeleteUserFromAdmin(int id);
+
     }
 }

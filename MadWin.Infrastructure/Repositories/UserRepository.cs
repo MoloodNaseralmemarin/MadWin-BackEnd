@@ -101,12 +101,13 @@ namespace MadWin.Infrastructure.Repositories
                 .IgnoreQueryFilters()
                 .Where(u => !u.IsDelete);
 
+
             if (!string.IsNullOrEmpty(filterFirstName))
             {
                 result = result.Where(u => u.FirstName.Contains(filterFirstName));
             }
 
-            int take = 20;
+            int take = 10;
             int skip = (pageId - 1) * take;
 
             var list = new UserForAdminViewModel
@@ -114,7 +115,7 @@ namespace MadWin.Infrastructure.Repositories
                 currentPage = pageId,
                 countPage = (int)Math.Ceiling(result.Count() / (double)take),
                 users = await result
-                    .OrderBy(u => u.CreateDate)
+                    .OrderByDescending(u => u.Id)
                     .Skip(skip)
                     .Take(take)
                     .ToListAsync()
@@ -129,7 +130,7 @@ namespace MadWin.Infrastructure.Repositories
                 .Select(u => new EditUserViewModel
                 {
                     CellPhone = u.CellPhone,
-                    TellPhone = u.TelPhone,
+                    TelPhone = u.TelPhone,
                     FirstName = u.FirstName,
                     LastName = u.LastName,
                     UserId = u.Id,
