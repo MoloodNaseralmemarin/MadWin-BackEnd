@@ -54,5 +54,41 @@ namespace Shop2City.WebHost.Areas.Admin.Controllers
             return RedirectToAction("Index");
 
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var model = await _userService.GetUserForEditAsync(id);
+            if (model == null) return NotFound();
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit([FromForm] RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+            if (await _userService.IsExistCellPhoneAsync(model.CellPhone))
+            {
+                ModelState.AddModelError("CellPhone", ErrorMessage.InvalidCellPhone);
+                return View(model);
+            }
+            model.Password = _passwordHasher.HashPassword(model.Password);
+            var user = new User
+            {
+                Address = model.Address,
+                CellPhone = model.CellPhone,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Password = model.Password,
+                UserName = model.CellPhone
+
+            };
+            await _userService.CreateUser(user);
+            return RedirectToAction("Index");
+
+        }
     }
 }

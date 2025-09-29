@@ -21,5 +21,6 @@ namespace MadWin.Core.Interfaces
         Task<string> GetCellPhoneByUserIdAsync(int userId);
 
         Task<UserForAdminViewModel> GetAllUsers(int pageId = 1, string filterFirstName = "");
+        Task<EditUserViewModel> GetUserForShowEditModeAsync(int userId);
     }
 }

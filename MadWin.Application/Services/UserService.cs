@@ -116,6 +116,11 @@ namespace MadWin.Application.Services
         {
             return await _userRepository.GetAllUsers(pageId,filterFirstName);
         }
+
+        public async Task<EditUserViewModel> GetUserForEditAsync(int userId)
+        {
+            return await _userRepository.GetUserForShowEditModeAsync(userId);
+        }
     }
 }
 

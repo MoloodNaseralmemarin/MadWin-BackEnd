@@ -29,5 +29,7 @@ namespace MadWin.Application.Services
         Task<int> CountUserActive();
         Task<UserForAdminViewModel> GetAllUsers(int pageId = 1, string filterFirstName = "");
 
+        Task<EditUserViewModel> GetUserForEditAsync(int userId);
+
     }
 }

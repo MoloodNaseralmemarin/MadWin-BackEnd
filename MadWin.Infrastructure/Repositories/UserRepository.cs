@@ -121,5 +121,21 @@ namespace MadWin.Infrastructure.Repositories
             };
             return list;
         }
+
+        public async Task<EditUserViewModel> GetUserForShowEditModeAsync(int userId)
+        {
+            return await _context.Users
+                .Where(u => u.Id == userId)
+                .Select(u => new EditUserViewModel
+                {
+                    CellPhone = u.CellPhone,
+                    TellPhone = u.TelPhone,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    UserId = u.Id,
+                    Address = u.Address
+                })
+                .SingleOrDefaultAsync();
+        }
     }
 }
