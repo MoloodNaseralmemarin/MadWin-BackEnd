@@ -50,17 +50,21 @@
                             <th>نام کامل</th>
                             <th>شماره همراه</th>
                             <th>تاریخ ثبت‌نام</th>
+                            <td>تعداد سفارش</td>
+                            <td>تعداد فاکتور</td>
                             <th>دستورات</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var user in Model.users)
+                        @foreach (var user in Model.Users)
                         {
                             <tr>
                                 <td>@user.Id</td>
                                 <td>@user.FirstName @user.LastName</td>
                                 <td>@user.CellPhone</td>
                                 <td>@user.CreateDate.ToShamsi()</td>
+                                <td>@user.OrderCount</td>
+                                <td>@user.FactorCount</td>
                                 <td>
                                     <div class="btn-group">
                                         <a href="@Url.Action("Edit", "Users", new { area = "Admin", id = user.Id })"
@@ -84,7 +88,7 @@
             <!-- نمایش به صورت کارت (فقط موبایل) -->
             <div class="d-block d-md-none">
                 <div class="row g-2">
-                    @foreach (var user in Model.users)
+                    @foreach (var user in Model.Users)
                     {
                         <div class="col-12">
                             <div class="card shadow-sm">
@@ -93,6 +97,8 @@
                                     <p class="card-text mb-1"><strong>شناسه:</strong> @user.Id</p>
                                     <p class="card-text mb-1"><strong>شماره همراه:</strong> @user.CellPhone</p>
                                     <p class="card-text mb-1"><strong>تاریخ ثبت‌نام:</strong> @user.CreateDate.ToShamsi()</p>
+                                    <p class="card-text mb-1"><strong>تعداد سفارش:</strong> @user.OrderCount</p>
+                                    <p class="card-text mb-1"><strong>تعدا فاکتور</strong> @user.FactorCount</p>
                                     <div class="d-flex justify-content-end mt-2">
                                         <a href="@Url.Action("Edit", "Users", new { area = "Admin", id = user.Id })"
                                            class="btn btn-warning btn-sm me-2">

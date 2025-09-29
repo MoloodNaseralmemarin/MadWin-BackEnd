@@ -43,7 +43,7 @@ namespace MadWin.Core.Entities.Users
         public virtual List<Product> Products { get; set; }
         public virtual List<Factor> Factors { get; set; }
 
-        public virtual List<Order> OrderModels { get; set; }
+        public virtual List<Order> Orders { get; set; }
 
         public List<LoginHistory> LoginHistories { get; set; }
         #endregion

@@ -99,8 +99,9 @@ namespace MadWin.Infrastructure.Repositories
         {
             IQueryable<User> result = GetQuery()
                 .IgnoreQueryFilters()
-                .Where(u => !u.IsDelete);
-
+                .Where(u => !u.IsDelete)
+                .Include(u => u.Orders)
+                .Include(u => u.Factors);
 
             if (!string.IsNullOrEmpty(filterFirstName))
             {
@@ -114,15 +115,25 @@ namespace MadWin.Infrastructure.Repositories
             {
                 currentPage = pageId,
                 countPage = (int)Math.Ceiling(result.Count() / (double)take),
-                users = await result
+                Users = await result
                     .OrderByDescending(u => u.Id)
                     .Skip(skip)
                     .Take(take)
+                    .Select(u => new UserForAdminItemViewModel
+                    {
+                        Id = u.Id,
+                        FirstName = u.FirstName,
+                        LastName = u.LastName,
+                        CellPhone=u.CellPhone,
+                        CreateDate=u.CreateDate,
+                        OrderCount = u.Orders.Count(),
+                        FactorCount = u.Factors.Count()
+                    })
                     .ToListAsync()
             };
+
             return list;
         }
-
         public async Task<EditUserViewModel> GetUserForShowEditModeAsync(int userId)
         {
             return await _context.Users

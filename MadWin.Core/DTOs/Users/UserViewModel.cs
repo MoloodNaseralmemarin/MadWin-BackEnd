@@ -6,14 +6,28 @@ using System.ComponentModel.DataAnnotations;
 namespace MadWin.Core.DTOs.Users
 {
     #region UserForAdminViewModel
+
+    public class UserForAdminItemViewModel
+    {
+        public int Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+
+        public string CellPhone { get; set; }
+
+        public DateTime CreateDate { get; set; }
+
+        public int OrderCount { get; set; }
+        public int FactorCount { get; set; }
+    }
     public class UserForAdminViewModel
     {
-        public List<User> users { get; set; }
+        public List<UserForAdminItemViewModel> Users { get; set; }
 
         public int currentPage { get; set; }
-
         public int countPage { get; set; }
     }
+
     #endregion
     #region CreateUserViewModel
     public class CreateUserViewModel
