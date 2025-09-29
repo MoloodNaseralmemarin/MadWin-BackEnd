@@ -2,6 +2,7 @@
 using MadWin.Core.Entities.CurtainComponents;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Shop2City.WebHost.ViewModels.CurtainComponents;
 using System.Threading.Tasks;
 
@@ -42,33 +43,26 @@ namespace Shop2City.WebHost.Areas.Admin.Controllers
             return View(vm);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(CurtainComponentEditViewModel vm)
+        public async Task<JsonResult> UpdateInline(int Id, string Name, string Cost)
         {
-            // اعتبارسنجی سمت سرور
-            if (!ModelState.IsValid)
-                return View(vm);
-
-            // نگاشت ViewModel -> Entity
-            var curtainComponent = new CurtainComponent
+            try
             {
-                Id = vm.Id,
-                Name = vm.Name,
-                Cost = vm.Cost,
-            };
+                var item =await _curtainComponentService.GetByIdAsync(Id);
+                if (item == null)
+                    return Json(new { success = false });
 
-            // فراخوانی سرویس برای بروزرسانی
-            var success = await _curtainComponentService.EditCurtainComponentAsync(curtainComponent);
+                item.Name = Name;
+                item.Cost = decimal.Parse(Cost);
+                item.LastUpdateDate = DateTime.Now;
 
-            if (!success)
-            {
-                // اگر مشتری پیدا نشد یا خطایی رخ داد
-                ModelState.AddModelError("", "خطایی در بروزرسانی اطلاعات مشتری رخ داد.");
-                return View(vm);
+                await _curtainComponentService.EditCurtainComponentAsync(item);
+                return Json(new { success = true });
             }
-
-            TempData["Success"] = "اطلاعات مشتری با موفقیت بروزرسانی شد.";
-            return RedirectToAction(nameof(Index)); // برگرد به لیست مشتری‌ها
+            catch
+            {
+                return Json(new { success = false });
+            }
         }
+
     }
 }

@@ -1,26 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MadWin.Core.DTOs.DisCounts
 {
-    public class DisCountViewModel
+    public class DiscountForAdminItemViewModel
     {
-        public int id { get; set; }
-        public DateTime createDate { get; set; }
-        public string item { get; set; }
+        public int Id { get; set; }
 
-        public int disCountPercent { get; set; }
+        public DateTime CreateDate { get; set; }
+        [Display(Name = "عنوان")]
+        public string Item { get; set; } //O سسفارش با انداره دلخواه -D// سفارش آماده
 
-        public string disCountCode { get; set; }
+        [Display(Name = "کد تخفیف")]
+        public string DiscountCode { get; set; }
 
-        public int useableCount { get; set; }
-        public DateTime startDate {get;set;}
-        public DateTime endDate { get; set; }
-        public string isInactive { get; set; }
+        [Display(Name = "درصد کد تخفیف")]
+        public int Percentage { get; set; }
 
+        [Display(Name = "تعداد")]
+        public int UseableCount { get; set; }
+
+        [Display(Name = "تاریخ شروع")]
+        public DateTime StartDate { get; set; }
+
+        [Display(Name = "تاریخ پایان")]
+        public DateTime ExpiryDate { get; set; }
+
+        public string Description {  get; set; }
+    }
+
+    public class DiscountForAdminViewModel
+    {
+        public List<DiscountForAdminItemViewModel> Discounts { get; set; }
+
+        public int CurrentPage { get; set; }
+        public int CountPage { get; set; }
     }
 
     public class DiscountResult

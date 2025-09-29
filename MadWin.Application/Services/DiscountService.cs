@@ -2,6 +2,7 @@
 using MadWin.Application.DTOs.Discounts;
 using MadWin.Core.DTOs.DisCounts;
 using MadWin.Core.DTOs.Orders;
+using MadWin.Core.DTOs.Users;
 using MadWin.Core.Entities.CommissionRates;
 using MadWin.Core.Entities.Discounts;
 using MadWin.Core.Entities.Users;
@@ -123,10 +124,9 @@ namespace MadWin.Application.Services
             return DiscountUseType.Success;
         }
 
-        public async Task<IEnumerable<Discount>> GetAllDiscountAsync()
+        public async Task<DiscountForAdminViewModel> GetAllDiscountsAsync(int pageId = 1)
         {
-            var curtainComponent = await _discountRepository.GetAllAsync();
-            return curtainComponent;
+            return await _discountRepository.GetAllDiscountsAsync(pageId);
         }
 
         public async Task<Discount> GetByIdAsync(int id)

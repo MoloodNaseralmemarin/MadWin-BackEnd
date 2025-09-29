@@ -1,4 +1,6 @@
-﻿using MadWin.Core.Entities.Discounts;
+﻿
+using MadWin.Core.DTOs.DisCounts;
+using MadWin.Core.Entities.Discounts;
 using MadWin.Core.Lookups.Discounts;
 
 namespace MadWin.Core.Interfaces
@@ -13,5 +15,6 @@ namespace MadWin.Core.Interfaces
         Task<bool> HasUserUsedDiscountAsync(int userId, int discountId, int orderId);
 
         Task<bool> IsExistDisCountCode(string discountcode);
+        Task<DiscountForAdminViewModel> GetAllDiscountsAsync(int pageId = 1);
     }
 }

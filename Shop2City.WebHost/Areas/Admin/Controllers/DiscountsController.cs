@@ -15,10 +15,10 @@ namespace Shop2City.WebHost.Areas.Admin.Controllers
         {
             _discountService = discountService;   
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageId = 1)
         {
-            var discounts = await _discountService.GetAllDiscountAsync();
-            return View(discounts);
+            var allDiscounts = await _discountService.GetAllDiscountsAsync(pageId);
+            return View(allDiscounts);
         }
 
         [HttpGet]
