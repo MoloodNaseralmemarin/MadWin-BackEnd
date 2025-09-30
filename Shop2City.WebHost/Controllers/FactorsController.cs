@@ -49,8 +49,6 @@ namespace Shop2City.WebHost.Controllers
 
             return Json(new { success = true, data = updatedList });
         }
-
-
         #endregion
 
         [HttpGet]

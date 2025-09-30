@@ -79,150 +79,153 @@ namespace MadWin.Application.Services
         // متدی برای ارسال پیامک برای مشتری
         public async Task<bool> SendSMSOrderForCustomerAsync(string cellPhone, int orderId)
         {
-            string equalParts;
-            var order = await _orderRepository.GetOrderSummaryByOrderIdAsync(orderId);
-            var s = _orderWidthPartRepository.GetStringAsync(orderId);
-            var message = $"{order.Count} عدد پرده آهنربایی {order.CategoryGroup} به ابعاد {order.SizeSMS} به صورت {order.PartCount} قسمت {order.IsEqualParts} از چپ به راست{order.WidthParts} با کد پیگیری {order.OrderId} برای شما ثبت گردید.";
+            //string equalParts;
+            //var order = await _orderRepository.GetOrderSummaryByOrderIdAsync(orderId);
+            //var s = _orderWidthPartRepository.GetStringAsync(orderId);
+            //var message = $"{order.Count} عدد پرده آهنربایی {order.CategoryGroup} به ابعاد {order.SizeSMS} به صورت {order.PartCount} قسمت {order.IsEqualParts} از چپ به راست{order.WidthParts} با کد پیگیری {order.OrderId} برای شما ثبت گردید.";
 
-            if (order.IsEqualParts)
-            {
-                equalParts = "مساوی";
-            }
-            else
-            {
-                equalParts = "نامساوی";
-            }
-            try
-            {
-                var otpsms = new Api(_smsSettings.ApiKey);
-                var result = await otpsms.VerifyAsync(1, "MadWinGetOrderForCustomer",
-                    new string[]
-                    { cellPhone },
-                    order.Count.ToString(),
-                    order.CategoryGroup,
-                    order.SizeSMS,
-                    order.PartCount + " قسمت " + equalParts + " از راست به چپ " + s, order.OrderId.ToString());
+            //if (order.IsEqualParts)
+            //{
+            //    equalParts = "مساوی";
+            //}
+            //else
+            //{
+            //    equalParts = "نامساوی";
+            //}
+            //try
+            //{
+            //    var otpsms = new Api(_smsSettings.ApiKey);
+            //    var result = await otpsms.VerifyAsync(1, "MadWinGetOrderForCustomer",
+            //        new string[]
+            //        { cellPhone },
+            //        order.Count.ToString(),
+            //        order.CategoryGroup,
+            //        order.SizeSMS,
+            //        order.PartCount + " قسمت " + equalParts + " از راست به چپ " + s, order.OrderId.ToString());
 
-                if (result != null)
-                {
-                    await SaveSmsAsync(cellPhone, "MadWinGetOrderForCustomer", message, "سفارش دهنده", 4, "200", orderId, null);
-                    _logger.LogInformation("پیامک ثبت سفارش توسط مشتری با موفقیت ارسال شد.");
-                    return true;
-                }
-                else
-                {
-                    _logger.LogWarning("ارسال پیامک ثبت سفارش توسط مشتری با خطا مواجه شد. نتیجه خالی بود.");
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "خطا در ارسال پیامک سفارش مشتری‌.");
-                return false;
-            }
+            //    if (result != null)
+            //    {
+            //        await SaveSmsAsync(cellPhone, "MadWinGetOrderForCustomer", message, "سفارش دهنده", 4, "200", orderId, null);
+            //        _logger.LogInformation("پیامک ثبت سفارش توسط مشتری با موفقیت ارسال شد.");
+            //        return true;
+            //    }
+            //    else
+            //    {
+            //        _logger.LogWarning("ارسال پیامک ثبت سفارش توسط مشتری با خطا مواجه شد. نتیجه خالی بود.");
+            //        return false;
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logger.LogError(ex, "خطا در ارسال پیامک سفارش مشتری‌.");
+            //    return false;
+            //}
+            return true;
         }
 
         // متدی برای ارسال پیامک برای تولید
         public async Task<bool> SendSMSOrderForProductionAsync(string cellPhone, int orderId)
         {
-            //2 عدد پرده آهنربایی طلقی توری به ابعاد 230 * 120 به صورت 2 قسمت نامساوی از چپ به راست(10 - 10) با کد پیگیری 1252 .
-            //با تشکر وین ماد
-            // لغو 11
-            string equalParts;
-            var order = await _orderRepository.GetOrderSummaryByOrderIdAsync(orderId);
-            var s = _orderWidthPartRepository.GetStringAsync(orderId);
-            var message = $"{order.Count} عدد پرده آهنربایی {order.CategoryGroup} به ابعاد {order.SizeSMS} به صورت {order.PartCount} قسمت {order.IsEqualParts} از چپ به راست{order.WidthParts} با کد پیگیری {order.OrderId} برای شما ثبت گردید.";
+            ////2 عدد پرده آهنربایی طلقی توری به ابعاد 230 * 120 به صورت 2 قسمت نامساوی از چپ به راست(10 - 10) با کد پیگیری 1252 .
+            ////با تشکر وین ماد
+            //// لغو 11
+            //string equalParts;
+            //var order = await _orderRepository.GetOrderSummaryByOrderIdAsync(orderId);
+            //var s = _orderWidthPartRepository.GetStringAsync(orderId);
+            //var message = $"{order.Count} عدد پرده آهنربایی {order.CategoryGroup} به ابعاد {order.SizeSMS} به صورت {order.PartCount} قسمت {order.IsEqualParts} از چپ به راست{order.WidthParts} با کد پیگیری {order.OrderId} برای شما ثبت گردید.";
 
-            if (order.IsEqualParts)
-            {
-                equalParts = "مساوی";
-            }
-            else
-            {
-                equalParts = "نامساوی";
-            }
+            //if (order.IsEqualParts)
+            //{
+            //    equalParts = "مساوی";
+            //}
+            //else
+            //{
+            //    equalParts = "نامساوی";
+            //}
 
-            try
-            {
-                var otpsms = new Api(_smsSettings.ApiKey);
-                var result = await otpsms.VerifyAsync(1, "MadWinGetOrderForProduction",
-                    new string[]
-                    { cellPhone },
-                    order.Count.ToString(),
-                    order.CategoryGroup,
-                    order.SizeSMS,
-                    order.PartCount + " قسمت " + equalParts + " از راست به چپ " + s, order.OrderId.ToString());
+            //try
+            //{
+            //    var otpsms = new Api(_smsSettings.ApiKey);
+            //    var result = await otpsms.VerifyAsync(1, "MadWinGetOrderForProduction",
+            //        new string[]
+            //        { cellPhone },
+            //        order.Count.ToString(),
+            //        order.CategoryGroup,
+            //        order.SizeSMS,
+            //        order.PartCount + " قسمت " + equalParts + " از راست به چپ " + s, order.OrderId.ToString());
 
 
-                if (result != null)
-                {
-                    await SaveSmsAsync(cellPhone, "MadWinGetOrderForProduction", message, "تولید کننده", 4, "200", orderId, null);
-                    _logger.LogInformation("پیامک ثبت سفارش برای تولید کننده با موفقیت ارسال شد.");
-                    return true;
-                }
-                else
-                {
-                    _logger.LogWarning("ارسال پیامک ثبت سفارش برای مدیر با خطا مواجه شد. نتیجه خالی بود.");
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "خطا در ارسال پیامک سفارش مشتری‌.");
-                return false;
-            }
+            //    if (result != null)
+            //    {
+            //        await SaveSmsAsync(cellPhone, "MadWinGetOrderForProduction", message, "تولید کننده", 4, "200", orderId, null);
+            //        _logger.LogInformation("پیامک ثبت سفارش برای تولید کننده با موفقیت ارسال شد.");
+            //        return true;
+            //    }
+            //    else
+            //    {
+            //        _logger.LogWarning("ارسال پیامک ثبت سفارش برای مدیر با خطا مواجه شد. نتیجه خالی بود.");
+            //        return false;
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logger.LogError(ex, "خطا در ارسال پیامک سفارش مشتری‌.");
+            //    return false;
+            //}
+            return true;
         }
 
         //
         public async Task<bool> SendSMSOrderForManagerAsync(string cellPhone, int orderId)
         {
-            //2 عدد پرده آهنربایی طلقی توری به ابعاد 230 * 120 به صورت 2 قسمت نامساوی از چپ به راست(10 - 10) با کد پیگیری 1252 .
-            //با تشکر وین ماد
-            // لغو 11
-            string equalParts;
-            var order = await _orderRepository.GetOrderSummaryByOrderIdAsync(orderId);
-            var s = _orderWidthPartRepository.GetStringAsync(orderId);
-            var message = $"{order.Count} عدد پرده آهنربایی {order.CategoryGroup} به ابعاد {order.SizeSMS} به صورت {order.PartCount} قسمت {order.IsEqualParts} از چپ به راست{order.WidthParts} با کد پیگیری {order.OrderId} برای شما ثبت گردید.";
+            ////2 عدد پرده آهنربایی طلقی توری به ابعاد 230 * 120 به صورت 2 قسمت نامساوی از چپ به راست(10 - 10) با کد پیگیری 1252 .
+            ////با تشکر وین ماد
+            //// لغو 11
+            //string equalParts;
+            //var order = await _orderRepository.GetOrderSummaryByOrderIdAsync(orderId);
+            //var s = _orderWidthPartRepository.GetStringAsync(orderId);
+            //var message = $"{order.Count} عدد پرده آهنربایی {order.CategoryGroup} به ابعاد {order.SizeSMS} به صورت {order.PartCount} قسمت {order.IsEqualParts} از چپ به راست{order.WidthParts} با کد پیگیری {order.OrderId} برای شما ثبت گردید.";
 
 
-            if (order.IsEqualParts)
-            {
-                equalParts = "مساوی";
-            }
-            else
-            {
-                equalParts = "نامساوی";
-            }
+            //if (order.IsEqualParts)
+            //{
+            //    equalParts = "مساوی";
+            //}
+            //else
+            //{
+            //    equalParts = "نامساوی";
+            //}
 
-            try
-            {
-                var otpsms = new Api(_smsSettings.ApiKey);
-                var result = await otpsms.VerifyAsync(1, "MadWinGetOrderForManager",
-                    new string[]
-                    { cellPhone },
-                    order.Count.ToString(),
-                    order.CategoryGroup,
-                    order.SizeSMS,
-                    order.PartCount + " قسمت " + equalParts + " از راست به چپ " + s, order.OrderId.ToString(), order.FullName);
+            //try
+            //{
+            //    var otpsms = new Api(_smsSettings.ApiKey);
+            //    var result = await otpsms.VerifyAsync(1, "MadWinGetOrderForManager",
+            //        new string[]
+            //        { cellPhone },
+            //        order.Count.ToString(),
+            //        order.CategoryGroup,
+            //        order.SizeSMS,
+            //        order.PartCount + " قسمت " + equalParts + " از راست به چپ " + s, order.OrderId.ToString(), order.FullName);
 
 
-                if (result != null)
-                {
-                    await SaveSmsAsync(cellPhone, "MadWinGetOrderForManager", message, "مدیریت", 4, "200", orderId, null);
-                    _logger.LogInformation("پیامک ثبت سفارش برای تولید کننده با موفقیت ارسال شد.");
-                    return true;
-                }
-                else
-                {
-                    _logger.LogWarning("ارسال پیامک ثبت سفارش برای تولید کننده با خطا مواجه شد. نتیجه خالی بود.");
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "خطا در ارسال پیامک سفارش مشتری‌.");
-                return false;
-            }
+            //    if (result != null)
+            //    {
+            //        await SaveSmsAsync(cellPhone, "MadWinGetOrderForManager", message, "مدیریت", 4, "200", orderId, null);
+            //        _logger.LogInformation("پیامک ثبت سفارش برای تولید کننده با موفقیت ارسال شد.");
+            //        return true;
+            //    }
+            //    else
+            //    {
+            //        _logger.LogWarning("ارسال پیامک ثبت سفارش برای تولید کننده با خطا مواجه شد. نتیجه خالی بود.");
+            //        return false;
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logger.LogError(ex, "خطا در ارسال پیامک سفارش مشتری‌.");
+            //    return false;
+            //}
+            return false;
         }
 
 

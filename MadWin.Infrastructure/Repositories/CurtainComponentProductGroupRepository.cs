@@ -1,16 +1,9 @@
 ﻿using MadWin.Core.DTOs.Calculations;
-using MadWin.Core.Entities.CommissionRates;
 using MadWin.Core.Entities.CurtainComponents;
-using MadWin.Core.Entities.Orders;
 using MadWin.Core.Interfaces;
 using MadWin.Infrastructure.Context;
-using MadWin.Infrastructure.DTOs.Calculations;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace MadWin.Infrastructure.Repositories
 {

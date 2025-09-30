@@ -1,9 +1,6 @@
 ﻿using MadWin.Application.Services;
 using MadWin.Core.DTOs.Orders;
-using MadWin.Core.Lookups.DeliveryMethods;
 using Microsoft.AspNetCore.Mvc;
-using Shop2City.WebHost.ViewModels.DeliveryMethods;
-using Shop2City.WebHost.ViewModels.Orders;
 
 namespace Shop2City.WebHost.ViewComponents
     {
@@ -18,19 +15,18 @@ namespace Shop2City.WebHost.ViewComponents
                 _deliveryMethodService = deliveryMethodService;
             }
 
-            public async Task<IViewComponentResult> InvokeAsync(int pageNumber = 1, int pageSize = 10)
+            public async Task<IViewComponentResult> InvokeAsync(int pageId = 1)
             {
-                var orders = await _orderService.GetTodayOrdersAsync(pageNumber, pageSize)
-                             ?? new PagedResult<OrderSummaryDto> { Items = new List<OrderSummaryDto>(), TotalCount = 0 };
+            var orders = await _orderService.GetTodayOrdersAsync(pageId);
+            var deliveryMethods = await _deliveryMethodService.GetDeliveryMethodInfoAsync();
 
-                var deliveryMethods = await _deliveryMethodService.GetDeliveryMethodInfoAsync()
-                                      ?? new List<DeliveryMethodInfoLookup>();
+            var vm = new OrderSummaryViewModel
+            {
+                OrderSummaryForAdmin = orders,
+                DeliveryMethods = deliveryMethods,
 
-                var vm = new OrderSummaryPageViewModel
-                {
-                    OrderSummary = orders,
-                    DeliveryMethods = deliveryMethods
-                };
+            };
+            
 
             return await Task.FromResult((IViewComponentResult)View("OrderSummary", vm));
         }

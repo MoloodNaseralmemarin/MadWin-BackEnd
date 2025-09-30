@@ -1,14 +1,10 @@
 ﻿using MadWin.Core.Common;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MadWin.Application.DTOs.Orders
+
+namespace MadWin.Core.DTOs.Orders
 {
-    public class CreateOrderInitialDto
+    public class CreateDto
     {
         [Display(Name = "گروه اصلی")]
         [Required(ErrorMessage = "انتخاب گروه اصلی الزامی می باشد")]
@@ -48,20 +44,5 @@ namespace MadWin.Application.DTOs.Orders
         public decimal CommissionAmount { get; set; }
 
         public List<int> WidthParts { get; set; }
-    }
-
-    public class OrderForUserPanelDto
-    {
-        public int OrderId { get; set; }
-        public string CategoryTitle { get; set; }
-        public string SubCategoryTitle { get; set; }
-        public string UserFullName { get; set; }
-        public List<OrderDetailDto> Details { get; set; }
-    }
-    public class OrderDetailDto
-    {
-        public int ProductId { get; set; }
-        // public string ProductName { get; set; }
-        //public int Quantity { get; set; }
     }
 }

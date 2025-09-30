@@ -13,19 +13,15 @@ namespace MadWin.Core.Interfaces
 
         Task UpdatePriceAndDeliveryAsync(int deliveryId,int orderId);
 
-        Task<OrderSummaryDto> GetOrderSummaryByOrderIdAsync(int orderId);
-
-        Task<IEnumerable<OrderSummaryDto>> GetOrderSummaryByUserIdAsync(int userId);
         Task<Order> GetOrderByOrderIdAsync(int orderId);
 
         Task<OrderInfoLookup> GetOrderInfoByOrderIdAsync(int orderId);
         Task<int> CountOrders();
-        Task<PagedResult<OrderSummaryDto>> GetOrderSummaryAsync(OrderFilterParameters filter);
-
-        Task<PagedResult<OrderSummaryDto>> GetTodayOrdersAsync(int PageNumber = 1, int PageSize = 10);
 
         Task SoftDeleteFromOrderAsync(IEnumerable<int> orderIds);
 
         Task<IEnumerable<CurtainComponentDetail>> GetByOrderIdAsync(int orderId);
+
+        Task<OrderSummaryForAdminDto> GetTodayOrdersAsync(int pageId = 1);
     }
 }

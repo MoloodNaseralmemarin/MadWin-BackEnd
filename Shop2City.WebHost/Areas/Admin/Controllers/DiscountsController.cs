@@ -1,5 +1,8 @@
 ﻿using MadWin.Application.Services;
+using MadWin.Core.DTOs.DisCounts;
 using MadWin.Core.Entities.CommissionRates;
+using MadWin.Core.Entities.Discounts;
+using MadWin.Infrastructure.Convertors;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shop2City.WebHost.ViewModels.CommissionRates;
@@ -20,7 +23,28 @@ namespace Shop2City.WebHost.Areas.Admin.Controllers
             var allDiscounts = await _discountService.GetAllDiscountsAsync(pageId);
             return View(allDiscounts);
         }
+        [HttpGet]
+        public IActionResult Create() => View();
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([FromForm] AddDiscountForAdminViewModel model,string startDate,string expiryDate)
+        {
+            model.StartDate = ConvertDateTime.ToGreDateTime(startDate);
+            model.ExpiryDate = ConvertDateTime.ToGreDateTime(expiryDate);
+            var discount = new Discount
+            {
+                ExpiryDate=model.ExpiryDate,
+                StartDate=model.StartDate,
+                DiscountCode=model.DiscountCode,
+                Item = model.Item,
+                Percentage = model.Percentage,
+                UseableCount = model.UseableCount,
+            };
+            await _discountService.AddDiscount(discount);
+            return RedirectToAction("Index");
+
+        }
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {

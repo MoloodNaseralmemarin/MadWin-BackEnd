@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MadWin.Application.ViewModels.Account
+namespace Shop2City.WebHost.ViewModels.Account
 {
     public class RegisterViewModel
     {

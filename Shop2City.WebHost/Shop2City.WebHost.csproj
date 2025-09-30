@@ -25,6 +25,7 @@
   <ItemGroup>
     <None Include="Pages\_ViewImports.cshtml" />
     <None Include="Pages\_ViewStart.cshtml" />
+    <None Include="wwwroot\js\OrderSummary.js" />
   </ItemGroup>
 
   <ItemGroup>

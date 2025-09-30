@@ -24,6 +24,8 @@
 <!--Footer End-->
     <!-- JS Part Start-->
         <partial name="_JS"/>
-    @RenderSection("Scripts", required: false)
+   
+    @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

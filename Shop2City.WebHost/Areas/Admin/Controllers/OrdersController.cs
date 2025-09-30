@@ -21,16 +21,16 @@ namespace Shop2City.Web.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(OrderFilterParameters filter, int pageNumber = 1, int pageSize = 12)
         {
-            var result = await _orderService.GetOrderSummaryAsync(filter);
+            //var result = await _orderService.GetOrderSummaryAsync(filter);
 
-            var vm = new OrderSummaryForAdminViewModel
-            {
-                Filter = filter,
-                OrderSummary = result,
-                CurrentPage = pageNumber,
-                TotalPages = (int)Math.Ceiling((double)result.TotalCount / pageSize)
-            };
-            return View(vm);
+            //var vm = new OrderSummaryForAdminViewModel
+            //{
+            //    Filter = filter,
+            //    OrderSummary = result,
+            //    CurrentPage = pageNumber,
+            //    TotalPages = (int)Math.Ceiling((double)result.TotalCount / pageSize)
+            //};
+            return View();
         }
 
 

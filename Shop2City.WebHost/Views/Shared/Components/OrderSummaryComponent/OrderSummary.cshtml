@@ -1,214 +1,206 @@
 ﻿@using MadWin.Core.DTOs.Orders
 @using Shop2City.Core.Convertors
-@using Shop2City.WebHost.ViewModels.Orders
-@model OrderSummaryPageViewModel
+@model OrderSummaryViewModel
 
+@Html.AntiForgeryToken() <!-- توکن CSRF -->
 
 <div class="container mt-3">
-    <h4 class="mb-3">سفارشات امروز <span class="badge bg-primary">@Model.OrderSummary.TotalCount</span></h4>
+    <h4 class="mb-3">
+        سفارشات امروز
+        <span class="badge bg-primary">@Model.OrderSummaryForAdmin.OrderSummary?.Count ?? 0</span>
+    </h4>
 
-    @if (Model.OrderSummary.Items.Any())
+    @if (Model.OrderSummaryForAdmin.OrderSummary == null || !Model.OrderSummaryForAdmin.OrderSummary.Any())
     {
+        <p>هیچ سفارشی برای امروز ثبت نشده است.</p>
+    }
+    else
+    {
+        <!-- Hidden orderId -->
+        <input type="hidden" class="orderId" value="@Model.OrderSummaryForAdmin.OrderSummary.First().OrderId" />
+
         <!-- جدول دسکتاپ -->
         <div class="table-responsive d-none d-md-block">
-            <table class="table table-bordered table-hover align-middle">
+            <table class="table table-bordered table-hover order-table align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th>کد</th>
+                        <th><input type="checkbox" id="selectAll"/></th>
                         <th>تاریخ</th>
-                        <th>نام مشتری</th>
-                        <th>دسته‌بندی</th>
-                        <th>اندازه</th>
+                        <th>ساعت</th>
+                        <th>نام محصول</th>
                         <th>تعداد</th>
-                        <th>قیمت</th>
+                        <th>قیمت واحد</th>
+                        <th>قیمت کل</th>
+                        <th>عملیات</th>
                     </tr>
                 </thead>
                 <tbody>
-                @foreach (var order in Model.OrderSummary.Items)
-                {
+                    @foreach (var item in Model.OrderSummaryForAdmin.OrderSummary)
+                    {
+                        var statusClass = item.IsEqualParts ? "bg-success text-white" : "bg-warning text-dark";
+
+                        <tr>
+                            <td rowspan="2"><input type="checkbox" class="delete-checkbox" value="@item.OrderId" /></td>
+                            <td>@item.CreateDate.ToShamsi()</td>
+                            <td>@item.CreateDate.ToString("HH:mm:ss")</td>
+                            <td>@item.CategoryGroup</td>
+                            <td><span class="badge bg-info">@item.Count</span></td>
+                            <td><span>@item.PriceWithFee.ToString("N0") ریال</span></td>
+                            <td><span>@((item.PriceWithFee * item.Count).ToString("N0")) ریال</span></td>
+                            <td rowspan="2" class="text-center align-middle ">
+                                <a onclick="removeItems(@item.OrderId)">
+                                    <i class="fa fa-trash text-danger"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>@(item.IsEqualParts ? "قطعات مساوی هستند" : "قطعات اندازه‌های مختلف دارند")</td>
+                            <td>تعداد قطعات: @item.PartCount</td>
+                            <td>@item.Size</td>
+                            <td colspan="3">
+                                موقعیت قطعات:
+                                @for (int i = 0; i < item.WidthParts.Count; i++)
+                                {
+                                    string position = item.WidthParts.Count == 3
+                                    ? (i == 0 ? "چپ" : i == 1 ? "وسط" : "راست")
+                                    : (i % 2 == 0 ? "راست" : "چپ");
+                                    <span class="d-inline-block me-3"><strong>@position:</strong> @item.WidthParts[i].WidthValue</span>
+                                }
+                            </td>
+                        </tr>
+                    }
                     <tr>
-                        <td>@order.OrderId</td>
-                        <td>@order.CreateDate.ToShamsi()</td>
-                        <td>@order.FullName</td>
-                        <td>@order.CategoryGroup</td>
-                        <td>@order.Size</td>
-                        <td>@order.Count</td>
-                        <td>@order.PriceWithFee.ToString("N0") ریال</td>
+                        <td colspan="8">
+                            <i class="fas fa-trash text-danger"></i>
+                        </td>
+                     </tr> 
+                    <!-- بخش انتخاب روش ارسال -->
+                    <tr>
+                        <td colspan="2"><strong>روش ارسال:</strong></td>
+                        <td colspan="6">
+                            <div class="radio-groups">
+                                @foreach (var delivery in Model.DeliveryMethods)
+                                {
+                                    <input type="radio" name="selection" value="@delivery.DeliveryId" id="delivery_@delivery.DeliveryId" />
+                                    <label for="delivery_@delivery.DeliveryId">@delivery.Name</label>
+                                }
+                            </div>
+                        </td>
                     </tr>
-                }
+
+                    <!-- بخش کد تخفیف -->
+                    <tr>
+                        <td colspan="2"><strong>کد تخفیف:</strong></td>
+                        <td colspan="6" class="mt-2">
+                            <input type="text" class="discountCode form-control" />
+                            <button id="applyDiscountBtnMobile" class="btn btn-primary w-100 py-2">
+                                اعمال کد تخفیف
+                            </button>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
 
         <!-- کارت موبایل -->
         <div class="d-block d-md-none">
-            @foreach (var order in Model.OrderSummary.Items)
+            @foreach (var item in Model.OrderSummaryForAdmin.OrderSummary)
             {
+                var statusBg = item.IsEqualParts ? "bg-success text-white" : "bg-warning text-dark";
                 <div class="card mb-3 shadow-sm border-0">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <span>@order.CategoryGroup</span>
-                        <small>@order.CreateDate.ToShamsi()</small>
+                    <div class="card-header @statusBg d-flex justify-content-between align-items-center">
+                        <span>@item.CategoryGroup</span>
+                        <small>@item.CreateDate.ToShamsi() - @item.CreateDate.ToString("HH:mm:ss")</small>
                     </div>
                     <div class="card-body">
-                        <div class="row mb-1">
-                            <div class="col-6"><strong>کد:</strong> @order.OrderId</div>
-                            <div class="col-6"><strong>نام مشتری:</strong> @order.FullName</div>
+                        <div class="row mb-2">
+                            <div class="col-6"><strong>تعداد انتخاب‌شده:</strong> <span class="badge bg-info">@item.Count</span></div>
+                            <div class="col-6"><strong>وضعیت قطعات:</strong> @(item.IsEqualParts ? "قطعات مساوی هستند" : "قطعات اندازه‌های مختلف دارند")</div>
                         </div>
-                        <div class="row mb-1">
-                            <div class="col-6"><strong>اندازه:</strong> @order.Size</div>
-                            <div class="col-6"><strong>تعداد:</strong> @order.Count</div>
+                        <div class="row mb-2">
+                            <div class="col-6"><strong>قیمت واحد:</strong> <span class="badge bg-secondary">@item.PriceWithFee.ToString("N0") ریال</span></div>
+                            <div class="col-6"><strong>قیمت کل:</strong> <span class="badge bg-primary">@((item.PriceWithFee * item.Count).ToString("N0")) ریال</span></div>
                         </div>
-                        <div class="row mb-1">
-                            <div class="col-12"><strong>قیمت:</strong> @order.PriceWithFee.ToString("N0") ریال</div>
+                        <div class="row mb-2">
+                            <div class="col-6"><strong>ابعاد (ارتفاع × عرض):</strong> @item.Size</div>
+                            <div class="col-6"><strong>تعداد قطعات:</strong> @item.PartCount</div>
+                        </div>
+
+                        @if (item.WidthParts.Count > 0)
+                        {
+                            <div class="mt-2">
+                                <strong>محل نصب و عرض:</strong>
+                                <div class="row">
+                                    @for (int i = 0; i < item.WidthParts.Count; i++)
+                                    {
+                                        string position = item.WidthParts.Count == 3
+                                        ? (i == 0 ? "چپ" : i == 1 ? "وسط" : "راست")
+                                        : (i % 2 == 0 ? "راست" : "چپ");
+                                        <div class="col-6 mb-1">
+                                            <span class="fw-bold">@position:</span> @item.WidthParts[i].WidthValue
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <div class="mt-2 d-flex justify-content-end">
+                            <a href="#" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i> حذف</a>
                         </div>
                     </div>
                 </div>
             }
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-warning">هیچ سفارشی برای امروز ثبت نشده است.</div>
-    }
 
-    <hr />
-
-    <h5>روش‌های ارسال</h5>
-    @if (Model.DeliveryMethods.Any())
-    {
-        <div class="radio-groups">
-            @foreach (var delivery in Model.DeliveryMethods)
-            {
-                <label class="form-check-label me-3">
-                    <input type="radio" name="deliveryMethod" value="@delivery.DeliveryId" class="form-check-input" />
-                    @delivery.Name
-                </label>
-            }
+            <div class="card mb-3 shadow-sm border-0">
+                <div class="card-header bg-light">
+                    <strong>روش ارسال</strong>
+                </div>
+                <div class="card-body">
+                    <div class="radio-groups mb-3">
+                        @foreach (var delivery in Model.DeliveryMethods)
+                        {
+                            <input type="radio" name="selection" value="@delivery.DeliveryId" id="delivery_mobile_@delivery.DeliveryId" />
+                            <label for="delivery_mobile_@delivery.DeliveryId">@delivery.Name</label>
+                        }
+                    </div>
+                    <div>
+                        <strong>کد تخفیف:</strong>
+                        <input type="text" class="discountCode form-control mb-2" />
+                        <button id="applyDiscountBtnMobile" class="btn btn-primary btn-block">اعمال</button>
+                        <span id="discountMessageMobile" class="text-danger mt-1 d-block"></span>
+                    </div>
+                </div>
+            </div>
         </div>
-    }
-    else
-    {
-        <div class="text-muted">هیچ روش ارسالی ثبت نشده است.</div>
+
+        <!-- جدول نهایی مبلغ -->
+        <div class="d-flex justify-content-center mt-4">
+    <div class="w-100" style="max-width: 500px;">
+        <table class="table table-bordered text-center">
+            <tr>
+                <td><strong>جمع کل قبل از تخفیف :</strong></td>
+                <td id="SubtotalPrice">@Model.OrderSummaryForAdmin.TotalPrice.ToString("N0") ریال</td>
+            </tr>
+            <tr>
+                <td><strong>مبلغ تخفیف :</strong></td>
+                <td><span id="disTotal">0</span> ریال</td>
+            </tr>
+            <tr>
+                <td><strong>هزینه ارسال و بسته‌بندی :</strong></td>
+                <td><span id="deliveryPrice">0</span> ریال</td>
+            </tr>
+            <tr class="h4 text-primary">
+                <td colspan="2"><strong>مبلغ قابل پرداخت :</strong> <span id="sumOrder">0</span> ریال</td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <button class="btn btn-success w-100 py-2" id="postButton" disabled>
+                        پرداخت آنلاین - <span id="sumOrderBtn">0 ریال</span>
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
     }
 </div>
-
-
-@section Scripts
-{
-    <script>
-        function updateTotal() {
-            let subtotalText = $("#SubtotalPrice").text();
-            let subtotal = Number(subtotalText.replace(/[^\d]/g, ''));
-
-            let deliveryText = $("#deliveryPrice").text();
-            let delivery = Number(deliveryText.replace(/[^\d]/g, ''));
-
-            let disTotalText = $("#disTotal").text();
-            let disTotal = Number(disTotalText.replace(/[^\d]/g, ''));
-
-            let total = subtotal - disTotal + delivery;
-            if (total < 0) total = 0;
-
-            $("#sumOrder").text(total.toLocaleString());
-        }
-
-        let selectedDeliveryId = null;
-
-        $(document).ready(function () {
-            updateTotal();
-
-            $("input:radio[name=selection]").on("change", function () {
-                selectedDeliveryId = $(this).val();
-                $("input:radio[name=selection]").each(function () {
-                    $(this).prop("checked", $(this).val() === selectedDeliveryId);
-                });
-                $("#postButton").prop("disabled", false);
-
-                $.ajax({
-                    type: "GET",
-                    url: "/Home/GetDeliveryPrice",
-                    data: { deliveryId: selectedDeliveryId },
-                    success: function (result) {
-                        if (result.success) {
-                            $("#deliveryPrice").text(result.price.toLocaleString());
-                            updateTotal();
-                        }
-                    },
-                    error: function () {
-                        alert("خطا در دریافت هزینه ارسال");
-                    }
-                });
-            });
-
-            // اعمال کد تخفیف - دسکتاپ
-            $("#applyDiscountBtn").click(function (e) {
-                e.preventDefault();
-
-                var orderId = $(".orderId").first().val();
-                var discountCode = $(".discountCode").first().val().trim();
-
-                if (!discountCode) {
-                    $("#discountMessage").text("لطفاً کد تخفیف را وارد کنید.");
-                    return;
-                }
-
-                $.ajax({
-                    type: "POST",
-                    url: "/Home/ApplyDiscount",
-                    data: { orderId: orderId, discountCode: discountCode },
-                    success: function (result) {
-                        if (result.success) {
-                            $("#disTotal").text(result.discountAmount.toLocaleString());
-                            $("#discountMessage").text("کد تخفیف با موفقیت اعمال شد.").removeClass("text-danger").addClass("text-success");
-                            updateTotal();
-                        } else {
-                            $("#discountMessage").text(result.message).removeClass("text-success").addClass("text-danger");
-                            $("#disTotal").text("0");
-                            updateTotal();
-                        }
-                    },
-                    error: function () {
-                        $("#discountMessage").text("خطا در اعمال کد تخفیف. لطفاً دوباره تلاش کنید.").removeClass("text-success").addClass("text-danger");
-                        $("#disTotal").text("0");
-                        updateTotal();
-                    }
-                });
-            });
-
-            // اعمال کد تخفیف - موبایل
-            $("#applyDiscountBtnMobile").click(function (e) {
-                e.preventDefault();
-
-                var orderId = $(".orderId").last().val();
-                var discountCode = $(".discountCode").last().val().trim();
-
-                if (!discountCode) {
-                    $("#discountMessageMobile").text("لطفاً کد تخفیف را وارد کنید.");
-                    return;
-                }
-
-                $.ajax({
-                    type: "POST",
-                        url: "/Home/ApplyDiscount",
-                        data: { orderId: orderId, discountCode: discountCode },
-                        success: function (result) {
-                            if (result.success) {
-                                $("#disTotal").text(result.discountAmount.toLocaleString());
-                                $("#discountMessageMobile").text("کد تخفیف با موفقیت اعمال شد.").removeClass("text-danger").addClass("text-success");
-                                updateTotal();
-                            } else {
-                                $("#discountMessageMobile").text(result.message).removeClass("text-success").addClass("text-danger");
-                                $("#disTotal").text("0");
-                                updateTotal();
-                            }
-                        },
-                    error: function () {
-                        $("#discountMessageMobile").text("خطا در اعمال کد تخفیف. لطفاً دوباره تلاش کنید.").removeClass("text-success").addClass("text-danger");
-                        $("#disTotal").text("0");
-                        updateTotal();
-                    }
-                });
-            });
-        });
-    </script>
-}

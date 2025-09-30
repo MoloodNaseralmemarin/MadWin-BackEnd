@@ -1,5 +1,4 @@
-﻿using MadWin.Application.DTOs.Orders;
-using MadWin.Core.DTOs.Calculations;
+﻿using MadWin.Core.DTOs.Calculations;
 using MadWin.Core.DTOs.Orders;
 using MadWin.Core.Entities.Common;
 using MadWin.Core.Entities.CurtainComponents;
@@ -23,7 +22,7 @@ namespace MadWin.Application.Services
             _curtainComponentProductGroupRepository= curtainComponentProductGroupRepository;
 
         }
-        public async Task<int> CreateOrderInitialAsync(CreateOrderInitialDto dto, int userId, decimal basePrice)
+        public async Task<int> CreateOrderInitialAsync(CreateDto dto, int userId, decimal basePrice)
         {
             var order = new Order
             {
@@ -75,19 +74,7 @@ namespace MadWin.Application.Services
             var result = await _curtainComponentProductGroupRepository.CalculationByCategory(categoryId, subCategoryId);
             return result;
         }
-        public async Task<OrderSummaryDto> GetOrderSummaryByOrderIdAsync(int orderId)
-        {
-            var order = await _orderRepository.GetOrderSummaryByOrderIdAsync(orderId);
-
-            if (order == null)
-            {
-                _logger.LogWarning("هیچ سفارشی با شماره فاکتور {orderId} پیدا نشد.", orderId);
-                return null;
-            }
-
-            _logger.LogInformation("سفارش با شماره فاکتور {orderId} با موفقیت بارگذاری شد.", orderId);
-            return order;
-        }
+ 
         public async Task<Order> GetOrderByOrderIdAsync(int orderId)
         {
             return await _orderRepository.GetByIdAsync(orderId);
@@ -101,19 +88,7 @@ namespace MadWin.Application.Services
             await _orderRepository.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<OrderSummaryDto>> GetOrderSummaryByUserIdAsync(int userId)
-        {
-            var order = await _orderRepository.GetOrderSummaryByUserIdAsync(userId);
 
-            if (order == null)
-            {
-                _logger.LogWarning("هیچ سفارشی با شماره فاکتور {userId} پیدا نشد.", userId);
-                return null;
-            }
-
-            _logger.LogInformation("سفارش با شماره فاکتور {userId} با موفقیت بارگذاری شد.", userId);
-            return order; ;
-        }
 
         public async Task UpdatePriceAndDeliveryAsync(int deliveryId, int orderId)
         {
@@ -132,16 +107,9 @@ namespace MadWin.Application.Services
         {
             return await _orderRepository.CountOrders();
         }
-
-
-        public async Task<PagedResult<OrderSummaryDto>> GetOrderSummaryAsync(OrderFilterParameters filter)
+        public async Task<OrderSummaryForAdminDto> GetTodayOrdersAsync(int pageId = 1)
         {
-            return await _orderRepository.GetOrderSummaryAsync(filter);
-        }
-
-        public async Task<PagedResult<OrderSummaryDto>> GetTodayOrdersAsync(int PageNumber = 1, int PageSize = 10)
-        {
-            return await _orderRepository.GetTodayOrdersAsync(PageNumber, PageSize);
+            return await _orderRepository.GetTodayOrdersAsync(pageId);
         }
 
         public class SoftDeleteResult
@@ -188,7 +156,10 @@ namespace MadWin.Application.Services
             return await _orderRepository.GetByOrderIdAsync(orderId);
         }
 
-
+        public Task SoftDeleteAsync(IEnumerable<int> orderIds)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

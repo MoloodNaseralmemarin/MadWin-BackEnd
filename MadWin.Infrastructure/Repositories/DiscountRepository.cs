@@ -18,7 +18,7 @@ namespace MadWin.Infrastructure.Repositories
         }
         public async Task<DiscountInfoLookup> GetDisCountForOrderInfoAsync(string code)
         {
-            var discount= await _context.Set<Discount>()
+            var discount = await _context.Set<Discount>()
                 .AsNoTracking()
                 .Where(dc => dc.DiscountCode == code && dc.Item == "O")
                 .Select(dc => new DiscountInfoLookup
@@ -31,7 +31,7 @@ namespace MadWin.Infrastructure.Repositories
                     UseableCount = dc.UseableCount
                 })
                 .FirstOrDefaultAsync();
-            if(discount == null ) 
+            if (discount == null)
                 return null;
             return discount;
         }
@@ -86,7 +86,7 @@ namespace MadWin.Infrastructure.Repositories
             return await _context.Set<Discount>()
              .AnyAsync(dc => dc.DiscountCode == discountcode);
         }
-       public async Task<DiscountForAdminViewModel> GetAllDiscountsAsync(int pageId)
+        public async Task<DiscountForAdminViewModel> GetAllDiscountsAsync(int pageId)
         {
             IQueryable<Discount> result = GetQuery()
                           .IgnoreQueryFilters()
@@ -105,8 +105,8 @@ namespace MadWin.Infrastructure.Repositories
                     .Take(take)
                     .Select(d => new DiscountForAdminItemViewModel
                     {
-                        Id=d.Id,
-                        CreateDate=d.CreateDate,
+                        Id = d.Id,
+                        CreateDate = d.CreateDate,
                         DiscountCode = d.DiscountCode,
                         ExpiryDate = d.ExpiryDate,
                         Item = d.Item,

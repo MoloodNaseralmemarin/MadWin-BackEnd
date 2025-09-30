@@ -18,6 +18,8 @@ namespace MadWin.Application.Services
 
         Task<Discount> GetByIdAsync(int id);
         Task<DiscountForAdminViewModel> GetAllDiscountsAsync(int pageId = 1);
+
+        Task AddDiscount(Discount discount);
     }
 }
         

@@ -48,11 +48,5 @@ namespace Shop2City.WebHost.Controllers
             });
         }
 
-        [Route("Error")]
-        public IActionResult Error()
-        {
-            return PhysicalFile(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Error.html"), "text/html");
-        }
-
     }
 }

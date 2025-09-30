@@ -1,9 +1,6 @@
-﻿using MadWin.Application.DTOs.CommissionRates;
-using MadWin.Application.DTOs.Discounts;
+﻿using MadWin.Application.DTOs.Discounts;
 using MadWin.Core.DTOs.DisCounts;
 using MadWin.Core.DTOs.Orders;
-using MadWin.Core.DTOs.Users;
-using MadWin.Core.Entities.CommissionRates;
 using MadWin.Core.Entities.Discounts;
 using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
@@ -132,6 +129,12 @@ namespace MadWin.Application.Services
         public async Task<Discount> GetByIdAsync(int id)
         {
             return await _discountRepository.GetByIdAsync(id);
+        }
+
+        public async Task AddDiscount(Discount discount)
+        {
+            await _discountRepository.AddAsync(discount);
+            await _discountRepository.SaveChangesAsync();
         }
 
     }

@@ -1,8 +1,7 @@
-﻿<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-
+﻿<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
+ <script src="~/js/OrderSummary.js"></script>
 
 <!--Start AddToCart-->
 <script type="text/javascript">
@@ -83,60 +82,6 @@
         };
     });
 </script>
-<!--Factors-->
-<script>
-    function parseNumber(text) {
-        return Number(text.replace(/[^\d]/g, '')) || 0;
-    }
-
-    function updateTotal() {
-        const subtotal = parseNumber($("#SubtotalPrice").text());
-        const delivery = parseNumber($("#deliveryPrice").text());
-        const discount = parseNumber($("#disTotal").text());
-
-        const total = subtotal - discount + delivery;
-        $("#totalPrice").text(total.toLocaleString());
-    }
-
-    $(function () {
-        // بارگذاری اولیه
-        updateTotal();
-
-        // تغییر روش ارسال
-        $("input[name=selection]").on("change", function () {
-            $.get("/Home/GetDeliveryPrice", { deliveryId: $(this).val() })
-                .done(function (result) {
-                    if (result.success) {
-                        $("#deliveryPrice").text(result.price.toLocaleString());
-                        updateTotal();
-                    }
-                });
-        });
-
-        // اعمال کد تخفیف
-        $("#applyDiscountBtn").on("click", function (e) {
-            e.preventDefault();
-
-                $.get('/Factors/UseDiscountForFactor', {
-        factorId: $("#factorId").val(),
-        discountCode: $("#discountCode").val()
-    })
-            .done(function (response) {
-                if (response.success) {
-                    $("#disTotal").text(response.discountAmount.toLocaleString());
-                    updateTotal();
-                    toastr.success(response.message);
-                } else {
-                    toastr.error(response.message);
-                }
-            })
-            .fail(function () {
-                toastr.error("خطا در ارتباط با سرور");
-            });
-        });
-    });
-</script>
-
 <!--حذف از فاکتور-->
 <script>
     function removeItems(factorId) {

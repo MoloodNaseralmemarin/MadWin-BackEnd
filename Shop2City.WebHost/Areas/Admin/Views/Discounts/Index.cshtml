@@ -54,6 +54,16 @@
                                 <td>@discount.UseableCount</td>
                                 <td>@discount.StartDate.ToShamsi() - @discount.ExpiryDate.ToShamsi()</td>
                                 <td>
+                                    @if (discount.IsInactive == true)
+                                    {
+                                        <span class="btn btn-success">فعال</span>
+                                    }
+                                    else if (discount.IsInactive==false)
+                                    {
+                                        <span class="btn btn-danger">غیرفعال</span>
+                                    }
+                                </td>
+                                <td>
                                     <div class="btn-group">
                                         <a href="@Url.Action("Edit", "Discounts", new { area = "Admin", id = discount.Id })"
                                            class="btn btn-warning btn-sm">

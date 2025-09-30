@@ -1,6 +1,4 @@
-﻿using MadWin.Application.DTOs.Orders;
-using MadWin.Application.Repositories;
-using MadWin.Application.Services;
+﻿using MadWin.Application.Services;
 using MadWin.Core.DTOs.Orders;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Lookups.CommissionRates;
@@ -78,13 +76,9 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
         }
 
 
-
-
-        #region محاسبات
-
-        #endregion
+        #region ثبت سفارش 
         [HttpPost]
-        public async Task<IActionResult> CreateOrder(CreateOrderInitialDto orderView)
+        public async Task<IActionResult> CreateOrder(CreateDto orderView)
         {
             int orderId = 0;
             #region بدست اوردن userId
@@ -165,14 +159,15 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
 
             var subCategory = _productService.GetSubCategoryForManageProduct(int.Parse(category.First().Value));
             ViewData["SubCategories"] = new SelectList(subCategory, "Value", "Text");
-            var model = await _orderService.GetTodayOrdersAsync(1, 10);
+            var model = await _orderService.GetTodayOrdersAsync(10);
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                 return ViewComponent("OrderSummary");
 
             return View();
         }
+        #endregion
         #region پرده طلقی ایرانی
-        private async Task<decimal> CalculateIraniAsync(CreateOrderInitialDto order)
+        private async Task<decimal> CalculateIraniAsync(CreateDto order)
         {
             var unitPrice = await _curtainComponentRepository.GetPriceByIdAsync(1);
             if (unitPrice <= 0)
@@ -181,7 +176,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
         }
         #endregion
         #region پرده طلقی خارجی
-        private async Task<decimal> CalculateKharejiAsync(CreateOrderInitialDto order)
+        private async Task<decimal> CalculateKharejiAsync(CreateDto order)
         {
             var unitPrice = await _curtainComponentRepository.GetPriceByIdAsync(2);
             if (unitPrice <= 0)
@@ -190,7 +185,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
         }
         #endregion
         #region پرده توری یک لایه
-        private async Task<decimal> CalculateTooriOneLayerAsync(CreateOrderInitialDto order)
+        private async Task<decimal> CalculateTooriOneLayerAsync(CreateDto order)
         {
             var unitPrice = await _curtainComponentRepository.GetPriceByIdAsync(3);
             if (unitPrice <= 0)
@@ -199,7 +194,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
         }
         #endregion
         #region پرده توری دو لایه
-        private async Task<decimal> CalculateTooriTwoLayerAsync(CreateOrderInitialDto order, int partCount)
+        private async Task<decimal> CalculateTooriTwoLayerAsync(CreateDto order, int partCount)
         {
             decimal totalCost = 0;
 
@@ -391,7 +386,6 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             return cost;
         }
         #endregion
-
         #region محاسبه ارتفاع برای زیپ چسب 2.5 سانت و گان
         public int GetAdjustedHeight(int height)
         {
@@ -429,14 +423,17 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             return await _commissionRateRepository.GetCommissionInfoAsync(partCount, isEqualParts);
         }
         #endregion
-  
-        
         #region کد تخفیف
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UseDiscountAsync(int orderId, string discountCode)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(userIdString, out int userId))
                 return Json(new { success = false, message = "کاربر نامعتبر" });
+
+            if (string.IsNullOrEmpty(discountCode))
+                return Json(new { success = false, message = "کد تخفیف وارد نشده است." });
 
             var result = await _disCountService.UseDiscountAsync(orderId, discountCode, userId);
 
@@ -492,24 +489,12 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
         }
         #endregion
 
-        [Authorize]
-        public async Task<IActionResult> ShowOrderForUser()
-        {
-            #region بدست اوردن userId
-            var UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!int.TryParse(UserId, out int userId))
-            {
-                return Unauthorized(); // یا هر رفتار مناسب
-            }
-            #endregion
-            var order = await _orderService.GetOrderSummaryByUserIdAsync(userId);
-            return View(order);
-        }
         #region حذف از سفارش
-        public async Task<IActionResult> RemoveItemsByOrderAsync(int[] orderIds)
+        public async Task<IActionResult> RemoveItemsByOrderAsync(int[] orderId)
         {
-            return null;
-            //await _orderService.SoftDeleteFromOrderAsync(orderIds);
+            await _orderService.SoftDeleteAsync(orderId);
+            var updatedList = await _orderService.GetTodayOrdersAsync();
+            return Json(new { success = true, data = updatedList });
         }
         #endregion
     }

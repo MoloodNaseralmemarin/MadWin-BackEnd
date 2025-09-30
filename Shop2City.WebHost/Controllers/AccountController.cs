@@ -1,13 +1,11 @@
 ﻿using MadWin.Application.DTOs.Account;
 using MadWin.Application.Services;
-using MadWin.Application.ViewModels.Account;
 using MadWin.Core.Common;
 using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using Shop2City.Core.Convertors;
 using Shop2City.WebHost.ViewModels.Account;
 using System.Security.Claims;
 

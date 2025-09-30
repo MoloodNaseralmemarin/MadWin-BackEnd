@@ -1,10 +1,10 @@
 ﻿using MadWin.Application.Services;
-using MadWin.Application.ViewModels.Account;
 using MadWin.Core.Common;
 using MadWin.Core.DTOs.Users;
 using MadWin.Core.Entities.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shop2City.WebHost.ViewModels.Account;
 
 namespace Shop2City.WebHost.Areas.Admin.Controllers
 {
@@ -30,7 +30,6 @@ namespace Shop2City.WebHost.Areas.Admin.Controllers
         public IActionResult Create() => View();
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromForm] RegisterViewModel model)
         {
             if (!ModelState.IsValid)

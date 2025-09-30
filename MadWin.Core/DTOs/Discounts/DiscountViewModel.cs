@@ -30,6 +30,8 @@ namespace MadWin.Core.DTOs.DisCounts
         [Display(Name = "تاریخ پایان")]
         public DateTime ExpiryDate { get; set; }
 
+        public bool IsInactive{ get; set; }
+
         public string Description {  get; set; }
     }
 
@@ -46,5 +48,27 @@ namespace MadWin.Core.DTOs.DisCounts
         public bool Success { get; set; }
         public string Message { get; set; }
         public decimal NewTotal { get; set; }
+    }
+
+    public class AddDiscountForAdminViewModel
+    {
+        [Display(Name = "عنوان")]
+        public string Item { get; set; } 
+
+        [Display(Name = "کد تخفیف")]
+        public string DiscountCode { get; set; }
+
+        [Display(Name = "درصد کد تخفیف")]
+        public int Percentage { get; set; }
+
+        [Display(Name = "تعداد")]
+        public int UseableCount { get; set; }
+
+        [Display(Name = "تاریخ شروع")]
+        public DateTime StartDate { get; set; }
+
+        [Display(Name = "تاریخ پایان")]
+        public DateTime ExpiryDate { get; set; }
+
     }
 }
