@@ -4,7 +4,7 @@ function parseNumber(text) {
 }
 
 function formatCurrency(num) {
-    return num.toLocaleString() + " ریال";
+    return num.toLocaleString();
 }
 
 // --- محاسبه جمع ---
@@ -27,27 +27,24 @@ function updateTotal() {
 }
 
 // --- حذف آیتم‌ها ---
-function removeItems() {
-    // جمع‌آوری همه ردیف‌های انتخاب‌شده
+function removeItems(orderId = null) {
     let selectedIds = [];
-    $(".delete-checkbox:checked").each(function () {
-        selectedIds.push($(this).val());
-    });
 
-    if (selectedIds.length === 0) {
-        toastr.warning('هیچ موردی انتخاب نشده است.');
-        // بروزرسانی قیمت بدون حذف
-        $.getJSON("/Factors/GetSubtotalPrice", { orderId: orderId }, function (data) {
-            if (data && data.price !== undefined) {
-                $("#SubtotalPrice").text(data.price);
-            } else {
-                console.error("قیمت برنگشت یا null بود!");
-            }
+    if (orderId) {
+        // حالت موبایل → فقط یک آیتم خاص
+        selectedIds.push(orderId);
+    } else {
+        // حالت دسکتاپ → همه چک‌باکس‌های انتخاب‌شده
+        $(".delete-checkbox:checked").each(function () {
+            selectedIds.push($(this).val());
         });
-        return;
+
+        if (selectedIds.length === 0) {
+            toastr.warning('هیچ موردی انتخاب نشده است.');
+            return;
+        }
     }
 
-    // ارسال درخواست حذف به سرور
     $.ajax({
         url: '/Orders/RemoveItemsByOrder',
         type: 'POST',
@@ -58,22 +55,24 @@ function removeItems() {
             if (response.success) {
                 toastr.success('حذف با موفقیت انجام شد.');
 
-                // حذف ردیف‌های انتخاب‌شده و جزئیات مرتبط
                 selectedIds.forEach(id => {
+                    // حذف ردیف اصلی و جزئیات
                     let mainRow = $("input.delete-checkbox[value='" + id + "']").closest("tr");
                     let detailRow = $("tr.detail-row[data-orderid='" + id + "']");
                     mainRow.add(detailRow).remove();
+
+                    // موبایل
+                    $(".card").has("a[onclick='removeItems(" + id + ")']").remove();
                 });
 
-                updateTotal(); // اگر تابعی برای جمع کل داری
+                updateTotal();
                 $("#selectAll").prop("checked", false);
 
-                // بروزرسانی قیمت بعد از حذف
-                $.getJSON("/Factors/GetSubtotalPrice", { orderId: orderId }, function (data) {
+                // بروزرسانی جمع کل از سرور
+                $.getJSON("/Orders/GetSumPriceWithFeeByOrder", { orderId: selectedIds[0] }, function (data) {
                     if (data && data.price !== undefined) {
-                        $("#SubtotalPrice").text(data.price);
-                    } else {
-                        console.error("قیمت برنگشت یا null بود!");
+                        $("#SubtotalPrice").text(formatCurrency(data.price));
+                        updateTotal();
                     }
                 });
 
@@ -86,8 +85,6 @@ function removeItems() {
         });
 }
 
-
-
 // --- رویدادها ---
 $(document).ready(function () {
     updateTotal();
@@ -96,7 +93,7 @@ $(document).ready(function () {
     const token = $('input[name="__RequestVerificationToken"]').val();
     let selectedDeliveryId = null;
 
-    // انتخاب همه چک‌باکس‌ها
+    // انتخاب همه
     $("#selectAll").on("change", function () {
         $(".delete-checkbox").prop("checked", $(this).is(":checked"));
     });
@@ -133,19 +130,19 @@ $(document).ready(function () {
             discountCode: discountCode,
             __RequestVerificationToken: token
         })
-        .done(function (response) {
-            if (response.success) {
-                $("#disTotal").text(formatCurrency(response.discountAmount));
-                updateTotal();
-                toastr.success(response.message);
-            } else {
-                toastr.error(response.message);
-            }
-        })
-        .fail(function (xhr) {
-            console.error(xhr.responseText);
-            toastr.error("خطا در ارتباط با سرور");
-        });
+            .done(function (response) {
+                if (response.success) {
+                    $("#disTotal").text(formatCurrency(response.discountAmount));
+                    updateTotal();
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+            })
+            .fail(function (xhr) {
+                console.error(xhr.responseText);
+                toastr.error("خطا در ارتباط با سرور");
+            });
     });
 
     // پرداخت آنلاین
@@ -163,16 +160,16 @@ $(document).ready(function () {
                 source: 'order'
             })
         })
-        .done(function (response) {
-            if (response.success) {
-                window.location.href = response.redirectUrl;
-            } else {
-                toastr.error(response.message);
-            }
-        })
-        .fail(function (xhr, status, error) {
-            console.error(error);
-            toastr.error("خطا در ارسال درخواست پرداخت");
-        });
+            .done(function (response) {
+                if (response.success) {
+                    window.location.href = response.redirectUrl;
+                } else {
+                    toastr.error(response.message);
+                }
+            })
+            .fail(function (xhr, status, error) {
+                console.error(error);
+                toastr.error("خطا در ارسال درخواست پرداخت");
+            });
     });
 });

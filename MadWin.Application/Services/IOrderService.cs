@@ -24,7 +24,7 @@ namespace MadWin.Application.Services
         Task<OrderSummaryForAdminDto> GetTodayOrdersAsync(int userId);
 
         Task<IEnumerable<CurtainComponentDetail>> GetCurtainComponentDetailsByOrderIdAsync(int orderId);
-        Task SoftDeleteFromOrderAsync(IEnumerable<int> orderId);
+        Task SoftDeleteFromOrderAsync(int[] orderId);
 
         Task<decimal> GetSumPriceWithFeeByOrder(int[] orderIds, int userId);
     }

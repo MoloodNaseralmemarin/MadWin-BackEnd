@@ -119,10 +119,10 @@ namespace MadWin.Application.Services
             public List<int> DeletedCurtainDetailIds { get; set; } = new();
         }
 
-        public async Task SoftDeleteFromOrderAsync(IEnumerable<int> orderId)
+        public async Task SoftDeleteFromOrderAsync(int[] orderId)
         {
             if (orderId == null || !orderId.Any()) return;
-            var allOrders = await _orderRepository.GetAllAsync();
+            var allOrders = _orderRepository.GetQuery();
             var ordersToDelete = allOrders.Where(o => orderId.Contains(o.Id) && !o.IsDelete).ToList();
             if (!ordersToDelete.Any()) return;
 

@@ -25,6 +25,7 @@
                 <thead class="table-light">
                     <tr>
                         <th><input type="checkbox" id="selectAll" /></th>
+                        <th>شماره  سفارش</th>
                         <th>تاریخ</th>
                         <th>ساعت</th>
                         <th>نام محصول</th>
@@ -41,9 +42,10 @@
 
                         <!-- ردیف اصلی -->
                         <tr>
-                            <td rowspan="2">
+                            <td rowspan="2" class="text-center align-middle">
                                 <input type="checkbox" class="delete-checkbox" value="@item.OrderId" />
                             </td>
+                            <td rowspan="2">@item.OrderId</td>
                             <td>@item.CreateDate.ToShamsi()</td>
                             <td>@item.CreateDate.ToString("HH:mm:ss")</td>
                             <td>@item.CategoryGroup</td>
@@ -74,10 +76,16 @@
                             </td>
                         </tr>
                     }
-
+                    <tr>
+                        <td colspan="9">
+                            <a onclick="removeItems()">
+                                <i class="fa fa-trash text-danger"></i>
+                            </a>
+                        </td>
+                    </tr>
                     <!-- بخش انتخاب روش ارسال -->
                     <tr>
-                        <td colspan="2"><strong>روش ارسال:</strong></td>
+                        <td colspan="3"><strong>روش ارسال:</strong></td>
                         <td colspan="6">
                             <div class="radio-groups">
                                 @foreach (var delivery in Model.DeliveryMethods)
@@ -91,7 +99,7 @@
 
                     <!-- بخش کد تخفیف -->
                     <tr>
-                        <td colspan="2"><strong>کد تخفیف:</strong></td>
+                        <td colspan="3"><strong>کد تخفیف:</strong></td>
                         <td colspan="6" class="mt-2">
                             <input type="text" class="discountCode form-control" />
                             <button id="applyDiscountBtnMobile" class="btn btn-primary w-100 py-2">
@@ -182,23 +190,23 @@
                 <table class="table table-bordered text-center">
                     <tr>
                         <td><strong>جمع کل قبل از تخفیف :</strong></td>
-                        <td id="SubtotalPrice">@Model.OrderSummaryForAdmin.TotalPrice.ToString("N0") ریال</td>
+                        <td id="SubtotalPrice">@Model.OrderSummaryForAdmin.TotalPrice.ToString("N0")</td>
                     </tr>
                     <tr>
                         <td><strong>مبلغ تخفیف :</strong></td>
-                        <td><span id="disTotal">0</span> ریال</td>
+                        <td><span id="disTotal">0</span></td>
                     </tr>
                     <tr>
                         <td><strong>هزینه ارسال و بسته‌بندی :</strong></td>
-                        <td><span id="deliveryPrice">0</span> ریال</td>
+                        <td><span id="deliveryPrice">0</span></td>
                     </tr>
                     <tr class="h4 text-primary">
-                        <td colspan="2"><strong>مبلغ قابل پرداخت :</strong> <span id="sumOrder">0</span> ریال</td>
+                        <td colspan="2"><strong>مبلغ قابل پرداخت :</strong> <span id="sumOrder">0</span></td>
                     </tr>
                     <tr>
                         <td colspan="2">
                             <button class="btn btn-success w-100 py-2" id="postButton" disabled>
-                                پرداخت آنلاین - <span id="sumOrderBtn">0 ریال</span>
+                                پرداخت آنلاین - <span id="sumOrderBtn">0</span>
                             </button>
                         </td>
                     </tr>
