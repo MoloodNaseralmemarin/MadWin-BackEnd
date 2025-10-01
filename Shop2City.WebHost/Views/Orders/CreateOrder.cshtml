@@ -4,223 +4,121 @@
 @{
   
 }
+<div class="modal fade" id="customSizeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <form id="customSizeForm" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">سفارش با اندازه دلخواه</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
 
-<div class="container my-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a asp-controller="Home" asp-action="Index"><i class="fa fa-home"></i></a>
-            </li>
-            <li class="breadcrumb-item">
-                <a asp-area="UserPanel" asp-controller="Home" asp-action="Index">پنل کاربری</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">سفارش با اندازه دلخواه</li>
-        </ol>
-    </nav>
+                <div class="modal-body">
 
-    <div class="row">
-        <partial name="_SideBar" />
-
-        <div class="col-lg-9" id="content">
-            <h1 class="h4 mb-4">سفارش با اندازه دلخواه</h1>
-
-            <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#customSizeModal">
-                سفارش با اندازه دلخواه
-            </button>
-
-            <!-- سفارش‌های امروز -->
-            @await Component.InvokeAsync("OrderSummaryComponent", new { userId = Model.UserId })
-
-            <div class="modal fade" id="customSizeModal" tabindex="-1" aria-labelledby="customSizeModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="customSizeModalLabel">سفارش با اندازه دلخواه</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="بستن"></button>
+                    <!-- دسته بندی -->
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label">دسته</label>
+                            <select class="form-select" id="CategoryId" required>
+                                <option value="">انتخاب کنید</option>
+                            </select>
                         </div>
-                        <div class="modal-body">
-                            <form asp-action="CreateOrder" method="post" class="needs-validation" novalidate id="customSizeForm">
-                                <input type="hidden" id="PartCount" name="PartCount" />
-                                <input type="hidden" id="IsEqualParts" name="IsEqualParts" />
-                                <input type="hidden" id="DivisionType" name="DivisionType" />
-
-                                <!-- دسته‌بندی و زیر دسته -->
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label asp-for="CategoryId" class="form-label"></label>
-                                        <select asp-for="CategoryId" class="form-select" asp-items="Model.Categories" required id="CategoryId"></select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label asp-for="SubCategoryId" class="form-label"></label>
-                                        <select asp-for="SubCategoryId" class="form-select" asp-items="Model.SubCategories" required id="SubCategoryId"></select>
-                                    </div>
-                                </div>
-
-                                <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
-                                    <i class="fa fa-exclamation-triangle me-2"></i>
-                                    <div><strong>مشتری گرامی،</strong> لطفاً جهت چپ و راست پرده را از محل نصب تعیین کنید.</div>
-                                </div>
-
-                                <!-- Height و Width -->
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label asp-for="Height" class="form-label"></label>
-                                        <input asp-for="Height" type="number" class="form-control" min="1" placeholder="مثال: 250" required autocomplete="off" />
-                                        <div class="form-text">(cm) سانتی‌متر</div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label asp-for="Width" class="form-label"></label>
-                                        <input asp-for="Width" id="totalWidth" type="number" class="form-control" min="1" placeholder="مثال: 300" required autocomplete="off" />
-                                        <div class="form-text">(cm) سانتی‌متر</div>
-                                    </div>
-                                </div>
-
-                                <!-- تقسیم‌بندی -->
-                                <div class="mb-3 custom-radio-group d-flex gap-2 flex-wrap">
-                                    <label class="form-label w-100">تقسیم‌بندی عرض پرده <span class="text-danger">*</span></label>
-
-                                    <div class="form-check division-card p-2 rounded border" data-type="2-equal">
-                                        <input class="form-check-input" type="radio" name="division" id="div-2-equal" value="2-equal" onclick="updateInputs(2,'equal')" required>
-                                        <label class="form-check-label" for="div-2-equal">دو قسمت مساوی</label>
-                                    </div>
-                                    <div class="form-check division-card p-2 rounded border" data-type="2-unequal">
-                                        <input class="form-check-input" type="radio" name="division" id="div-2-unequal" value="2-unequal" onclick="updateInputs(2,'unequal')">
-                                        <label class="form-check-label" for="div-2-unequal">دو بخش نامساوی</label>
-                                    </div>
-                                    <div class="form-check division-card p-2 rounded border" data-type="3-equal">
-                                        <input class="form-check-input" type="radio" name="division" id="div-3-equal" value="3-equal" onclick="updateInputs(3,'equal')">
-                                        <label class="form-check-label" for="div-3-equal">سه بخش مساوی</label>
-                                    </div>
-                                    <div class="form-check division-card p-2 rounded border" data-type="3-unequal">
-                                        <input class="form-check-input" type="radio" name="division" id="div-3-unequal" value="3-unequal" onclick="updateInputs(3,'unequal')">
-                                        <label class="form-check-label" for="div-3-unequal">سه بخش نامساوی</label>
-                                    </div>
-                                </div>
-
-                                <div class="mb-3" id="width-inputs">
-                                    <label class="form-label">اندازه‌های عرض</label>
-                                    <div id="input-container"></div>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label asp-for="Count" class="form-label"></label>
-                                    <input asp-for="Count" type="number" class="form-control" min="1" placeholder="تعداد" required />
-                                </div>
-
-                                <div class="d-grid mt-3">
-                                    <button type="submit" class="btn btn-primary" id="submitOrder" disabled>ثبت سفارش</button>
-                                </div>
-                            </form>
+                        <div class="col-6">
+                            <label class="form-label">زیر دسته</label>
+                            <select class="form-select" id="SubCategoryId" required></select>
                         </div>
                     </div>
-                </div>
-            </div>
 
+                    <!-- ابعاد -->
+                    <div class="row g-3 mt-2">
+                        <div class="col-6">
+                            <label class="form-label">ارتفاع (cm)</label>
+                            <input type="number" id="Height" class="form-control" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">عرض کل (cm)</label>
+                            <input type="number" id="totalWidth" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <!-- تقسیم بندی -->
+                    <div class="mt-3">
+                        <label class="form-label">تقسیم‌بندی</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <label class="btn btn-outline-primary">
+                                <input type="radio" name="division" value="2-equal" onclick="updateInputs(2,'equal')"> ۲ مساوی
+                            </label>
+                            <label class="btn btn-outline-primary">
+                                <input type="radio" name="division" value="2-unequal" onclick="updateInputs(2,'unequal')"> ۲ نامساوی
+                            </label>
+                            <label class="btn btn-outline-primary">
+                                <input type="radio" name="division" value="3-equal" onclick="updateInputs(3,'equal')"> ۳ مساوی
+                            </label>
+                            <label class="btn btn-outline-primary">
+                                <input type="radio" name="division" value="3-unequal" onclick="updateInputs(3,'unequal')"> ۳ نامساوی
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mt-3" id="width-inputs">
+                        <label class="form-label">اندازه‌ها</label>
+                        <div id="input-container"></div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label">تعداد</label>
+                        <input type="number" id="Count" class="form-control" min="1" required>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" id="submitOrder" disabled>ثبت</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        $(function(){
+<script>
+    const $form = $("#customSizeForm");
+    const $submit = $("#submitOrder");
 
-            const $form = $("#customSizeForm");
-            const $submit = $("#submitOrder");
-            const $category = $("#CategoryId");
-            const $subCategory = $("#SubCategoryId");
-            const $width = $("#totalWidth");
+    function checkForm(){
+      let valid = true;
+      $form.find("input[required], select[required]").each(function(){
+        if(!$(this).val()) valid = false;
+      });
 
-            $submit.prop("disabled", true);
+      let sum = 0, total = parseFloat($("#totalWidth").val())||0;
+      $(".width-input").each(function(){ sum += parseFloat($(this).val())||0; });
+      if($(".width-input").length && sum !== total) valid = false;
 
-            // لود زیر دسته‌ها با AJAX
-            function loadSubCategories(categoryId, callback){
-                if(!categoryId) return;
-                $.getJSON('@Url.Action("GetSubCategories", "Orders")', { categoryId: categoryId }, function(data){
-                    $subCategory.empty();
-                    $subCategory.append($('<option>', { value: "", text: "انتخاب کنید" }));
-                    $.each(data, function(i, item){
-                        $subCategory.append($('<option>', { value: item.value, text: item.text }));
-                    });
-                    if(callback) callback();
-                });
-            }
+      $submit.prop("disabled", !valid);
+    }
 
-            // بررسی اعتبار فرم
-            function checkForm(){
-                let valid = true;
-                $form.find("input[required], select[required]").each(function(){
-                    if(!$(this).val()) valid = false;
-                });
-                let sum = 0;
-                $(".width-input").each(function(){ sum += parseFloat($(this).val()) || 0; });
-                if($(".width-input").length && sum !== (parseFloat($width.val())||0)) valid = false;
-                $submit.prop("disabled", !valid);
-            }
+    $form.on("input change", "input, select", checkForm);
 
-            $form.on("input change", "input, select", checkForm);
-            $form.on("input", ".width-input", checkForm);
+    function updateInputs(count, type){
+      const totalWidth = parseFloat($("#totalWidth").val());
+      if(!totalWidth) return;
 
-            $(".division-card").click(function(){
-                $(".division-card").removeClass("selected");
-                $(this).addClass("selected");
-                $(this).find("input[type=radio]").prop("checked", true).trigger("change");
-            });
+      const container = $("#input-container");
+      container.empty();
 
-            // وقتی دسته تغییر می‌کند، زیر دسته‌ها بروزرسانی شوند
-            $category.on("change", function(){
-                loadSubCategories($(this).val(), checkForm);
-            });
+      const labels = (count===2)? ["راست","چپ"] : ["راست","وسط","چپ"];
 
-            // هنگام باز شدن مودال، زیر دسته‌ها لود شوند
-            $('#customSizeModal').on('shown.bs.modal', function(){
-                loadSubCategories($category.val(), function(){
-                    const selected = $("input[name=division]:checked");
-                    if(selected.length){
-                        const parts = selected.val().split('-');
-                        updateInputs(parseInt(parts[0]), parts[1]);
-                    }
-                    checkForm();
-                });
-            });
+      for(let i=0; i<count; i++){
+        container.append(`
+          <div class="mb-2">
+            <label class="form-label">${labels[i]}</label>
+            <input type="number" class="form-control width-input"
+              ${type==="equal" ? "readonly" : ""}
+              value="${type==="equal" ? (totalWidth/count).toFixed(0) : ""}">
+          </div>
+        `);
+      }
+      checkForm();
+    }
+</script>
 
-        });
-
-        // تقسیم‌بندی عرض
-        function updateInputs(count, type){
-            const totalWidth = parseFloat(document.getElementById("totalWidth").value);
-            if(isNaN(totalWidth) || totalWidth <=0) return;
-
-            document.getElementById("DivisionType").value = `${count}-${type}`;
-            document.getElementById("PartCount").value = count;
-            document.getElementById("IsEqualParts").value = (type==="equal")?"true":"false";
-
-            const container = document.getElementById("input-container");
-            container.innerHTML = "";
-
-            const labels = (count===2)? ["راست","چپ"] : ["راست","وسط","چپ"];
-
-            for(let i=0; i<count; i++){
-                const div = document.createElement("div");
-                div.className = "mb-2";
-
-                const label = document.createElement("label");
-                label.className = "mb-1";
-                label.textContent = labels[i] || `بخش ${i+1}`;
-
-                const input = document.createElement("input");
-                input.type = "number";
-                input.name = `WidthParts[${i}]`;
-                input.className = "form-control width-input";
-                input.readOnly = (type==="equal");
-                input.value = (type==="equal") ? (totalWidth/count).toFixed(0) : "";
-                input.oninput = function(){ $(".width-input").trigger("input"); };
-
-                div.appendChild(label);
-                div.appendChild(input);
-                container.appendChild(div);
-            }
-
-            $(".width-input").trigger("input");
-        }
-    </script>
-}
