@@ -82,56 +82,6 @@
         };
     });
 </script>
-<!--حذف از فاکتور-->
-<script>
-    function removeItems(factorId) {
-         console.log("1",factorId);
-        var selectedIds = [];
-        $(".delete-checkbox:checked").each(function () {
-            selectedIds.push($(this).val());
-        });
-
-         if (selectedIds.length === 0) {
-        toastr.warning('هیچ موردی انتخاب نشده است.');
-    $.getJSON("/Factors/GetSubtotalPrice", { factorId: factorId }, function (data) {
-        if (data && data.price !== undefined) {
-            $("#SubtotalPrice").text(data.price);
-        } else {
-            console.error("قیمت برنگشت یا null بود!");
-        }
-    });
-        return;
-    }
-
-        $.ajax({
-            url: '/Factors/RemoveItemsByFactor',
-            type: 'POST',
-            data: { factorDetailIds: selectedIds },
-            traditional: true,
-            success: function(response) {
-                if (response.success) {
-                    // حذف ردیف‌های انتخاب شده از جدول
-                    $(".delete-checkbox:checked").closest("tr").remove();
-                    toastr.success('حذف با موفقیت انجام شد.');
-          $.getJSON("/Factors/GetSubtotalPrice", { factorId: factorId }, function (data) {
-        if (data && data.price !== undefined) {
-            $("#SubtotalPrice").text(data.price);
-            updateTotal();
-        } else {
-            console.error("قیمت برنگشت یا null بود!");
-        }
-    });
-                } else {
-                    toastr.error('خطا در حذف.');
-                }
-            },
-            error: function() {
-                toastr.error('مشکل در ارتباط با سرور.');
-            }
-        });
-    }
-</script>
-
 <!--پرداخت فاکتور-->
 <script>
     $("#postButton").on("click", function () {

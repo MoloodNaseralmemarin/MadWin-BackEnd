@@ -30,9 +30,6 @@ namespace MadWin.Core.DTOs.Orders
     public class OrderSummaryForAdminDto
     {
         public List<OrderSummaryForAdminItemDto> OrderSummary { get; set; } = new();
-        public int CurrentPage { get; set; }
-        public int CountPage { get; set; }
-        // جمع کل سفارش‌های امروز همین کاربر
         public decimal TotalPrice { get; set; }
     }
 

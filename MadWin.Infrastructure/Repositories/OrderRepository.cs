@@ -127,7 +127,7 @@ namespace MadWin.Infrastructure.Repositories
                 .Where(o => o.IsFinaly)
                 .CountAsync();
         }
-        
+
         public async Task SoftDeleteFromOrderAsync(IEnumerable<int> orderIds)
         {
             if (orderIds == null || !orderIds.Any())
@@ -184,54 +184,57 @@ namespace MadWin.Infrastructure.Repositories
                 .ToListAsync();
 
         }
-
-        public async Task<OrderSummaryForAdminDto> GetTodayOrdersAsync(int pageId = 1)
+        public async Task<OrderSummaryForAdminDto> GetTodayOrdersAsync(int userId)
         {
             var today = DateTime.Today;
             var tomorrow = today.AddDays(1);
 
-            int take = 10;
-            int skip = (pageId - 1) * take;
-
-            // کوئری اصلی
+            // کوئری اصلی (فقط سفارش‌های همین کاربر)
             IQueryable<Order> query = GetQuery()
                 .IgnoreQueryFilters()
                 .Include(o => o.User)
                 .Include(o => o.OrderCategory)
                 .Include(o => o.OrderSubCategory)
-                .Where(o => !o.IsDelete && o.CreateDate >= today && o.CreateDate < tomorrow);
-
-            // گرفتن تعداد کل
-            int totalCount = await query.CountAsync();
+                .Where(o => !o.IsDelete
+                            && o.CreateDate >= today
+                            && o.CreateDate < tomorrow
+                            && o.UserId == userId); // 🔹 فیلتر بر اساس کاربر
 
             // ساخت DTO
             var list = new OrderSummaryForAdminDto
             {
-                CurrentPage = pageId,
-                CountPage = (int)Math.Ceiling(totalCount / (double)take),
                 OrderSummary = await query
                     .OrderByDescending(o => o.Id)
-                    .Skip(skip)
-                    .Take(take)
                     .Select(o => new OrderSummaryForAdminItemDto
                     {
                         OrderId = o.Id,
                         CreateDate = o.CreateDate,
-                        FullName = (o.User != null ? o.User.FirstName + " " + o.User.LastName : "نامشخص"),
+                        FullName = (o.User != null
+                            ? (o.User.FirstName ?? "") + " " + (o.User.LastName ?? "")
+                            : "نامشخص"),
                         CategoryGroup =
                             (o.OrderCategory != null ? o.OrderCategory.Title : "") +
-                            (o.OrderSubCategory != null ? " / " + o.OrderSubCategory.Title : ""),
+                            (o.OrderSubCategory != null && !string.IsNullOrEmpty(o.OrderSubCategory.Title)
+                                ? " / " + o.OrderSubCategory.Title
+                                : ""),
+
                         Size = $"ارتفاع: {o.Height} - عرض: {o.Width}",
                         SizeSMS = $"w: {o.Width} * h: {o.Height}",
                         Count = o.Count,
                         PriceWithFee = o.PriceWithFee,
                         IsEqualParts = o.IsEqualParts,
                         PartCount = o.PartCount,
-                        IsFinaly = o.IsFinaly
+                        IsFinaly = o.IsFinaly,
+                        WidthParts = new List<OrderWidthPartDto>() // همیشه لیست خالی
                     }).ToListAsync()
             };
-            // جمع کل سفارش‌ها برای همین صفحه
-            list.TotalPrice = list.OrderSummary?.Sum(o => o.PriceWithFee * o.Count) ?? 0;
+
+            // جمع کل سفارش‌ها
+            list.TotalPrice = list.OrderSummary?.Sum(o => (o.PriceWithFee) * o.Count) ?? 0;
+
+            if (list.OrderSummary == null)
+                throw new Exception("OrderSummary is null!");
+
             var orderIds = list.OrderSummary.Select(o => o.OrderId).ToList();
 
             if (orderIds.Any())
@@ -248,12 +251,14 @@ namespace MadWin.Infrastructure.Repositories
                 // اضافه کردن تکه‌ها به هر سفارش
                 foreach (var order in list.OrderSummary)
                 {
-                    order.WidthParts = widthParts
+                    var parts = widthParts
                         .Where(wp => wp.OrderId == order.OrderId)
                         .Select(wp => new OrderWidthPartDto
                         {
                             WidthValue = wp.WidthValue
                         }).ToList();
+
+                    order.WidthParts = parts ?? new List<OrderWidthPartDto>();
                 }
             }
 
@@ -262,3 +267,5 @@ namespace MadWin.Infrastructure.Repositories
 
     }
 }
+
+      

@@ -6,6 +6,8 @@ namespace Shop2City.WebHost.ViewModels.Orders
 {
     public class OrderViewModel
     {
+
+        public int UserId { get; set; }
         [Display(Name = "دسته‌بندی")]
         [Required(ErrorMessage = "لطفاً یک دسته‌بندی انتخاب کنید.")]
         public int? CategoryId { get; set; }

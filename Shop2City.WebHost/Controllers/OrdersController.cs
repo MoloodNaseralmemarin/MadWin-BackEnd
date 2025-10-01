@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Shop2City.Core.Services.Products;
 using Shop2City.WebHost.ViewModels.Orders;
 using System.Security.Claims;
+using System.Text;
 
 namespace Shop2City.Web.Areas.UserPanel.Controllers
 {
@@ -17,39 +18,32 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
         private readonly IProductService _productService;
         private readonly IOrderService _orderService;
         private readonly ICurtainComponentDetailService _curtainComponentDetailService;
-        private readonly IDeliveryMethodService _deliveryMethodService;
-        private readonly ILogger<OrdersController> _logger;
         private readonly IDiscountService _disCountService;
         private readonly ICommissionRateRepository _commissionRateRepository;
         private readonly ICurtainComponentRepository _curtainComponentRepository;
 
         public OrdersController(
-            IUserService userService,
-           
             IProductService productService,
             IOrderService orderService,
-            IOrderRepository orderRepository,
             ICurtainComponentDetailService curtainComponentDetailService,
-            IDeliveryMethodService deliveryMethodService,
-            ILogger<OrdersController> logger,
             IDiscountService disCountService,
             ICommissionRateRepository commissionRateRepository,
-            ICurtainComponentRepository curtainComponentRepository
-           )
+            ICurtainComponentRepository curtainComponentRepository)
         {
-            _productService = productService;
-            _curtainComponentDetailService = curtainComponentDetailService;
-            _orderService = orderService;
-            _deliveryMethodService = deliveryMethodService;
-            _logger = logger;
-            _disCountService = disCountService;
-            _commissionRateRepository = commissionRateRepository;
-            _curtainComponentRepository = curtainComponentRepository;
-
-
+            // guard clauses - throw early if DI failed so NullReferenceExceptions are easier to trace
+            _productService = productService ?? throw new ArgumentNullException(nameof(productService));
+            _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
+            _curtainComponentDetailService = curtainComponentDetailService ?? throw new ArgumentNullException(nameof(curtainComponentDetailService));
+            _disCountService = disCountService ?? throw new ArgumentNullException(nameof(disCountService));
+            _commissionRateRepository = commissionRateRepository ?? throw new ArgumentNullException(nameof(commissionRateRepository));
+            _curtainComponentRepository = curtainComponentRepository ?? throw new ArgumentNullException(nameof(curtainComponentRepository));
         }
+
         public IActionResult CreateOrder()
         {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+                return Unauthorized();
             // گرفتن دسته‌ها
             var categories = _productService.GetCategoryForManageProduct(1) ?? Enumerable.Empty<SelectListItem>();
 
@@ -63,61 +57,68 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
 
             var model = new OrderViewModel
             {
+                UserId= userId,
                 Categories = new SelectList(categories, "Value", "Text"),
                 SubCategories = new SelectList(subCategories, "Value", "Text")
             };
 
             return View(model);
         }
+
         public IActionResult GetSubCategories(int categoryId)
         {
             var subCategories = _productService.GetSubCategoryForManageProduct(categoryId) ?? Enumerable.Empty<SelectListItem>();
             return Json(subCategories.Select(s => new { s.Value, s.Text }));
         }
 
-
         #region ثبت سفارش 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateOrder(CreateDto orderView)
         {
-            int orderId = 0;
-            #region بدست اوردن userId
-            var UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!int.TryParse(UserId, out int userId))
+            // اگر ورودی مدل نامعتبر است، برای فراخوانی از مودال/آژاکس بهتر است خطاها را برگردانیم
+            if (!ModelState.IsValid)
             {
-                return Unauthorized(); // یا هر رفتار مناسب
+                // در حالت آژاکس، خطاها را به صورت json ارسال کن
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    return BadRequest(ModelState);
+
+                // در حالت معمولی، دوباره ویو را با دیتاهای لازم بازگردان
+                await FillCategoryViewDataAsync();
+                return View(orderView);
             }
 
-            #endregion
-            #region اگر ارتفاع کمتر از 200 بود 200 محاسبه شود و عرض کمتر از 80 بود 80 محاسبه شود
-
-            if (orderView.Height < 200)
+            try
             {
-                orderView.Height = 200;
+                var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (!int.TryParse(userIdString, out int userId))
+                    return Unauthorized();
 
-            }
-            if (orderView.Width < 80)
-            {
-                orderView.Width = 80;
-            }
-            #endregion
-            decimal basePrice = 0;
-            var items = await _orderService.GetCalculationAsync(orderView.CategoryId, orderView.SubCategoryId);
+                // حداقل مقدارها
+                orderView.Height = Math.Max(orderView.Height, 200);
+                orderView.Width = Math.Max(orderView.Width, 80);
 
-            if (items == null || !items.Any())
-                return View();
+                decimal basePrice = 0m;
 
-            #region ثبت در جدول سفارش ها و بدست آوردن orderId
-            // مرحله 2: ثبت سفارش (بدون مبلغ نهایی، اگر می‌خوای بعداً آپدیت کنی)
-            orderId = await _orderService.CreateOrderInitialAsync(orderView, userId, 0); // مقدار اولیه صفر
-            #endregion
-            // مرحله 3: محاسبه هر آیتم
-            foreach (var item in items)
-            {
-                try
+                var items = await _orderService.GetCalculationAsync(orderView.CategoryId, orderView.SubCategoryId);
+
+                if (items == null || !items.Any())
                 {
-                    Console.WriteLine($"Processing component: {item.CurtainComponentId}");
+                    // اگر این متد داخل مودال فراخوانی شده، بهتر است یک PartialView یا Json برگردانیم
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                        return Json(new { success = false, message = "هیچ مولفه‌ای برای محاسبه یافت نشد." });
 
+                    await FillCategoryViewDataAsync();
+                    ModelState.AddModelError(string.Empty, "هیچ مولفه‌ای برای محاسبه یافت نشد.");
+                    return View(orderView);
+                }
+
+                // ثبت سفارش اولیه و گرفتن orderId
+                int orderId = await _orderService.CreateOrderInitialAsync(orderView, userId, 0);
+
+                // محاسبه قیمت‌ها و ذخیره جزئیات اجزا
+                foreach (var item in items)
+                {
                     decimal componentCost = item.CurtainComponentId switch
                     {
                         1 => await CalculateIraniAsync(orderView),
@@ -133,94 +134,120 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
                         11 => await CalculateGlue2CostAsync(orderView.Height),
                         12 => await GetWageCostAsync(),
                         13 => await GetPackagingCostAsync(),
-                        _ => 0
+                        _ => 0m
                     };
 
                     basePrice += componentCost;
 
+                    // لاگ ساده برای دیباگ (در تولید از ILogger استفاده کنید)
                     Console.WriteLine($"Saving component: {item.CurtainComponentId} with cost {componentCost}");
 
                     await _curtainComponentDetailService.CreateCurtainComponentDetailInitialAsync(orderId, item.CurtainComponentId, componentCost, orderView.Count);
                 }
-                catch (Exception ex)
+
+                // محاسبه کارمزد
+                var commission = await GetCommissionInfoAsync(orderView.PartCount, orderView.IsEqualParts);
+
+                if (commission == null)
                 {
-                    Console.WriteLine($"ERROR in component {item.CurtainComponentId}: {ex.Message}");
+                    // اگر کارمزد پیدا نشد، آپدیت را انجام نده و پیغام مناسب بازگردان
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                        return Json(new { success = false, message = "اطلاعات کارمزد یافت نشد." });
+
+                    ModelState.AddModelError(string.Empty, "اطلاعات کارمزد یافت نشد.");
+                    await FillCategoryViewDataAsync();
+                    return View(orderView);
                 }
+
+                // آپدیت قیمت و کارمزد
+                await _orderService.UpdatePriceAndCommissionAsync(orderId, basePrice, commission.CommissionPercent, commission.CommissionRateId);
+
+                // برای نمایش در مودال یا نتیجه‌ی آژاکس، یک پاسخ مناسب بازگردان
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    // در اینجا می‌توان اطلاعات خلاصه سفارش را برگرداند
+                    var summary = await _orderService.GetTodayOrdersAsync(userId);
+                    return Json(new { success = true, orderId, summary });
+                }
+
+                // در حالت غیر آژاکس، ریدایرکت یا بازگشت به صفحه‌ی مناسب
+                return RedirectToAction(nameof(CreateOrder));
             }
+            catch (Exception ex)
+            {
+                // در محیط تولید از ILogger استفاده کنید؛ برای دیباگ فعلا لاگ کن
+                Console.WriteLine(ex);
 
-            #region به دست آوردن مبلغ کارمزد نسب به تعداد تکه و مساوی/نامساوی
-            var commission = await GetCommissionInfoAsync(orderView.PartCount, orderView.IsEqualParts);
-            #endregion
-            #region ویرایش قیمت پایه + قیمت کارمزد + شناسه کارمزد
-            await _orderService.UpdatePriceAndCommissionAsync(orderId, basePrice, commission.CommissionPercent, commission.CommissionRateId);
-            #endregion
-            var category = _productService.GetCategoryForManageProduct(1);
-            ViewData["Categories"] = new SelectList(category, "Value", "Text");
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    return StatusCode(500, new { success = false, message = "خطای سرور. با پشتیبانی تماس بگیرید." });
 
-            var subCategory = _productService.GetSubCategoryForManageProduct(int.Parse(category.First().Value));
-            ViewData["SubCategories"] = new SelectList(subCategory, "Value", "Text");
-            var model = await _orderService.GetTodayOrdersAsync(10);
-            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-                return ViewComponent("OrderSummary");
-
-            return View();
+                ModelState.AddModelError(string.Empty, "خطای سرور. با پشتیبانی تماس بگیرید.");
+                await FillCategoryViewDataAsync();
+                return View(orderView);
+            }
         }
         #endregion
+
+        #region helper: پر کردن ViewData برای ویو
+        private async Task FillCategoryViewDataAsync()
+        {
+            var categories = _productService.GetCategoryForManageProduct(1) ?? Enumerable.Empty<SelectListItem>();
+            var firstCategoryId = categories.FirstOrDefault()?.Value;
+            var subCategories = new List<SelectListItem>();
+            if (int.TryParse(firstCategoryId, out int categoryId))
+            {
+                subCategories = _productService.GetSubCategoryForManageProduct(categoryId)?.ToList() ?? new List<SelectListItem>();
+            }
+
+            ViewData["Categories"] = new SelectList(categories, "Value", "Text");
+            ViewData["SubCategories"] = new SelectList(subCategories, "Value", "Text");
+        }
+        #endregion
+
         #region پرده طلقی ایرانی
         private async Task<decimal> CalculateIraniAsync(CreateDto order)
         {
             var unitPrice = await _curtainComponentRepository.GetPriceByIdAsync(1);
-            if (unitPrice <= 0)
-                return 0;
+            if (unitPrice <= 0) return 0;
             return ((order.Height + 10) * order.Width * unitPrice) / 10000;
         }
         #endregion
+
         #region پرده طلقی خارجی
         private async Task<decimal> CalculateKharejiAsync(CreateDto order)
         {
             var unitPrice = await _curtainComponentRepository.GetPriceByIdAsync(2);
-            if (unitPrice <= 0)
-                return 0;
+            if (unitPrice <= 0) return 0;
             return ((order.Height + 10) * order.Width * unitPrice) / 10000;
         }
         #endregion
+
         #region پرده توری یک لایه
         private async Task<decimal> CalculateTooriOneLayerAsync(CreateDto order)
         {
             var unitPrice = await _curtainComponentRepository.GetPriceByIdAsync(3);
-            if (unitPrice <= 0)
-                return 0;
+            if (unitPrice <= 0) return 0;
             return ((order.Height + 10) * order.Width * unitPrice) / 10000;
         }
         #endregion
+
         #region پرده توری دو لایه
         private async Task<decimal> CalculateTooriTwoLayerAsync(CreateDto order, int partCount)
         {
             decimal totalCost = 0;
 
-            // محاسبه هزینه لایه دوم (با ضخامت 40 و قیمت ID = 4)
-            decimal unitPrice = await _curtainComponentRepository.GetPriceByIdAsync(4);
-            if (unitPrice <= 0)
-                return 0;
+            decimal unitPriceSecondLayer = await _curtainComponentRepository.GetPriceByIdAsync(4);
+            if (unitPriceSecondLayer <= 0) return 0;
+
             decimal heightPlusMargin = order.Height + 10;
             decimal twoLayerArea = heightPlusMargin * 40;
-            decimal twoLayerCost = (twoLayerArea / 10000) * unitPrice;
+            decimal twoLayerCost = (twoLayerArea / 10000) * unitPriceSecondLayer;
 
-            // نصف قیمت گان
-            //decimal halfGanCost = unitPrice / 2;  به گفته آقای نادری در تارخ 03/26
-
-            //totalCost += twoLayerCost + halfGanCost;
-
-            // هزینه پرده توری یک لایه (ID = 3)
             decimal singleLayerCostPerMeter = await _curtainComponentRepository.GetPriceByIdAsync(3);
             decimal singleLayerCost = (heightPlusMargin * order.Width * singleLayerCostPerMeter) / 10000;
             totalCost += singleLayerCost + twoLayerCost;
 
-            #region برای پرده دولایه 3قسمت مساوی/نامساوی
-
-            #endregion
-
-            //// سایر اجزا
+            // سایر اجزا
             totalCost += await CalculateZipper5CostAsync(order.Width);
             totalCost += await CalculateZipper2CostAsync(order.Height);
             totalCost += await CalculateChodonCostAsync(order.Width);
@@ -236,6 +263,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             return isTriplePart ? a : totalCost;
         }
         #endregion
+
         #region زیپ چسب 5 سانت
         private async Task<decimal> CalculateZipper5CostAsync(int width)
         {
@@ -243,26 +271,24 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             const int extraWidth = 5;
 
             var unitPrice = await _curtainComponentRepository.GetPriceByIdAsync(5);
-            if (unitPrice <= 0)
-                return 0;
+            if (unitPrice <= 0) return 0;
 
             return (((width + extraWidth) * coefficient) * unitPrice);
         }
         #endregion
+
         #region زیپ چسب 2.5 سانت
         private async Task<decimal> CalculateZipper2CostAsync(int height)
         {
             var unitPrice = await _curtainComponentRepository.GetPriceByIdAsync(6);
-            if (unitPrice <= 0)
-                return 0;
+            if (unitPrice <= 0) return 0;
             var adjustedHeight = GetAdjustedHeight(height);
-            //decimal a =adjustedHeight / 100;
-            //decimal b = a *unitPrice;
             decimal a = (decimal)adjustedHeight / 100;
             decimal b = (decimal)a * unitPrice;
             return b;
         }
         #endregion
+
         #region جودون
         private async Task<decimal> CalculateChodonCostAsync(int width)
         {
@@ -270,8 +296,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             const int extraWidth = 2;
 
             var unitPrice = await _curtainComponentRepository.GetPriceByIdAsync(7);
-            if (unitPrice <= 0)
-                return 0;
+            if (unitPrice <= 0) return 0;
             var adjustedWidth = width + extraWidth;
 
             decimal resultChodon = adjustedWidth * coefficient * unitPrice;
@@ -279,6 +304,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             return resultChodon;
         }
         #endregion
+
         #region گان
         private async Task<decimal> CalculateGanCostAsync(int height, int partCount)
         {
@@ -289,21 +315,19 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
 
             var unitPrice = await _curtainComponentRepository.GetPriceByIdAsync(8);
 
-            if (unitPrice <= 0)
-                return 0;
+            if (unitPrice <= 0) return 0;
 
             int adjustedHeight = height + extraHeight;
             decimal resultGan = adjustedHeight * coefficient * widthFactor * quantity * unitPrice;
 
             var newGan = resultGan / 2;
 
-
             var isTriplePart = partCount == 3;
             decimal a = resultGan + newGan;
             return isTriplePart ? a : resultGan;
         }
-
         #endregion
+
         #region آهنربا
         private async Task<decimal> CalculateMagnetCostAsync(int height, int partCount)
         {
@@ -312,8 +336,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             const int threshold2 = 400;
 
             var unitPrice = await _curtainComponentRepository.GetPriceByIdAsync(9);
-            if (unitPrice <= 0)
-                return 0;
+            if (unitPrice <= 0) return 0;
 
             decimal result = 0;
 
@@ -343,6 +366,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             return isTriplePart ? result * 2 : result;
         }
         #endregion
+
         #region چسب 2 طرفه 4 سانت
         private async Task<decimal> CalculateGlue4CostAsync(int width)
         {
@@ -350,6 +374,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             const int extraWidth = 5;
 
             var unitPrice = await _curtainComponentRepository.GetPriceByIdAsync(10);
+            if (unitPrice <= 0) return 0;
 
             var adjustedwidth = width + extraWidth;
             decimal resultGlue4 = adjustedwidth * coefficient * unitPrice;
@@ -357,6 +382,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             return resultGlue4;
         }
         #endregion
+
         #region چسب 2 طرفه 2 سانت
         private async Task<decimal> CalculateGlue2CostAsync(int height)
         {
@@ -370,6 +396,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             return resultGlue2;
         }
         #endregion
+
         #region اجرت دوخت
         public async Task<decimal> GetWageCostAsync()
         {
@@ -377,15 +404,16 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             return cost;
         }
         #endregion
-        #region   #region اجرت بسته بندی
+
+        #region اجرت بسته بندی
         public async Task<decimal> GetPackagingCostAsync()
         {
             var cost = await _curtainComponentRepository.GetPriceByIdAsync(13);
 
-
             return cost;
         }
         #endregion
+
         #region محاسبه ارتفاع برای زیپ چسب 2.5 سانت و گان
         public int GetAdjustedHeight(int height)
         {
@@ -417,12 +445,14 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             return heightNew;
         }
         #endregion
+
         #region محاسبه کارمزد
         private async Task<CommissionInfoLookup> GetCommissionInfoAsync(int partCount, bool isEqualParts)
         {
             return await _commissionRateRepository.GetCommissionInfoAsync(partCount, isEqualParts);
         }
         #endregion
+
         #region کد تخفیف
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -437,13 +467,10 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
 
             var result = await _disCountService.UseDiscountAsync(orderId, discountCode, userId);
 
-
             switch (result)
             {
                 case DiscountUseType.Success:
-
                     var applyDiscount = await _disCountService.ApplyDiscountAsync(orderId, discountCode);
-
                     return Json(new
                     {
                         success = true,
@@ -452,50 +479,49 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
                     });
 
                 case DiscountUseType.ExpirationDate:
-                    return Json(new
-                    {
-                        success = false,
-                        message = "مهلت استفاده از کد تخفیف به پایان رسیده است"
-                    });
+                    return Json(new { success = false, message = "مهلت استفاده از کد تخفیف به پایان رسیده است" });
 
                 case DiscountUseType.NotFound:
-                    return Json(new
-                    {
-                        success = false,
-                        message = "کد تخفیف یافت نشد"
-                    });
+                    return Json(new { success = false, message = "کد تخفیف یافت نشد" });
 
                 case DiscountUseType.Finished:
-                    return Json(new
-                    {
-                        success = false,
-                        message = "سقف استفاده از این کد تخفیف به پایان رسیده است"
-                    });
+                    return Json(new { success = false, message = "سقف استفاده از این کد تخفیف به پایان رسیده است" });
 
                 case DiscountUseType.UserUsed:
-                    return Json(new
-                    {
-                        success = false,
-                        message = "شما قبلاً از این کد تخفیف استفاده کرده‌اید"
-                    });
+                    return Json(new { success = false, message = "شما قبلاً از این کد تخفیف استفاده کرده‌اید" });
 
                 default:
-                    return Json(new
-                    {
-                        success = false,
-                        message = "خطای ناشناخته‌ای رخ داده است"
-                    });
+                    return Json(new { success = false, message = "خطای ناشناخته‌ای رخ داده است" });
             }
         }
         #endregion
 
         #region حذف از سفارش
+        [HttpPost]
         public async Task<IActionResult> RemoveItemsByOrderAsync(int[] orderId)
         {
-            await _orderService.SoftDeleteAsync(orderId);
-            var updatedList = await _orderService.GetTodayOrdersAsync();
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+                return Unauthorized();
+            await _orderService.SoftDeleteFromOrderAsync(orderId);
+            var updatedList = await _orderService.GetTodayOrdersAsync(userId);
             return Json(new { success = true, data = updatedList });
         }
         #endregion
+
+        #region جمع کل سفارش روز +‌کاربر
+        [HttpGet]
+        public IActionResult GetSumPriceWithFeeByOrder(int[] orderId)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+                return Unauthorized();
+            var subtotal = _orderService.GetSumPriceWithFeeByOrder(orderId, userId);
+            return Json(new { price = subtotal });
+
+        }
+        #endregion
+
+
     }
 }

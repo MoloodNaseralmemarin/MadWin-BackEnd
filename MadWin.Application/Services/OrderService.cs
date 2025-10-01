@@ -107,9 +107,9 @@ namespace MadWin.Application.Services
         {
             return await _orderRepository.CountOrders();
         }
-        public async Task<OrderSummaryForAdminDto> GetTodayOrdersAsync(int pageId = 1)
+        public async Task<OrderSummaryForAdminDto> GetTodayOrdersAsync(int userId)
         {
-            return await _orderRepository.GetTodayOrdersAsync(pageId);
+            return await _orderRepository.GetTodayOrdersAsync(userId);
         }
 
         public class SoftDeleteResult
@@ -141,7 +141,6 @@ namespace MadWin.Application.Services
                 _orderWidthPartRepository.Update(item);
             }
             await _orderWidthPartRepository.SaveChangesAsync();
-            //var allCurtainComponentDetail = await _curtainComponentProductGroupRepository.GetAllAsync(); var curtainComponentDetailToDelete = allCurtainComponentDetail.Where(o => orderId.Contains(o.Id) && !o.IsDelete).ToList(); foreach (var item in curtainComponentDetailToDelete) { item.IsDelete = true; item.LastUpdateDate = DateTime.Now; item.Description = "توسط کاربر حذف شده است."; _curtainComponentProductGroupRepository.Update(item); } await _curtainComponentDetailRepository.SaveChangesAsync();
             return;
         }
         private void MarkAsDeleted(BaseEntity entity)
@@ -156,10 +155,21 @@ namespace MadWin.Application.Services
             return await _orderRepository.GetByOrderIdAsync(orderId);
         }
 
-        public Task SoftDeleteAsync(IEnumerable<int> orderIds)
+        public async Task<decimal> GetSumPriceWithFeeByOrder(int[] orderIds, int userId)
         {
-            throw new NotImplementedException();
+            var today = DateTime.Today;
+            var tomorrow = today.AddDays(1);
+
+            var allOrders = await _orderRepository.GetAllAsync();
+            var orders = allOrders
+                .Where(o => orderIds.Contains(o.Id) &&
+                            o.UserId == userId &&
+                            o.CreateDate >= today && o.CreateDate < tomorrow);
+
+            return orders.Sum(o => o.PriceWithFee);
         }
+
+
     }
 
 }

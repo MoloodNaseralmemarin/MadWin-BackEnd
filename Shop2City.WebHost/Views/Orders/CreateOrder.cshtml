@@ -29,7 +29,7 @@
             </button>
 
             <!-- سفارش‌های امروز -->
-            @await Component.InvokeAsync("OrderSummaryComponent")
+            @await Component.InvokeAsync("OrderSummaryComponent", new { userId = Model.UserId })
 
             <div class="modal fade" id="customSizeModal" tabindex="-1" aria-labelledby="customSizeModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered">

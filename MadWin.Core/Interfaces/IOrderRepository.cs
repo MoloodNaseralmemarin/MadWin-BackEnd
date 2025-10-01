@@ -22,6 +22,6 @@ namespace MadWin.Core.Interfaces
 
         Task<IEnumerable<CurtainComponentDetail>> GetByOrderIdAsync(int orderId);
 
-        Task<OrderSummaryForAdminDto> GetTodayOrdersAsync(int pageId = 1);
+        Task<OrderSummaryForAdminDto> GetTodayOrdersAsync(int userId);
     }
 }

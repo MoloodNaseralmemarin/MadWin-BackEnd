@@ -1,4 +1,5 @@
 ﻿using Ghasedak.Core;
+using MadWin.Core.DTOs.Users;
 using MadWin.Core.Entities.SentMessages;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Settings;
@@ -336,6 +337,11 @@ namespace MadWin.Application.Services
         {
             var sendSms = await _smsRepository.GetAllAsync();
             return sendSms.Count();
+        }
+
+        public async Task<UserForAdminViewModel> GetAllUsers(int pageId = 1, string filterFirstName = "")
+        {
+            return null;// await _userRepository.GetAllUsers(pageId, filterFirstName);
         }
     }
 }

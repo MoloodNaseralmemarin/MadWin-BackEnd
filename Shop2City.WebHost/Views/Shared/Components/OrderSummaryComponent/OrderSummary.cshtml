@@ -7,7 +7,7 @@
 <div class="container mt-3">
     <h4 class="mb-3">
         سفارشات امروز
-        <span class="badge bg-primary">@Model.OrderSummaryForAdmin.OrderSummary?.Count ?? 0</span>
+        <span class="badge bg-primary">@Model.OrderSummaryForAdmin.OrderSummary.Count</span>
     </h4>
 
     @if (Model.OrderSummaryForAdmin.OrderSummary == null || !Model.OrderSummaryForAdmin.OrderSummary.Any())
@@ -24,7 +24,7 @@
             <table class="table table-bordered table-hover order-table align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th><input type="checkbox" id="selectAll"/></th>
+                        <th><input type="checkbox" id="selectAll" /></th>
                         <th>تاریخ</th>
                         <th>ساعت</th>
                         <th>نام محصول</th>
@@ -39,21 +39,26 @@
                     {
                         var statusClass = item.IsEqualParts ? "bg-success text-white" : "bg-warning text-dark";
 
+                        <!-- ردیف اصلی -->
                         <tr>
-                            <td rowspan="2"><input type="checkbox" class="delete-checkbox" value="@item.OrderId" /></td>
+                            <td rowspan="2">
+                                <input type="checkbox" class="delete-checkbox" value="@item.OrderId" />
+                            </td>
                             <td>@item.CreateDate.ToShamsi()</td>
                             <td>@item.CreateDate.ToString("HH:mm:ss")</td>
                             <td>@item.CategoryGroup</td>
                             <td><span class="badge bg-info">@item.Count</span></td>
                             <td><span>@item.PriceWithFee.ToString("N0") ریال</span></td>
-                            <td><span>@((item.PriceWithFee * item.Count).ToString("N0")) ریال</span></td>
-                            <td rowspan="2" class="text-center align-middle ">
-                                <a onclick="removeItems(@item.OrderId)">
+                            <td><span class="item-price">@((item.PriceWithFee * item.Count).ToString("N0")) ریال</span></td>
+                            <td rowspan="2" class="text-center align-middle">
+                                <a onclick="removeItems(@item.OrderId)" style="cursor:pointer;">
                                     <i class="fa fa-trash text-danger"></i>
                                 </a>
                             </td>
                         </tr>
-                        <tr>
+
+                        <!-- ردیف جزئیات -->
+                        <tr class="detail-row" data-orderid="@item.OrderId">
                             <td>@(item.IsEqualParts ? "قطعات مساوی هستند" : "قطعات اندازه‌های مختلف دارند")</td>
                             <td>تعداد قطعات: @item.PartCount</td>
                             <td>@item.Size</td>
@@ -69,11 +74,7 @@
                             </td>
                         </tr>
                     }
-                    <tr>
-                        <td colspan="8">
-                            <i class="fas fa-trash text-danger"></i>
-                        </td>
-                     </tr> 
+
                     <!-- بخش انتخاب روش ارسال -->
                     <tr>
                         <td colspan="2"><strong>روش ارسال:</strong></td>
@@ -119,7 +120,7 @@
                         </div>
                         <div class="row mb-2">
                             <div class="col-6"><strong>قیمت واحد:</strong> <span class="badge bg-secondary">@item.PriceWithFee.ToString("N0") ریال</span></div>
-                            <div class="col-6"><strong>قیمت کل:</strong> <span class="badge bg-primary">@((item.PriceWithFee * item.Count).ToString("N0")) ریال</span></div>
+                            <div class="col-6"><strong>قیمت کل:</strong> <span class="badge bg-primary item-price">@((item.PriceWithFee * item.Count).ToString("N0")) ریال</span></div>
                         </div>
                         <div class="row mb-2">
                             <div class="col-6"><strong>ابعاد (ارتفاع × عرض):</strong> @item.Size</div>
@@ -145,7 +146,9 @@
                         }
 
                         <div class="mt-2 d-flex justify-content-end">
-                            <a href="#" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i> حذف</a>
+                            <a onclick="removeItems(@item.OrderId)" class="btn btn-sm btn-outline-danger" style="cursor:pointer;">
+                                <i class="fas fa-trash"></i> حذف
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -175,32 +178,32 @@
 
         <!-- جدول نهایی مبلغ -->
         <div class="d-flex justify-content-center mt-4">
-    <div class="w-100" style="max-width: 500px;">
-        <table class="table table-bordered text-center">
-            <tr>
-                <td><strong>جمع کل قبل از تخفیف :</strong></td>
-                <td id="SubtotalPrice">@Model.OrderSummaryForAdmin.TotalPrice.ToString("N0") ریال</td>
-            </tr>
-            <tr>
-                <td><strong>مبلغ تخفیف :</strong></td>
-                <td><span id="disTotal">0</span> ریال</td>
-            </tr>
-            <tr>
-                <td><strong>هزینه ارسال و بسته‌بندی :</strong></td>
-                <td><span id="deliveryPrice">0</span> ریال</td>
-            </tr>
-            <tr class="h4 text-primary">
-                <td colspan="2"><strong>مبلغ قابل پرداخت :</strong> <span id="sumOrder">0</span> ریال</td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <button class="btn btn-success w-100 py-2" id="postButton" disabled>
-                        پرداخت آنلاین - <span id="sumOrderBtn">0 ریال</span>
-                    </button>
-                </td>
-            </tr>
-        </table>
-    </div>
-</div>
+            <div class="w-100" style="max-width: 500px;">
+                <table class="table table-bordered text-center">
+                    <tr>
+                        <td><strong>جمع کل قبل از تخفیف :</strong></td>
+                        <td id="SubtotalPrice">@Model.OrderSummaryForAdmin.TotalPrice.ToString("N0") ریال</td>
+                    </tr>
+                    <tr>
+                        <td><strong>مبلغ تخفیف :</strong></td>
+                        <td><span id="disTotal">0</span> ریال</td>
+                    </tr>
+                    <tr>
+                        <td><strong>هزینه ارسال و بسته‌بندی :</strong></td>
+                        <td><span id="deliveryPrice">0</span> ریال</td>
+                    </tr>
+                    <tr class="h4 text-primary">
+                        <td colspan="2"><strong>مبلغ قابل پرداخت :</strong> <span id="sumOrder">0</span> ریال</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <button class="btn btn-success w-100 py-2" id="postButton" disabled>
+                                پرداخت آنلاین - <span id="sumOrderBtn">0 ریال</span>
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
     }
 </div>

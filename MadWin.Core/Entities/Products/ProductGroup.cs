@@ -45,14 +45,12 @@ namespace MadWin.Core.Entities.Products
         public List<Product> SubCategory { get; set; }
 
 
-        #region order
-        [InverseProperty("OrderCategory")]
-        public List<Order> OrderCategory { get; set; }
+  
+        [InverseProperty(nameof(Order.OrderCategory))]
+        public List<Order> OrdersAsCategory { get; set; }
 
-        [InverseProperty("OrderSubCategory")]
-        public List<Order> OrderSubCategory { get; set; }
-        #endregion
-
-        #endregion
+        [InverseProperty(nameof(Order.OrderSubCategory))]
+        public List<Order> OrdersAsSubCategory { get; set; }
     }
+    #endregion
 }
