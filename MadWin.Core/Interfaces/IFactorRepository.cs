@@ -1,5 +1,4 @@
-﻿using MadWin.Core.DTOs.Factors;
-using MadWin.Core.Entities.Factors;
+﻿using MadWin.Core.Entities.Factors;
 using MadWin.Core.Lookups.Factors;
 
 namespace MadWin.Core.Interfaces

@@ -6,7 +6,9 @@
             <thead class="table-light">
                 <tr>
                     <th scope="col">نام قطعه</th>
-                    <th scope="col">قیمت</th>
+                    <th scope="col">تعداد</th>
+                    <th scope="col">قیمت واحد</th>
+                <th scope="col">قیمت کل</th>
                 </tr>
             </thead>
             <tbody>
@@ -14,7 +16,9 @@
                 {
                     <tr>
                         <td class="text-wrap">@item.CurtainComponent?.Name</td>
-                        <td>@string.Format(new System.Globalization.CultureInfo("fa-IR"), "{0:N0}", item.UnitCost)</td>
+                    <td>@item.Count</td>
+                    <td>@item.UnitCost</td>
+                    <td>@item.FinalCost</td>
                     </tr>
                 }
             </tbody>

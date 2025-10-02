@@ -1,20 +1,22 @@
-﻿using MadWin.Core.DTOs.Factors;
-using MadWin.Core.Entities.Factors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MadWin.Core.DTOs.FilterParameters;
+using MadWin.Core.Entities.CurtainComponents;
+using MadWin.Core.Interfaces;
+
 
 namespace MadWin.Application.Services
 {
     public interface IFactorDetailService
     {
-        Task<FactorSummaryDto> GetFactorSummaryByFactorIdAsync(int factorId);
-
-        Task<List<FactorDetail>> GetAllFactorDetailByFactorIdAsync(int factorId);
+        Task<FactorForAdminViewModel> GetFactorSummaryByFactorIdAsync(int factorId, int userId);
 
         Task SoftDeleteAsync(IEnumerable<int> factorDetailIds);
+
+        Task<FactorForAdminViewModel> GetAllFactorAsync(FilterParameter filter, int pageId = 1);
+
+        Task<IEnumerable<FactorDetailDto>> GetByFactorIdAsync(int factorId);
+
+
+
 
     }
 }

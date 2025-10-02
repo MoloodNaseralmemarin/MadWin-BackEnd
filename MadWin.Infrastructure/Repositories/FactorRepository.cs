@@ -1,8 +1,4 @@
-﻿using MadWin.Core.DTOs.Factors;
-using MadWin.Core.DTOs.Orders;
-using MadWin.Core.Entities.Factors;
-using MadWin.Core.Entities.Orders;
-using MadWin.Core.Entities.Users;
+﻿using MadWin.Core.Entities.Factors;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Lookups.Factors;
 using MadWin.Infrastructure.Context;

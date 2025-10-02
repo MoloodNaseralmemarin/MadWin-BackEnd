@@ -1,7 +1,4 @@
-﻿using MadWin.Core.DTOs.Factors;
-using MadWin.Core.DTOs.Orders;
-using MadWin.Core.Entities.Factors;
-using MadWin.Core.Entities.Orders;
+﻿using MadWin.Core.Entities.Factors;
 
 namespace MadWin.Application.Services
 {
@@ -21,7 +18,6 @@ namespace MadWin.Application.Services
 
         Task<int> CountFactors();
 
-        Task<IEnumerable<FactorSummaryDto>> GetAllFactorsAsync();
 
     }
 }

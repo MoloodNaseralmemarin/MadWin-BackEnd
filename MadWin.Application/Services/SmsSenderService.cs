@@ -261,35 +261,35 @@ namespace MadWin.Application.Services
 
         public async Task<bool> SendSMSFactorManagerAsync(int factorId)
         {
-            var message = $"Message = \"فاکتور\" + item.FactorId + \"-\" + listFactorDetails.Count + \"-\" + i + \" \" + \"نوع\" + item.Product.Title + \" \" + \"تعداد :\" + item.Quantity + \" \" + \"با تشکر پناه پلاست لغو 11\",";
-            var listFactorDetails = await _factorDetailService.GetAllFactorDetailByFactorIdAsync(factorId);
+            //var message = $"Message = \"فاکتور\" + item.FactorId + \"-\" + listFactorDetails.Count + \"-\" + i + \" \" + \"نوع\" + item.Product.Title + \" \" + \"تعداد :\" + item.Quantity + \" \" + \"با تشکر پناه پلاست لغو 11\",";
+            //var listFactorDetails = await _factorDetailService.GetAllFactorDetailByFactorIdAsync(factorId);
             try
             {
-                var i = 1;
-                foreach (var item in listFactorDetails)
-                {
-                    var otpsms = new Api(_smsSettings.ApiKey);
-                    var result = otpsms.VerifyAsync(1, "MadWinGetFactorForManager",
-                    new string[] { "09180580270" },//09180580270
-                    item.Factor.User.FirstName + " " + item.Factor.User.LastName,
-                     item.FactorId + "-" + listFactorDetails.Count + "-" + i,
-                    item.Product.Title,
-                    item.Quantity.ToString(),
-                    "ماد وین");
+            //    var i = 1;
+            //    foreach (var item in listFactorDetails)
+            //    {
+            //        var otpsms = new Api(_smsSettings.ApiKey);
+            //        var result = otpsms.VerifyAsync(1, "MadWinGetFactorForManager",
+            //        new string[] { "09180580270" },//09180580270
+            //        item.Factor.User.FirstName + " " + item.Factor.User.LastName,
+            //         item.FactorId + "-" + listFactorDetails.Count + "-" + i,
+            //        item.Product.Title,
+            //        item.Quantity.ToString(),
+            //        "ماد وین");
 
-                    if (result != null)
-                    {
-                        await SaveSmsAsync("09180580270", "MadWinGetFactorForCustomer", message, "سفارش دهنده", 2, "200", null, factorId);
-                        _logger.LogInformation("پیامک ثبت فاکتور توسط مشتری با موفقیت ارسال شد.");
-                        return true;
-                    }
-                    else
-                    {
-                        _logger.LogWarning("ارسال پیامک ثبت فاکتور توسط مشتری با خطا مواجه شد. نتیجه خالی بود.");
-                        return false;
-                    }
-                }
-                i++;
+            //        if (result != null)
+            //        {
+            //            await SaveSmsAsync("09180580270", "MadWinGetFactorForCustomer", message, "سفارش دهنده", 2, "200", null, factorId);
+            //            _logger.LogInformation("پیامک ثبت فاکتور توسط مشتری با موفقیت ارسال شد.");
+            //            return true;
+            //        }
+            //        else
+            //        {
+            //            _logger.LogWarning("ارسال پیامک ثبت فاکتور توسط مشتری با خطا مواجه شد. نتیجه خالی بود.");
+            //            return false;
+            //        }
+            //    }
+            //    i++;
                 return true;
 
 

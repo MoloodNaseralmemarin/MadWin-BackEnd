@@ -1,6 +1,4 @@
-﻿using MadWin.Core.DTOs.Factors;
-using MadWin.Core.Entities.Factors;
-using MadWin.Core.Entities.Orders;
+﻿using MadWin.Core.Entities.Factors;
 using MadWin.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -120,18 +118,6 @@ namespace MadWin.Application.Services
         {
             var countFactors = await _factorRepository.GetAllAsync();
             return countFactors.Count();
-        }
-
-        public async Task<IEnumerable<FactorSummaryDto>> GetAllFactorsAsync()
-        {
-            var factors = await _factorRepository.GetAllAsync() ?? new List<Factor>();
-
-            return factors.Select(f => new FactorSummaryDto
-            {
-                FactorId = f.Id,
-                
-
-            });
         }
     }
 }

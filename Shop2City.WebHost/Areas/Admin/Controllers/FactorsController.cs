@@ -1,7 +1,8 @@
 ﻿using MadWin.Application.Services;
+using MadWin.Core.DTOs.FilterParameters;
+using MadWin.Core.DTOs.Orders;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Shop2City.WebHost.ViewModels.Factors;
 
 namespace Shop2City.WebHost.Areas.Admin.Controllers
 {
@@ -9,16 +10,25 @@ namespace Shop2City.WebHost.Areas.Admin.Controllers
     [Area("Admin")]
     public class FactorsController : Controller
     {
-        private readonly IFactorService _factorService;
+        private readonly IFactorDetailService _factorDetailService;
 
-        public FactorsController(IFactorService factorService)
+        public FactorsController(IFactorDetailService factorDetailService)
         {
-            _factorService = factorService;
+            _factorDetailService = factorDetailService;
         }
-        public async Task<IActionResult> GetAllFactors()
+        [HttpGet]
+        public async Task<IActionResult> Index(FilterParameter filter, int pageId = 1)
         {
-            var allFactors = await _factorService.GetAllFactorsAsync();
-            return View(allFactors);
+            var result = await _factorDetailService.GetAllFactorAsync(filter,pageId);
+            return View(result);
+        }
+
+
+        public async Task<IActionResult> ShowFactorDetails(int id)
+        {
+            var getAllOrderDetails = await _factorDetailService.GetByFactorIdAsync(id);
+            return PartialView("_FactorDetailsPartial", getAllOrderDetails);
+
         }
     }
 }

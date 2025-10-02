@@ -1,7 +1,6 @@
 ﻿using MadWin.Application.Services;
 using MadWin.Core.DTOs.Orders;
 using Microsoft.AspNetCore.Mvc;
-using Shop2City.WebHost.ViewModels.Factors;
 using System.Security.Claims;
 
 namespace Shop2City.WebHost.Controllers
@@ -23,18 +22,18 @@ namespace Shop2City.WebHost.Controllers
         public async Task<IActionResult> GetFactorSummary(int factorId)
 
         {
-            var factorSummary = await _factorDetailService.GetFactorSummaryByFactorIdAsync(factorId);  // از پارامتر استفاده شد
-            var deliveryMethods = await _deliveryMethodService.GetDeliveryMethodInfoAsync();
-            if (factorSummary == null)
-                return NotFound();
+            //////var factorSummary = await _factorDetailService.GetFactorSummaryByFactorIdAsync(factorId);  // از پارامتر استفاده شد
+            //////var deliveryMethods = await _deliveryMethodService.GetDeliveryMethodInfoAsync();
+            //////if (factorSummary == null)
+            //////    return NotFound();
 
-            var viewModel = new FactorSummaryViewModel
-            {
-                FactorSummary = factorSummary,
-                DeliveryMethods = deliveryMethods
-            };
+            //////var viewModel = new FactorSummaryViewModel
+            //////{
+            //////    FactorSummary = factorSummary,
+            //////    DeliveryMethods = deliveryMethods
+            //////};
 
-            return View(viewModel);
+            return View();
         }
         #region حذف آیتم از فاکتور
         public async Task<IActionResult> RemoveItemsByFactorAsync(int factorId, int[] factorDetailIds)
@@ -45,9 +44,9 @@ namespace Shop2City.WebHost.Controllers
             await _factorDetailService.SoftDeleteAsync(factorDetailIds);
 
             // حالا می‌توانیم اطلاعات فاکتور را دوباره بگیریم
-            var updatedList = await _factorDetailService.GetFactorSummaryByFactorIdAsync(factorId);
+           // var updatedList = await _factorDetailService.GetFactorSummaryByFactorIdAsync(factorId);
 
-            return Json(new { success = true, data = updatedList });
+            return Json(new { success = true });
         }
         #endregion
 

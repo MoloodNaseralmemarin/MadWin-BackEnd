@@ -1,11 +1,7 @@
-﻿using MadWin.Core.DTOs.Factors;
-using MadWin.Core.Entities.Factors;
+﻿
+using MadWin.Core.DTOs.FilterParameters;
+using MadWin.Core.Entities.Orders;
 using MadWin.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MadWin.Application.Services
 {
@@ -18,15 +14,9 @@ namespace MadWin.Application.Services
             _factorDetailRepository = factorDetailRepository;
             _factorRepository = factorRepository;
         }
-
-        public async Task<List<FactorDetail>> GetAllFactorDetailByFactorIdAsync(int factorId)
+        public async Task<FactorForAdminViewModel> GetFactorSummaryByFactorIdAsync(int factorId,int userId)
         {
-            return await _factorDetailRepository.GetAllFactorDetailByFactorIdAsync(factorId);
-        }
-
-        public async Task<FactorSummaryDto> GetFactorSummaryByFactorIdAsync(int factorId)
-        {
-            return await _factorDetailRepository.GetFactorSummaryByFactorIdAsync(factorId);
+            return await _factorDetailRepository.GetFactorSummaryByFactorIdAsync(factorId,userId);
         }
         public async Task SoftDeleteAsync(IEnumerable<int> factorDetailIds)
         {
@@ -73,6 +63,16 @@ namespace MadWin.Application.Services
             }
 
             await _factorRepository.SaveChangesAsync();
+        }
+
+        public async Task<FactorForAdminViewModel> GetAllFactorAsync(FilterParameter filter, int pageId = 1)
+        {
+            return  await _factorDetailRepository.GetAllFactorAsync(filter, pageId);
+        }
+
+        public async Task<IEnumerable<FactorDetailDto>> GetByFactorIdAsync(int factorId)
+        {
+            return await _factorDetailRepository.GetByFactorIdAsync(factorId);
         }
 
     }

@@ -17,7 +17,6 @@ using Shop2City.Core.Services.Properties;
 using Shop2City.Core.Services.PropertyTechnicalProducts;
 using Shop2City.Core.Services.PropertyTechnicals;
 using Shop2City.Core.Services.PropertyTitles;
-using Shop2City.Core.Services.SlideShows;
 using Shop2City.Core.Services.Transactions;
 using System.Collections.ObjectModel;
 
@@ -112,7 +111,6 @@ builder.Services.AddScoped<IUserDiscountCodeRepository, UserDiscountCodeReposito
 builder.Services.AddScoped<IViewRenderService, RenderViewToString>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<ISlideShowService, SlideShowService>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IProductImageService, ProductImageService>();

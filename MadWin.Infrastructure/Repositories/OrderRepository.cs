@@ -306,10 +306,17 @@ namespace MadWin.Infrastructure.Repositories
                 query = query.Where(o => o.PriceWithFee <= filter.ToPrice.Value);
             }
 
+            int take = 12;
+            int skip = (pageId - 1) * take;
+
             var list = new OrderForAdminViewModel
             {
+                CurrentPage = pageId,
+                CountPage = (int)Math.Ceiling(query.Count() / (double)take),
                 OrderSummary = await query
-                    .OrderByDescending(o => o.Id)
+                    .OrderByDescending(u => u.Id)
+                    .Skip(skip)
+                    .Take(take)
                     .Select(o => new OrderSummaryForAdminItemDto
                     {
                         OrderId = o.Id,
@@ -331,6 +338,7 @@ namespace MadWin.Infrastructure.Repositories
                         PartCount = o.PartCount,
                         IsFinaly = o.IsFinaly,
                         BasePrice=o.BasePrice,
+                        TotalPrice=o.TotalCost,
                         WidthParts = new List<OrderWidthPartDto>() // همیشه لیست خالی
                     }).ToListAsync()
             };
