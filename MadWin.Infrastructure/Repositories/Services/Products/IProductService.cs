@@ -80,7 +80,7 @@ namespace Shop2City.Core.Services.Products
 
         List<SelectListItem> GetCategoryForManageProduct(int groupId);
 
-        List<SelectListItem> GetSubCategoryForManageProduct(int categoryId);
+        Task<List<SelectListItem>> GetSubCategoryForManageProduct(int categoryId);
 
         #endregion
 

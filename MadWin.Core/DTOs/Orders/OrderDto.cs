@@ -1,4 +1,5 @@
 ﻿using MadWin.Core.Common;
+using MadWin.Core.DTOs.Users;
 using MadWin.Core.Lookups.DeliveryMethods;
 using System.ComponentModel.DataAnnotations;
 
@@ -18,6 +19,10 @@ namespace MadWin.Core.DTOs.Orders
         public bool IsEqualParts { get; set; }
         public decimal PriceWithFee { get; set; }
         public bool IsFinaly { get; set; }
+
+        public decimal BasePrice { get; set; }
+
+        public decimal TotalPrice { get; set; }
 
         public List<OrderWidthPartDto> WidthParts { get; set; } = new();
     }
@@ -39,6 +44,17 @@ namespace MadWin.Core.DTOs.Orders
         public IEnumerable<DeliveryMethodInfoLookup> DeliveryMethods { get; set; }
 
     }
+
+
+    public class OrderForAdminViewModel
+    {
+        public List<OrderSummaryForAdminItemDto> OrderSummary { get; set; } = new();
+        public OrderFilterParameters filter { get; set; }
+
+        public int CurrentPage { get; set; }
+        public int CountPage { get; set; }
+    }
+
 
 
 }

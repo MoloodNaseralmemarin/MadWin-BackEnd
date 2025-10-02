@@ -3,6 +3,7 @@ using MadWin.Core.DTOs.Orders;
 using MadWin.Core.Entities.Common;
 using MadWin.Core.Entities.CurtainComponents;
 using MadWin.Core.Entities.Orders;
+using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -169,7 +170,19 @@ namespace MadWin.Application.Services
             return orders.Sum(o => o.PriceWithFee);
         }
 
+        public async Task<OrderForAdminViewModel> GetAllOrdersAsync(OrderFilterParameters filter, int pageId = 1)
+        {
+            var order = await _orderRepository.GetAllOrdersAsync(filter,pageId);
 
+            if (order == null)
+            {
+                _logger.LogWarning("هیچ سفارشی پیدا نشد.");
+                return null;
+            }
+
+            _logger.LogInformation("سفارش  با موفقیت بارگذاری شد.");
+            return order; 
+        }
     }
 
 }

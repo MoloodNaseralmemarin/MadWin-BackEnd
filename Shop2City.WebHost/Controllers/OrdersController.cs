@@ -9,6 +9,7 @@ using Shop2City.Core.Services.Products;
 using Shop2City.WebHost.ViewModels.Orders;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Shop2City.Web.Areas.UserPanel.Controllers
 {
@@ -39,7 +40,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             _curtainComponentRepository = curtainComponentRepository ?? throw new ArgumentNullException(nameof(curtainComponentRepository));
         }
 
-        public IActionResult CreateOrder()
+        public async Task<IActionResult> CreateOrder()
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(userIdString, out int userId))
@@ -52,7 +53,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             var subCategories = new List<SelectListItem>();
             if (int.TryParse(firstCategoryId, out int categoryId))
             {
-                subCategories = _productService.GetSubCategoryForManageProduct(categoryId)?.ToList() ?? new List<SelectListItem>();
+                subCategories =await _productService.GetSubCategoryForManageProduct(categoryId);
             }
 
             var model = new OrderViewModel
@@ -65,15 +66,20 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             return View(model);
         }
 
-        public IActionResult GetSubCategories(int categoryId)
+        [HttpGet]
+        public async Task<IActionResult> GetSubCategories(int categoryId)
         {
-            var subCategories = _productService.GetSubCategoryForManageProduct(categoryId) ?? Enumerable.Empty<SelectListItem>();
-            return Json(subCategories.Select(s => new { s.Value, s.Text }));
+            var items =await _productService.GetSubCategoryForManageProduct(categoryId);
+
+            // باید خروجی JSON به شکلی باشه که جاوااسکریپت بتونه بخونه
+            return Json(items.Select(s => new {
+                Id = s.Value,
+                Name = s.Text
+            }));
         }
 
         #region ثبت سفارش 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateOrder(CreateDto orderView)
         {
             // اگر ورودی مدل نامعتبر است، برای فراخوانی از مودال/آژاکس بهتر است خطاها را برگردانیم
@@ -84,7 +90,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
                     return BadRequest(ModelState);
 
                 // در حالت معمولی، دوباره ویو را با دیتاهای لازم بازگردان
-                await FillCategoryViewDataAsync();
+         
                 return View(orderView);
             }
 
@@ -108,7 +114,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
                     if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                         return Json(new { success = false, message = "هیچ مولفه‌ای برای محاسبه یافت نشد." });
 
-                    await FillCategoryViewDataAsync();
+                    
                     ModelState.AddModelError(string.Empty, "هیچ مولفه‌ای برای محاسبه یافت نشد.");
                     return View(orderView);
                 }
@@ -155,7 +161,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
                         return Json(new { success = false, message = "اطلاعات کارمزد یافت نشد." });
 
                     ModelState.AddModelError(string.Empty, "اطلاعات کارمزد یافت نشد.");
-                    await FillCategoryViewDataAsync();
+                    
                     return View(orderView);
                 }
 
@@ -182,27 +188,13 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
                     return StatusCode(500, new { success = false, message = "خطای سرور. با پشتیبانی تماس بگیرید." });
 
                 ModelState.AddModelError(string.Empty, "خطای سرور. با پشتیبانی تماس بگیرید.");
-                await FillCategoryViewDataAsync();
+                
                 return View(orderView);
             }
         }
         #endregion
 
-        #region helper: پر کردن ViewData برای ویو
-        private async Task FillCategoryViewDataAsync()
-        {
-            var categories = _productService.GetCategoryForManageProduct(1) ?? Enumerable.Empty<SelectListItem>();
-            var firstCategoryId = categories.FirstOrDefault()?.Value;
-            var subCategories = new List<SelectListItem>();
-            if (int.TryParse(firstCategoryId, out int categoryId))
-            {
-                subCategories = _productService.GetSubCategoryForManageProduct(categoryId)?.ToList() ?? new List<SelectListItem>();
-            }
 
-            ViewData["Categories"] = new SelectList(categories, "Value", "Text");
-            ViewData["SubCategories"] = new SelectList(subCategories, "Value", "Text");
-        }
-        #endregion
 
         #region پرده طلقی ایرانی
         private async Task<decimal> CalculateIraniAsync(CreateDto order)

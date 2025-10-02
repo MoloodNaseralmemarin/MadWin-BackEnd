@@ -233,16 +233,16 @@ namespace Shop2City.Core.Services.Products
                 .ToList();
         }
 
-        public List<SelectListItem> GetSubCategoryForManageProduct(int categoryId)
+        public async Task<List<SelectListItem>> GetSubCategoryForManageProduct(int categoryId)
         {
-            return _context.ProductGroups
+            return await _context.ProductGroups
                 .Where(pg => pg.ParentId == categoryId && pg.IsActive)
                 .Select(pg => new SelectListItem
                 {
                     Text = pg.Title,
                     Value = pg.Id.ToString()
                 })
-                .ToList();
+                .ToListAsync();
         }
 
         public void UpdateProduct(Product product, IFormFile imgProduct)

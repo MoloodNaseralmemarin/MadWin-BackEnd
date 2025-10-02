@@ -3,6 +3,7 @@ using MadWin.Core.DTOs.Orders;
 using MadWin.Core.Entities.CurtainComponents;
 using MadWin.Core.Entities.Orders;
 using MadWin.Core.Interfaces;
+using System.Threading.Tasks;
 
 
 namespace MadWin.Application.Services
@@ -22,6 +23,8 @@ namespace MadWin.Application.Services
         Task<int> CountOrders();
 
         Task<OrderSummaryForAdminDto> GetTodayOrdersAsync(int userId);
+
+        Task<OrderForAdminViewModel> GetAllOrdersAsync(OrderFilterParameters filter, int pageId = 1);
 
         Task<IEnumerable<CurtainComponentDetail>> GetCurtainComponentDetailsByOrderIdAsync(int orderId);
         Task SoftDeleteFromOrderAsync(int[] orderId);
