@@ -59,17 +59,16 @@ namespace MadWin.Infrastructure.Repositories
 
         public async Task<FactorInfoLookup> GetFactorInfoByFactorIdAsync(int factorId)
         {
-            var factor = await _context.Set<Factor>()
-                .Where(f => f.Id == factorId)
-                .Where(f => f.FactorDetails.Any(fd => !fd.IsDelete)) // شرط روی FactorDetails
-                .Select(f => new FactorInfoLookup
-                {
-                    FactorId = f.Id,
-                    Price = f.TotalPrice
-                })
-                .FirstOrDefaultAsync();
-
-            return factor;
+   
+            return await GetQuery()
+                      .Where(f => f.Id == factorId)
+                      .Where(f => f.FactorDetails.Any(fd => !fd.IsDelete))
+                      .Select(f => new FactorInfoLookup
+                      {
+                          FactorId = f.Id,
+                          Price = f.TotalPrice
+                      })
+                      .FirstOrDefaultAsync();
         }
 
         public async Task<Factor> GetFactorByFactorIdAsync(int factorId)

@@ -5,7 +5,8 @@
     var factorSummary = Model.FactorSummaryForAdmin;
     var factor = factorSummary.FactorSummary.FirstOrDefault();
     var factorId = factor?.FactorId ?? 0;
-    var totalPrice = factorSummary.TotalCost; // یا TotalPrice اگه پراپرتی‌ات اینطوره
+    var createDate = factor.CreateDate;
+    var totalPrice = factor.SubTotal; // یا TotalPrice اگه پراپرتی‌ات اینطوره
 }
 
 <div class="container my-4">
@@ -34,7 +35,7 @@
             <!-- کارت سبد خرید -->
             <div class="card shadow border-0 rounded-3">
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fa fa-shopping-basket"></i> خلاصه فاکتور</h5>
+                    <h5 class="mb-0"><i class="fa fa-shopping-basket"></i>خلاصه فاکتور</h5>
                     <span class="badge bg-light text-dark">شماره فاکتور: @factorId</span>
                 </div>
 
@@ -96,19 +97,21 @@
                                 <tr>
                                     <td colspan="2"><strong>کد تخفیف:</strong></td>
                                     <td colspan="4" class="mt-2">
-                                        <input type="text" class="discountCode form-control" />
-                                        <button id="applyDiscountBtnMobile" class="btn btn-primary w-100 py-2">
+                                        <input type="hidden" id="factorId" value="@factorId" />
+                                        <input type="text" id="discountCode" class="form-control" />
+                                        <button id="applyDiscountBtn" class="btn btn-primary w-100 py-2">
                                             اعمال کد تخفیف
                                         </button>
                                     </td>
                                 </tr>
+
                             </table>
                             <div class="d-flex justify-content-center mt-4">
                                 <div class="w-100" style="max-width: 500px;">
                                     <table class="table table-bordered text-center">
                                         <tr>
                                             <td><strong>جمع کل قبل از تخفیف :</strong></td>
-                                            <td id="SubtotalPrice">@Model.FactorSummaryForAdmin.TotalCost.ToString("N0")</td>
+                                            <td id="SubtotalPrice">@totalPrice.ToString("N0")</td>
                                         </tr>
                                         <tr>
                                             <td><strong>مبلغ تخفیف :</strong></td>
@@ -151,35 +154,110 @@
     </div>
 </div>
 
-<script>
-    // حذف آیتم‌ها
-    function removeItems(factorId) {
-        var selectedIds = [];
-        $(".delete-checkbox:checked").each(function () {
-            selectedIds.push($(this).val());
-        });
+@section Scripts {
+    <script>
+        let selectedDeliveryId = null; // متغیر سراسری
 
-        if (selectedIds.length === 0) {
-            toastr.warning('هیچ موردی انتخاب نشده است.');
-            return;
+        function updateTotal() {
+            let subtotalText = $("#SubtotalPrice").text();
+            let subtotal = Number(subtotalText.replace(/[^\d]/g, ''));
+
+            let deliveryText = $("#deliveryPrice").text();
+            let delivery = Number(deliveryText.replace(/,/g, ''));
+
+            let disTotalText = $("#disTotal").text();
+            let disTotal = Number(disTotalText.replace(/,/g, ''));
+
+            let total = subtotal - disTotal + delivery;
+
+            $("#sumOrder").text(total.toLocaleString());
+            $("#sumOrderBtn").text(total.toLocaleString()); // دکمه پرداخت هم آپدیت بشه
         }
 
-        $.ajax({
-            url: '/Factors/RemoveItemsByFactor',
-            type: 'POST',
-            data: { factorDetailIds: selectedIds },
-            traditional: true,
-            success: function (response) {
-                if (response.success) {
-                    toastr.success("آیتم‌ها با موفقیت حذف شدند.");
-                    location.reload();
-                } else {
-                    toastr.error("خطا در حذف آیتم‌ها.");
-                }
-            },
-            error: function () {
-                toastr.error("مشکلی در برقراری ارتباط با سرور رخ داد.");
-            }
+        $(document).ready(function () {
+            // بارگذاری اولیه
+            updateTotal();
+
+            // وقتی delivery تغییر می‌کنه
+            $("input:radio[name=selection]").on("change", function () {
+                selectedDeliveryId = $(this).val();
+                $("#postButton").prop("disabled", false);
+
+                $.ajax({
+                    type: "GET",
+                    url: "/Home/GetDeliveryPrice",
+                    data: { deliveryId: selectedDeliveryId },
+                    success: function (result) {
+                        if (result.success) {
+                            $("#deliveryPrice").text(result.price.toLocaleString());
+                            updateTotal();
+                        }
+                    }
+                });
+            });
+
+            // اعمال کد تخفیف
+            $("#applyDiscountBtn").click(function (e) {
+                e.preventDefault();
+
+                var factorId = $("#factorId").val();
+                var discountCode = $("#discountCode").val();
+
+                $.ajax({
+                    url: '/Factors/UseDiscountForFactor',
+                    type: 'GET',
+                    data: {
+                        factorId: factorId,
+                        discountCode: discountCode
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            $("#disTotal").text(response.discountAmount.toLocaleString());
+                            updateTotal();
+                            toastr.success(response.message, "");
+                        } else {
+                            toastr.error(response.message, "");
+                        }
+                    },
+                    error: function () {
+                        toastr.error("بسیبسیسش", "");
+                    }
+                });
+            });
+
+            // پرداخت آنلاین
+            $('#postButton').click(function () {
+                var sumOrderText = $("#sumOrder").text();
+                var sumOrder = Number(sumOrderText.replace(/,/g, ''));
+
+                const dataToSend = {
+                    sumOrder: sumOrder,
+                    invoiceId: 0,
+                    deliveryId: selectedDeliveryId,
+                    source: 'order'
+                };
+
+                console.log(dataToSend);
+
+                $.ajax({
+                    url: '/Payment/ProcessPayment',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(dataToSend),
+                    success: function (response) {
+                        if (response.success) {
+                            window.location.href = response.redirectUrl;
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(error);
+                        alert("An error occurred while sending the request.");
+                    }
+                });
+            });
         });
-    }
-</script>
+    </script>
+}
+

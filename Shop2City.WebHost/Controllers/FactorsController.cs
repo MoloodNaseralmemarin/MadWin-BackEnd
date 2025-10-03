@@ -41,8 +41,8 @@ namespace Shop2City.WebHost.Controllers
             return Json(new { price = subtotal.ToString("N0") });
 
         }
-
         #region کد تخفیف
+        [HttpGet]
         public async Task<IActionResult> UseDiscountForFactorAsync(int factorId, string discountCode)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -51,13 +51,10 @@ namespace Shop2City.WebHost.Controllers
 
             var result = await _discountService.UseDiscountForFactorAsync(factorId, discountCode, userId);
 
-
             switch (result)
             {
                 case DiscountUseType.Success:
-
                     var applyDiscount = await _discountService.ApplyDiscountForFactorAsync(factorId, discountCode);
-
                     return Json(new
                     {
                         success = true,
@@ -66,42 +63,23 @@ namespace Shop2City.WebHost.Controllers
                     });
 
                 case DiscountUseType.ExpirationDate:
-                    return Json(new
-                    {
-                        success = false,
-                        message = "مهلت استفاده از کد تخفیف به پایان رسیده است"
-                    });
+                    return Json(new { success = false, message = "مهلت استفاده از کد تخفیف به پایان رسیده است" });
 
                 case DiscountUseType.NotFound:
-                    return Json(new
-                    {
-                        success = false,
-                        message = "کد تخفیف یافت نشد"
-                    });
+                    return Json(new { success = false, message = "کد تخفیف یافت نشد" });
 
                 case DiscountUseType.Finished:
-                    return Json(new
-                    {
-                        success = false,
-                        message = "سقف استفاده از این کد تخفیف به پایان رسیده است"
-                    });
+                    return Json(new { success = false, message = "سقف استفاده از این کد تخفیف به پایان رسیده است" });
 
                 case DiscountUseType.UserUsed:
-                    return Json(new
-                    {
-                        success = false,
-                        message = "شما قبلاً از این کد تخفیف استفاده کرده‌اید"
-                    });
+                    return Json(new { success = false, message = "شما قبلاً از این کد تخفیف استفاده کرده‌اید" });
 
                 default:
-                    return Json(new
-                    {
-                        success = false,
-                        message = "خطای ناشناخته‌ای رخ داده است"
-                    });
+                    return Json(new { success = false, message = "خطای ناشناخته‌ای رخ داده است" });
             }
         }
         #endregion
+
 
 
     }

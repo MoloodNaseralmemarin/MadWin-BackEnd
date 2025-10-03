@@ -71,6 +71,7 @@ namespace MadWin.Infrastructure.Repositories
                     {
                         FactorId = o.Id,
                         CreateDate = o.CreateDate,
+                        SubTotal = o.Factor.TotalPrice,
 
                         FactorDetails = o.Factor.FactorDetails
                             .Where(fd => !fd.IsDelete)

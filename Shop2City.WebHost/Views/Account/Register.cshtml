@@ -42,20 +42,20 @@
                            placeholder="مهدوی">
                 </div>
                 <div class="mb-3">
-                    <label asp-for="CellPhone" class="form-label">شماره ثابت </label>
+                    <label asp-for="TelPhone" class="form-label">شماره ثابت </label>
                     <input type="text"
-                           asp-for="CellPhone"
-                           id="cellPhone"
+                           asp-for="TelPhone"
+                           id="TelPhone"
                            class="form-control form-control-md d-md-block"
                            pattern="[0-9]*"
                            inputmode="numeric"
-                           placeholder="081-32530608">
+                           placeholder="08132530608">
                 </div>
                 <div class="mb-3">
-                    <label asp-for="TelPhone" class="form-label">شماره همراه </label>
+                    <label asp-for="CellPhone" class="form-label">شماره همراه </label>
                     <input type="text"
-                           asp-for="TelPhone"
-                           id="telPhone"
+                           asp-for="CellPhone"
+                           id="CellPhone"
                            class="form-control form-control-md d-md-block"
                            pattern="[0-9]*"
                            inputmode="numeric"
@@ -84,7 +84,7 @@
                            asp-for="ConfirmPassword"
                            id="password"
                            class="form-control form-control-md d-md-block"
-                           placeholder="تکرار کلمه عبو">
+                           placeholder="تکرار کلمه عبور">
                 </div>
                 <div class="mb-3">
                     <a asp-controller="Account" asp-action="Login">قبلاْ ثبت نام کرده ام</a>
