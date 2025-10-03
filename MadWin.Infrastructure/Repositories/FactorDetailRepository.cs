@@ -183,6 +183,85 @@ namespace MadWin.Infrastructure.Repositories
 
             return list;
         }
+
+        public async Task<FactorForAdminViewModel> GetAllFactorByUserIdAsync(int userId,FilterParameter filter, int pageId = 1)
+        {
+            // کوئری اصلی (فقط سفارش‌های همین کاربر)
+            IQueryable<FactorDetail> query = GetQuery()
+                .Include(f => f.Factor)
+                .ThenInclude(f => f.User)
+                .Where(fd => !fd.IsDelete && fd.Factor.UserId==userId);
+
+            // فیلترها
+            if (!string.IsNullOrWhiteSpace(filter.FullName))
+            {
+                query = query.Where(f =>
+                    string.Concat(f.Factor.User.FirstName, " ", f.Factor.User.LastName).Contains(filter.FullName));
+            }
+
+            if (filter.OrderId.HasValue)
+            {
+                query = query.Where(f => f.Factor.Id == filter.OrderId.Value);
+            }
+
+            if (filter.FromDate.HasValue)
+            {
+                query = query.Where(f => f.Factor.CreateDate >= filter.FromDate.Value);
+            }
+
+            if (filter.ToDate.HasValue)
+            {
+                query = query.Where(f => f.Factor.CreateDate <= filter.ToDate.Value);
+            }
+
+            if (filter.FromPrice.HasValue)
+            {
+                query = query.Where(f => f.Factor.TotalAmount >= filter.FromPrice.Value);
+            }
+
+            if (filter.ToPrice.HasValue)
+            {
+                query = query.Where(f => f.Factor.TotalAmount <= filter.ToPrice.Value);
+            }
+
+            int take = 12;
+            int skip = (pageId - 1) * take;
+
+            var list = new FactorForAdminViewModel
+            {
+                CurrentPage = pageId,
+                CountPage = (int)Math.Ceiling(query.Count() / (double)take),
+                FactorSummary = await query
+                    .OrderByDescending(u => u.FactorId)
+                    .Skip(skip)
+                    .Take(take)
+                    .Select(f => new FactorSummaryForAdminItemDto
+                    {
+                        FactorId = f.Factor.Id,
+                        IsFinaly = f.Factor.IsFinaly,
+                        FullName = (f.Factor.User != null
+                            ? (f.Factor.User.FirstName ?? "") + " " + (f.Factor.User.LastName ?? "")
+                            : "نامشخص"),
+                        CreateDate = f.Factor.CreateDate,
+                        DeliveryPrice = f.Factor.DeliveryMethodAmount, // قیمت ارسال
+                        Discount = f.Factor.DisTotal, // مبلغ تخفیف
+                        FactorDetailItemCount = f.Factor.FactorDetails
+                            .Where(fd => !fd.IsDelete) // تعداد جزئیات فاکتور غیر حذف شده
+                            .Count(), // محاسبه تعداد زیر فاکتورها
+                        FactorDetails = f.Factor.FactorDetails
+                            .Where(fd => !fd.IsDelete) // شرط روی جزئیات فاکتور
+                            .Select(fd => new FactorDetailDto
+                            {
+                                Id = fd.Id,
+                                ProductTitle = fd.Product.Title,
+                                Quantity = fd.Quantity,
+                                Price = fd.Price
+                            }).ToList()
+                    }).ToListAsync()
+            };
+
+            return list;
+        }
         public async Task<IEnumerable<FactorDetailDto>> GetByFactorIdAsync(int factorId)
         {
             return await _context.FactorDetails

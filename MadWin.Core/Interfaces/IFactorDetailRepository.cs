@@ -16,6 +16,7 @@ namespace MadWin.Core.Interfaces
 
         decimal GetSubtotalByFactorId(int factorId);
         Task<FactorForAdminViewModel> GetAllFactorAsync(FilterParameter filter, int pageId = 1);
+        Task<FactorForAdminViewModel> GetAllFactorByUserIdAsync(int userId, FilterParameter filter, int pageId = 1);
         Task<FactorForAdminViewModel> GetFactorSummaryByFactorIdAsync(int factorId, int userId);
 
         Task<IEnumerable<FactorDetailDto>> GetByFactorIdAsync(int factorId);

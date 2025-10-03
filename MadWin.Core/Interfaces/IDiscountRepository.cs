@@ -16,5 +16,7 @@ namespace MadWin.Core.Interfaces
 
         Task<bool> IsExistDisCountCode(string discountcode);
         Task<DiscountForAdminViewModel> GetAllDiscountsAsync(int pageId = 1);
+
+        
     }
 }

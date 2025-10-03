@@ -1,4 +1,5 @@
-﻿using MadWin.Application.Services;
+﻿
+using MadWin.Application.Services;
 using MadWin.Core.DTOs.Orders;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Lookups.CommissionRates;
@@ -8,8 +9,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Shop2City.Core.Services.Products;
 using Shop2City.WebHost.ViewModels.Orders;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shop2City.Web.Areas.UserPanel.Controllers
 {
@@ -39,32 +38,31 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
             _commissionRateRepository = commissionRateRepository ?? throw new ArgumentNullException(nameof(commissionRateRepository));
             _curtainComponentRepository = curtainComponentRepository ?? throw new ArgumentNullException(nameof(curtainComponentRepository));
         }
-
         public async Task<IActionResult> CreateOrder()
         {
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userIdString, out int userId))
-                return Unauthorized();
             // گرفتن دسته‌ها
-            var categories = _productService.GetCategoryForManageProduct(1) ?? Enumerable.Empty<SelectListItem>();
+            var categories = await _productService.GetCategoryForManageProduct(1);
+
+            // تعریف subCategories خالی برای استفاده بعدی
+            List<SelectListItem> subCategories = new List<SelectListItem>();
 
             // گرفتن زیر دسته‌ها بر اساس دسته اول
             var firstCategoryId = categories.FirstOrDefault()?.Value;
-            var subCategories = new List<SelectListItem>();
-            if (int.TryParse(firstCategoryId, out int categoryId))
+            if (!string.IsNullOrEmpty(firstCategoryId) && int.TryParse(firstCategoryId, out int categoryId))
             {
-                subCategories =await _productService.GetSubCategoryForManageProduct(categoryId);
+                subCategories = await _productService.GetSubCategoryForManageProduct(categoryId);
             }
 
             var model = new OrderViewModel
             {
-                UserId= userId,
                 Categories = new SelectList(categories, "Value", "Text"),
                 SubCategories = new SelectList(subCategories, "Value", "Text")
             };
 
             return View(model);
         }
+
+
 
         [HttpGet]
         public async Task<IActionResult> GetSubCategories(int categoryId)

@@ -81,10 +81,10 @@ namespace MadWin.Infrastructure.Repositories
                             && x.OrderId == orderId);
         }
 
-        public async Task<bool> IsExistDisCountCode(string discountcode)
+        public async Task<bool> IsExistDisCountCode(string discountCode)
         {
-            return await _context.Set<Discount>()
-             .AnyAsync(dc => dc.DiscountCode == discountcode);
+            var result = await GetByConditionAsync(dc => dc.DiscountCode == discountCode);
+            return result.Any();
         }
         public async Task<DiscountForAdminViewModel> GetAllDiscountsAsync(int pageId)
         {

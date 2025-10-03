@@ -13,7 +13,7 @@ namespace Shop2City.WebHost.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var products = _productService.GetAllProductsByGroupId(6);
+            var products =await _productService.GetAllProductsByGroupId(6);
             if (!products.Any())
                 return Content("");
             return await Task.FromResult((IViewComponentResult)View("CategoryTooriOneLayer", products));

@@ -16,13 +16,10 @@
     <h3 class="h5 mb-3">میز کار</h3>
     <ul class="list-group list-group-flush">
         <li class="list-group-item">
-            <a asp-controller="UserPanel" asp-action="EditProfile" class="text-decoration-none d-block">ویرایش حساب کاربری</a>
+            <a asp-area="UserPanel" asp-controller="Orders" asp-action="Index" class="text-decoration-none d-block">لیست سفارش ها</a>
         </li>
         <li class="list-group-item">
-            <a asp-controller="UserPanel" asp-action="ChangePassword" class="text-decoration-none d-block">تغییر رمز عبور</a>
-        </li>
-        <li class="list-group-item">
-            <a href="/UserPanel/Orders/ShowOrder" class="text-decoration-none d-block">لیست فاکتورها</a>
+            <a asp-area="UserPanel" asp-controller="Factors" asp-action="Index" class="text-decoration-none d-block">لیست فاکتورها</a>
         </li>
         <li class="list-group-item">
             <a asp-controller="Account" asp-action="Logout" class="text-decoration-none d-block text-danger">خروج از حساب کاربری</a>

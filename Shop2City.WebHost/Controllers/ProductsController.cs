@@ -23,17 +23,6 @@ namespace Shop2City.WebHost.Controllers
             _userService = userService;
             _serviceProvider = serviceProvider;
         }
-        public IActionResult Index(int pageId = 1, string filterProductTitleFa = ""
-           , List<int> selectedGroups = null)
-        {
-            ViewBag.selectedGroups = selectedGroups;
-            ViewBag.FilterProductTitleFa = filterProductTitleFa;
-            ViewBag.Groups = _productService.GetAllGroup();
-            ViewBag.list = _productService.ShowMainProductGroups();
-            ViewBag.pageId = pageId;
-            ViewData["Referer"] = Request.Headers["Path"].ToString();
-            return View(_productService.GetProduct(pageId, filterProductTitleFa, selectedGroups));
-        }
         [Authorize]
         public async Task<IActionResult> BuyProduct()
         {

@@ -113,6 +113,8 @@ namespace MadWin.Application.Services
             return await _orderRepository.GetTodayOrdersAsync(userId);
         }
 
+
+
         public class SoftDeleteResult
         {
             public List<int> DeletedOrderIds { get; set; } = new();
@@ -182,6 +184,20 @@ namespace MadWin.Application.Services
 
             _logger.LogInformation("سفارش  با موفقیت بارگذاری شد.");
             return order; 
+        }
+
+        public async Task<OrderForAdminViewModel> GetAllOrdersByUserIdAsync(int userId, OrderFilterParameters filter, int pageId = 1)
+        {
+            var order = await _orderRepository.GetAllOrdersByUserIdAsync(userId,filter, pageId);
+
+            if (order == null)
+            {
+                _logger.LogWarning("هیچ سفارشی پیدا نشد.");
+                return null;
+            }
+
+            _logger.LogInformation("سفارش  با موفقیت بارگذاری شد.");
+            return order;
         }
     }
 

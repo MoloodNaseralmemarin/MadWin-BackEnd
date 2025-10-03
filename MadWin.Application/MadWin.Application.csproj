@@ -5,6 +5,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Services\IProductService.cs~RF77cd9d.TMP" />
+  </ItemGroup>
   
     <ItemGroup>
     <ProjectReference Include="..\MadWin.Core\MadWin.Core.csproj" />

@@ -17,7 +17,7 @@ namespace Shop2City.Web.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var products = _productService.GetAllProductsByGroupId(5);
+            var products =await _productService.GetAllProductsByGroupId(5);
             if (!products.Any())
                 return Content("");
             return await Task.FromResult((IViewComponentResult)View("CategoryKhareji", products));

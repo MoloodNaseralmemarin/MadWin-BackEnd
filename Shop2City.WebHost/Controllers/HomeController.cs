@@ -23,11 +23,11 @@ namespace Shop2City.WebHost.Controllers
         [Route("ShowProduct/{id}")]
         public IActionResult ShowProduct(int id)
         {
-            var product = _productService.GetProductForShow(id);
-            var productGalleries = _productService.GetProductActiveGalleries(id);
+            //var product = _productService.GetProductForShow(id);
+            //var productGalleries = _productService.GetProductActiveGalleries(id);
 
 
-            return View(Tuple.Create(product, productGalleries));
+            return View();
         }
 
         [HttpGet]

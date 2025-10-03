@@ -13,6 +13,8 @@ namespace MadWin.Application.Services
 
         Task<FactorForAdminViewModel> GetAllFactorAsync(FilterParameter filter, int pageId = 1);
 
+        Task<FactorForAdminViewModel> GetAllFactorByUserIdAsync(int userId,FilterParameter filter, int pageId = 1);
+
         Task<IEnumerable<FactorDetailDto>> GetByFactorIdAsync(int factorId);
 
 

@@ -4,6 +4,7 @@ using MadWin.Core.DTOs.Users;
 using MadWin.Core.Entities.Common;
 using MadWin.Core.Entities.CurtainComponents;
 using MadWin.Core.Entities.Orders;
+using MadWin.Core.Entities.Products;
 using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Lookups.Orders;
@@ -267,7 +268,6 @@ namespace MadWin.Infrastructure.Repositories
 
         public async Task<OrderForAdminViewModel> GetAllOrdersAsync(OrderFilterParameters filter, int pageId = 1)
         {
-            // کوئری اصلی (فقط سفارش‌های همین کاربر)
             IQueryable<Order> query = GetQuery()
                 .Include(o => o.User)
                 .Include(o => o.OrderCategory)
@@ -339,6 +339,116 @@ namespace MadWin.Infrastructure.Repositories
                         IsFinaly = o.IsFinaly,
                         BasePrice=o.BasePrice,
                         TotalPrice=o.TotalCost,
+                        WidthParts = new List<OrderWidthPartDto>() // همیشه لیست خالی
+                    }).ToListAsync()
+            };
+
+
+            if (list.OrderSummary == null)
+                throw new Exception("OrderSummary is null!");
+
+            var orderIds = list.OrderSummary.Select(o => o.OrderId).ToList();
+
+            if (orderIds.Any())
+            {
+                // گرفتن عرض‌های تکه‌ها
+                var widthParts = await _context.Set<OrderWidthPart>()
+                    .Where(w => orderIds.Contains(w.OrderId))
+                    .Select(w => new
+                    {
+                        w.OrderId,
+                        w.WidthValue
+                    }).ToListAsync();
+
+                // اضافه کردن تکه‌ها به هر سفارش
+                foreach (var order in list.OrderSummary)
+                {
+                    var parts = widthParts
+                        .Where(wp => wp.OrderId == order.OrderId)
+                        .Select(wp => new OrderWidthPartDto
+                        {
+                            WidthValue = wp.WidthValue
+                        }).ToList();
+
+                    order.WidthParts = parts ?? new List<OrderWidthPartDto>();
+                }
+            }
+            return list;
+        }
+        public async Task<OrderForAdminViewModel> GetAllOrdersByUserIdAsync(int userId, OrderFilterParameters filter, int pageId = 1)
+        {
+            // کوئری اصلی (فقط سفارش‌های همین کاربر)
+            IQueryable<Order> query = GetQuery()
+                .Include(o => o.User)
+                .Include(o => o.OrderCategory)
+                .Include(o => o.OrderSubCategory)
+                .Where(o => !o.IsDelete && o.UserId == userId);
+
+            // فیلترها
+            if (!string.IsNullOrWhiteSpace(filter.FullName))
+            {
+                query = query.Where(o =>
+                    string.Concat(o.User.FirstName, " ", o.User.LastName).Contains(filter.FullName));
+            }
+
+            if (filter.OrderId.HasValue)
+            {
+                query = query.Where(o => o.Id == filter.OrderId.Value);
+            }
+
+            if (filter.FromDate.HasValue)
+            {
+                query = query.Where(o => o.CreateDate >= filter.FromDate.Value);
+            }
+
+            if (filter.ToDate.HasValue)
+            {
+                query = query.Where(o => o.CreateDate <= filter.ToDate.Value);
+            }
+
+            if (filter.FromPrice.HasValue)
+            {
+                query = query.Where(o => o.PriceWithFee >= filter.FromPrice.Value);
+            }
+
+            if (filter.ToPrice.HasValue)
+            {
+                query = query.Where(o => o.PriceWithFee <= filter.ToPrice.Value);
+            }
+
+            int take = 12;
+            int skip = (pageId - 1) * take;
+
+            var list = new OrderForAdminViewModel
+            {
+                CurrentPage = pageId,
+                CountPage = (int)Math.Ceiling(query.Count() / (double)take),
+                OrderSummary = await query
+                    .OrderByDescending(u => u.Id)
+                    .Skip(skip)
+                    .Take(take)
+                    .Select(o => new OrderSummaryForAdminItemDto
+                    {
+                        OrderId = o.Id,
+                        CreateDate = o.CreateDate,
+                        FullName = (o.User != null
+                            ? (o.User.FirstName ?? "") + " " + (o.User.LastName ?? "")
+                            : "نامشخص"),
+                        CategoryGroup =
+                            (o.OrderCategory != null ? o.OrderCategory.Title : "") +
+                            (o.OrderSubCategory != null && !string.IsNullOrEmpty(o.OrderSubCategory.Title)
+                                ? " / " + o.OrderSubCategory.Title
+                                : ""),
+
+                        Size = $"ارتفاع: {o.Height} - عرض: {o.Width}",
+                        SizeSMS = $"w: {o.Width} * h: {o.Height}",
+                        Count = o.Count,
+                        PriceWithFee = o.PriceWithFee,
+                        IsEqualParts = o.IsEqualParts,
+                        PartCount = o.PartCount,
+                        IsFinaly = o.IsFinaly,
+                        BasePrice = o.BasePrice,
+                        TotalPrice = o.TotalCost,
                         WidthParts = new List<OrderWidthPartDto>() // همیشه لیست خالی
                     }).ToListAsync()
             };

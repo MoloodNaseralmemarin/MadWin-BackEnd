@@ -5,6 +5,7 @@ using MadWin.Core.Entities.Discounts;
 using MadWin.Infrastructure.Convertors;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shop2City.WebHost.Dtos.Discounts;
 using Shop2City.WebHost.ViewModels.CommissionRates;
 
 namespace Shop2City.WebHost.Areas.Admin.Controllers
@@ -95,5 +96,17 @@ namespace Shop2City.WebHost.Areas.Admin.Controllers
             TempData["Success"] = "اطلاعات مشتری با موفقیت بروزرسانی شد.";
             return RedirectToAction(nameof(Index)); // برگرد به لیست مشتری‌ها
         }
+
+        [HttpPost]
+        public async Task<IActionResult> IsExistDisCountCode([FromBody] CheckDiscountDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Code))
+                return BadRequest(new { message = "کد تخفیف الزامی است" });
+
+            var exists = await _discountService.IsExistDisCountCode(dto.Code);
+
+            return Ok(new { isDuplicate = exists });
+        }
+
     }
 }

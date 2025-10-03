@@ -20,6 +20,8 @@ namespace MadWin.Application.Services
         Task<DiscountForAdminViewModel> GetAllDiscountsAsync(int pageId = 1);
 
         Task AddDiscount(Discount discount);
+
+        Task<bool> IsExistDisCountCode(string discountCode);
     }
 }
         

@@ -13,7 +13,7 @@ namespace Shop2City.WebHost.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var products = _productService.GetAllProductsByGroupId(4);
+            var products =await _productService.GetAllProductsByGroupId(4);
             if (!products.Any())
                 return Content("");
             return await Task.FromResult((IViewComponentResult)View("CategoryIrani", products));

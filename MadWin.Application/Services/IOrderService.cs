@@ -26,6 +26,8 @@ namespace MadWin.Application.Services
 
         Task<OrderForAdminViewModel> GetAllOrdersAsync(OrderFilterParameters filter, int pageId = 1);
 
+        Task<OrderForAdminViewModel> GetAllOrdersByUserIdAsync(int userId, OrderFilterParameters filter, int pageId = 1);
+
         Task<IEnumerable<CurtainComponentDetail>> GetCurtainComponentDetailsByOrderIdAsync(int orderId);
         Task SoftDeleteFromOrderAsync(int[] orderId);
 

@@ -136,6 +136,9 @@ namespace MadWin.Application.Services
             await _discountRepository.AddAsync(discount);
             await _discountRepository.SaveChangesAsync();
         }
-
+        public async Task<bool> IsExistDisCountCode(string discountCode)
+        {
+            return await _discountRepository.IsExistDisCountCode(discountCode);
+        }
     }
 }

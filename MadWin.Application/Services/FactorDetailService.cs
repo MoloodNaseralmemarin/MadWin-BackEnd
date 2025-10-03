@@ -69,11 +69,15 @@ namespace MadWin.Application.Services
         {
             return  await _factorDetailRepository.GetAllFactorAsync(filter, pageId);
         }
-
+        public async Task<FactorForAdminViewModel> GetAllFactorByUserIdAsync(int userId, FilterParameter filter, int pageId = 1)
+        {
+            return await _factorDetailRepository.GetAllFactorByUserIdAsync(userId,filter, pageId);
+        }
         public async Task<IEnumerable<FactorDetailDto>> GetByFactorIdAsync(int factorId)
         {
             return await _factorDetailRepository.GetByFactorIdAsync(factorId);
         }
 
+   
     }
 }
