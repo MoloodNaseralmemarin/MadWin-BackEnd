@@ -19,22 +19,6 @@ namespace Shop2City.WebHost.Controllers
             _factorService = factorService;
         }
 
-        public async Task<IActionResult> GetFactorSummary(int factorId)
-
-        {
-            //////var factorSummary = await _factorDetailService.GetFactorSummaryByFactorIdAsync(factorId);  // از پارامتر استفاده شد
-            //////var deliveryMethods = await _deliveryMethodService.GetDeliveryMethodInfoAsync();
-            //////if (factorSummary == null)
-            //////    return NotFound();
-
-            //////var viewModel = new FactorSummaryViewModel
-            //////{
-            //////    FactorSummary = factorSummary,
-            //////    DeliveryMethods = deliveryMethods
-            //////};
-
-            return View();
-        }
         #region حذف آیتم از فاکتور
         public async Task<IActionResult> RemoveItemsByFactorAsync(int factorId, int[] factorDetailIds)
         {

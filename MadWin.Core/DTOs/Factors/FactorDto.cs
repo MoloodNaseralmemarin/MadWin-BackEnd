@@ -1,17 +1,21 @@
 ﻿using MadWin.Core.DTOs.FilterParameters;
+using MadWin.Core.Lookups.DeliveryMethods;
 
+namespace MadWin.Core.DTOs.Fators
+
+{
 public class FactorSummaryForAdminItemDto
 {
     public int FactorId { get; set; }
 
-    public DateTime CreateDate {  get; set; }
-    public string FullName { get;set; }
+    public DateTime CreateDate { get; set; }
+    public string FullName { get; set; }
 
     // لیست جزئیات (هر محصول)
     public List<FactorDetailDto> FactorDetails { get; set; } = new();
 
     // جمع کل قبل از تخفیف
-    public decimal SubTotal => FactorDetails.Sum(d => d.TotalPrice);
+    public decimal SubTotal  {get;set;}
 
     // مبلغ تخفیف
     public decimal Discount { get; set; }
@@ -34,8 +38,8 @@ public class FactorDetailDto
     public string ProductTitle { get; set; } = "";
     public int Quantity { get; set; }
     public decimal Price { get; set; }
+    public decimal TotalPrice { get; set; }
 
-    public decimal TotalPrice => Price * Quantity;
 }
 
 public class FactorForAdminViewModel
@@ -45,4 +49,17 @@ public class FactorForAdminViewModel
 
     public int CurrentPage { get; set; }
     public int CountPage { get; set; }
+}
+
+public class FactorSummaryForAdminDto
+{
+    public List<FactorSummaryForAdminItemDto> FactorSummary { get; set; } = new();
+    public decimal TotalCost { get; set; }
+}
+public class FactorSummaryViewModel
+{
+    public FactorSummaryForAdminDto FactorSummaryForAdmin { get; set; }
+    public IEnumerable<DeliveryMethodInfoLookup> DeliveryMethods { get; set; }
+
+}
 }

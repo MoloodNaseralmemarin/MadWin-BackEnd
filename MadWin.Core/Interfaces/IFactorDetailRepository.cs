@@ -1,4 +1,6 @@
-﻿using MadWin.Core.DTOs.FilterParameters;
+﻿using MadWin.Core.DTOs.Fators;
+using MadWin.Core.DTOs.FilterParameters;
+using MadWin.Core.DTOs.Orders;
 using MadWin.Core.Entities.Factors;
 
 namespace MadWin.Core.Interfaces
@@ -17,7 +19,7 @@ namespace MadWin.Core.Interfaces
         decimal GetSubtotalByFactorId(int factorId);
         Task<FactorForAdminViewModel> GetAllFactorAsync(FilterParameter filter, int pageId = 1);
         Task<FactorForAdminViewModel> GetAllFactorByUserIdAsync(int userId, FilterParameter filter, int pageId = 1);
-        Task<FactorForAdminViewModel> GetFactorSummaryByFactorIdAsync(int factorId, int userId);
+        Task<FactorSummaryForAdminDto> GetOpenFactorAsync(int userId, int factorId);
 
         Task<IEnumerable<FactorDetailDto>> GetByFactorIdAsync(int factorId);
 

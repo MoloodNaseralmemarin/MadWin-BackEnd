@@ -11,16 +11,10 @@ namespace Shop2City.WebHost.Controllers
 {
     public class ProductsController : Controller
     {
-        private readonly IProductService _productService;
-        private readonly IFactorService _factorService;
-        private readonly IUserService _userService;
         private readonly IServiceProvider _serviceProvider;
 
-        public ProductsController(IProductService productService, IFactorService factorService, IUserService userService, IServiceProvider serviceProvider)
+        public ProductsController(IServiceProvider serviceProvider)
         {
-            _productService = productService;
-            _factorService = factorService;
-            _userService = userService;
             _serviceProvider = serviceProvider;
         }
         [Authorize]
@@ -59,7 +53,8 @@ namespace Shop2City.WebHost.Controllers
                 await factorService.UpdateFactorSumAsync(factorId);
 
                 // هدایت به صفحه خلاصه فاکتور
-                return RedirectToAction("GetFactorSummary", "Factors", new { factorId });
+                return RedirectToAction("FactorSummary", "Factors", new { area = "UserPanel", factorId = factorId });
+
             }
         }
     }

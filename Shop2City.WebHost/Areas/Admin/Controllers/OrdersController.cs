@@ -1,8 +1,6 @@
 ﻿using MadWin.Application.Services;
 using MadWin.Core.DTOs.Orders;
 using Microsoft.AspNetCore.Mvc;
-using Shop2City.WebHost.ViewModels.Orders;
-using System.Threading.Tasks;
 
 namespace Shop2City.Web.Areas.Admin.Controllers
 {

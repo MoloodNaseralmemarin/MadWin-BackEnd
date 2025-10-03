@@ -1,6 +1,7 @@
-﻿using MadWin.Application.Services;
+﻿using MadWin.Application.Repositories;
+using MadWin.Application.Services;
+using MadWin.Core.DTOs.Fators;
 using MadWin.Core.DTOs.FilterParameters;
-using MadWin.Core.DTOs.Orders;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -12,10 +13,12 @@ namespace Shop2City.WebHost.Areas.UserPanel.Controllers
     public class FactorsController : Controller
     {
         private readonly IFactorDetailService _factorDetailService;
+        private readonly IDeliveryMethodService _deliveryMethodService;
 
-        public FactorsController(IFactorDetailService factorDetailService)
+        public FactorsController(IFactorDetailService factorDetailService, IDeliveryMethodService deliveryMethodService)
         {
             _factorDetailService = factorDetailService;
+            _deliveryMethodService = deliveryMethodService;
         }
         [HttpGet]
         public async Task<IActionResult> Index(FilterParameter filter, int pageId = 1)
@@ -33,6 +36,25 @@ namespace Shop2City.WebHost.Areas.UserPanel.Controllers
             var getAllOrderDetails = await _factorDetailService.GetByFactorIdAsync(id);
             return PartialView("_FactorDetailsPartial", getAllOrderDetails);
 
+        }
+
+        public async Task<IActionResult> FactorSummary(int factorId)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+                return Unauthorized();
+            var factorSummary = await _factorDetailService.GetOpenFactorAsync(userId,factorId);  // از پارامتر استفاده شد
+            var deliveryMethods = await _deliveryMethodService.GetDeliveryMethodInfoAsync();
+            if (factorSummary == null)
+                return NotFound();
+
+            var viewModel = new FactorSummaryViewModel
+            {
+                FactorSummaryForAdmin = factorSummary,
+                DeliveryMethods = deliveryMethods
+            };
+
+            return View(viewModel);
         }
     }
 }

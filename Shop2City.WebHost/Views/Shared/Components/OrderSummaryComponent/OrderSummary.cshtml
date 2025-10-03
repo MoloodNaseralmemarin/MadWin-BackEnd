@@ -96,7 +96,6 @@
                             </div>
                         </td>
                     </tr>
-
                     <!-- بخش کد تخفیف -->
                     <tr>
                         <td colspan="3"><strong>کد تخفیف:</strong></td>
@@ -215,3 +214,124 @@
         </div>
     }
 </div>
+
+@section Scripts
+{
+
+    <script>
+        function updateTotal() {
+            let subtotalText = $("#SubtotalPrice").text();
+            let subtotal = Number(subtotalText.replace(/[^\d]/g, ''));
+
+            let deliveryText = $("#deliveryPrice").text();
+            let delivery = Number(deliveryText.replace(/,/g, ''));
+
+            let disTotalText = $("#disTotal").text();
+                let disTotal= Number(disTotalText.replace(/,/g, ''));
+
+            let total = subtotal - disTotal + delivery;
+
+                $("#sumOrder").text(total.toLocaleString());
+        }
+            let selectedDeliveryId = null; // متغیر سراسری
+        $(document).ready(function () {
+            // بارگذاری اولیه
+            updateTotal();
+
+            // مثال: وقتی delivery تغییر می‌کنه (مثلا بعد از ایجکس)، دوباره محاسبه کن
+            $("input:radio[name=selection]").on("change", function () {
+                   selectedDeliveryId = $(this).val();
+
+                           // دکمه پرداخت را فعال کن
+            $("#postButton").prop("disabled", false);
+
+                $.ajax({
+                    type: "GET",
+                    url: "/Home/GetDeliveryPrice",
+                        data: { deliveryId: selectedDeliveryId },
+                    success: function (result) {
+                        if (result.success) {
+                            let deliveryPrice = result.price;
+                            $("#deliveryPrice").text(deliveryPrice.toLocaleString());
+
+                            updateTotal(); // بعد از تغییر قیمت پست، جمع مجدد
+                        }
+                    }
+                });
+            });
+
+            $("#applyDiscountBtn").click(function (e) {
+                e.preventDefault();
+
+                var orderId = $("#orderId").val();
+                var discountCode = $("#discountCode").val();
+
+                   $.ajax({
+            url: '@Url.Action("UseDiscount", "Orders", new { area = "UserPanel" })',
+            type: 'GET',
+            data: {
+                orderId: orderId,
+                discountCode: discountCode
+            },
+            success: function (response) {
+                if (response.success) {
+                    $("#disTotal").text(response.discountAmount.toLocaleString());
+                             updateTotal(); // بعد از تغییر قیمت پست، تخفیف
+                    // نمایش پیام موفقیت با تنظیمات سفارشی
+                    toastr.success(response.message, "", {
+                        closeButton: true,
+                        progressBar: true,
+                        positionClass: "toast-top-right", // جای دلخواه
+                        timeOut: 5000                     // مدت‌زمان کوتاه
+                    });
+
+                } else {
+                    // نمایش پیام خطا با تنظیمات سفارشی
+                    toastr.error(response.message, "", {
+                        closeButton: true,
+                        progressBar: true,
+                        positionClass: "toast-top-right",
+                        timeOut: 8000
+                    });
+                }
+            },
+            error: function () {
+                $("#discountMessage").text("خطا در ارتباط با سرور").removeClass("text-success").addClass("text-danger");
+            }
+        });
+            });
+        });
+                $('#postButton').click(function () {
+                var sumOrderText = $("#sumOrder").text();
+                var sumOrder = Number(sumOrderText.replace(/,/g, ''));
+
+                const dataToSend = {
+                    sumOrder: sumOrder,
+                    invoiceId: 0,   // متغیر جاوااسکریپتی که از Razor مقدار گرفته
+                        deliveryId:selectedDeliveryId,
+                    source: 'order'
+                };
+
+                console.log(dataToSend);
+
+                $.ajax({
+                    url: '/Payment/ProcessPayment',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(dataToSend),
+                    success: function (response) {
+                        if (response.success) {
+                            window.location.href = response.redirectUrl;
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(error);
+                        alert("An error occurred while sending the request.");
+                    }
+                });
+            });
+
+    </script>
+}

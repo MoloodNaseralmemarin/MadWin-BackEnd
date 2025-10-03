@@ -1,6 +1,5 @@
-﻿using MadWin.Core.DTOs.FilterParameters;
-using MadWin.Core.DTOs.Users;
-using MadWin.Core.Entities.CurtainComponents;
+﻿using MadWin.Core.DTOs.Fators;
+using MadWin.Core.DTOs.FilterParameters;
 using MadWin.Core.Entities.Factors;
 using MadWin.Core.Interfaces;
 using MadWin.Infrastructure.Context;
@@ -50,34 +49,52 @@ namespace MadWin.Infrastructure.Repositories
                  .FirstOrDefaultAsync(d => d.FactorId == factorId);
             return factorDetail;
         }
-        public async Task<FactorForAdminViewModel> GetFactorSummaryByFactorIdAsync(int factorId, int userId)
-        {
-            // کوئری اصلی (فقط سفارش‌های همین کاربر)
-            IQueryable<FactorDetail> query = GetQuery()
-                .Include(fd => fd.Factor)
-                .ThenInclude(fd => fd.User)
-                .Where(fd => !fd.IsDelete && fd.Factor.UserId==userId);
 
-            var list = new FactorForAdminViewModel
+
+        public async Task<FactorSummaryForAdminDto> GetOpenFactorAsync(int userId, int factorId)
+        {
+            var query = GetQuery()
+                .Include(f => f.Factor)
+                    .ThenInclude(f => f.FactorDetails)
+                        .ThenInclude(fd => fd.Product)
+                .Where(fd => fd.FactorId == factorId
+                             && fd.Factor.UserId == userId
+                             && !fd.Factor.IsFinaly
+                             && !fd.IsDelete
+                             && !fd.Factor.IsDelete);
+
+            var list = new FactorSummaryForAdminDto
             {
                 FactorSummary = await query
-                    .OrderByDescending(f => f.Factor.Id)
-                    .Select(f => new FactorSummaryForAdminItemDto
+                    .OrderByDescending(o => o.Id)
+                    .Select(o => new FactorSummaryForAdminItemDto
                     {
-                        FactorId = f.Factor.Id,
-                        DeliveryPrice = f.Factor.DeliveryMethodAmount, // قیمت ارسال
-                        Discount = f.Factor.DisTotal, // مبلغ تخفیف
-                        FactorDetails = f.Factor.FactorDetails
-                            .Where(fd => !fd.IsDelete) // شرط روی جزئیات فاکتور
+                        FactorId = o.Id,
+                        CreateDate = o.CreateDate,
+
+                        FactorDetails = o.Factor.FactorDetails
+                            .Where(fd => !fd.IsDelete)
                             .Select(fd => new FactorDetailDto
                             {
                                 Id = fd.Id,
                                 ProductTitle = fd.Product.Title,
                                 Quantity = fd.Quantity,
-                                Price = fd.Price
+                                Price = fd.Price,
+                                TotalPrice = fd.Price * fd.Quantity
                             }).ToList()
-                    }).ToListAsync()
+                    }).ToListAsync(),
+
+                TotalCost = await query
+                    .Select(o => o.Factor.FactorDetails
+                        .Where(fd => fd.FactorId == factorId
+                             && fd.Factor.UserId == userId
+                             && !fd.Factor.IsFinaly
+                             && !fd.IsDelete
+                             && !fd.Factor.IsDelete)
+                        .Sum(fd => fd.Price * fd.Quantity))
+                    .FirstOrDefaultAsync()
             };
+
             return list;
         }
 

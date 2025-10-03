@@ -1,4 +1,6 @@
-﻿using MadWin.Core.DTOs.FilterParameters;
+﻿using MadWin.Core.DTOs.Fators;
+using MadWin.Core.DTOs.FilterParameters;
+using MadWin.Core.DTOs.Orders;
 using MadWin.Core.Entities.CurtainComponents;
 using MadWin.Core.Interfaces;
 
@@ -7,7 +9,7 @@ namespace MadWin.Application.Services
 {
     public interface IFactorDetailService
     {
-        Task<FactorForAdminViewModel> GetFactorSummaryByFactorIdAsync(int factorId, int userId);
+        Task<FactorSummaryForAdminDto> GetOpenFactorAsync(int userId, int factorId);
 
         Task SoftDeleteAsync(IEnumerable<int> factorDetailIds);
 

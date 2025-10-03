@@ -1,5 +1,7 @@
 ﻿
+using MadWin.Core.DTOs.Fators;
 using MadWin.Core.DTOs.FilterParameters;
+using MadWin.Core.DTOs.Orders;
 using MadWin.Core.Entities.Orders;
 using MadWin.Core.Interfaces;
 
@@ -14,9 +16,9 @@ namespace MadWin.Application.Services
             _factorDetailRepository = factorDetailRepository;
             _factorRepository = factorRepository;
         }
-        public async Task<FactorForAdminViewModel> GetFactorSummaryByFactorIdAsync(int factorId,int userId)
+        public async Task<FactorSummaryForAdminDto> GetOpenFactorAsync(int userId, int factorId)
         {
-            return await _factorDetailRepository.GetFactorSummaryByFactorIdAsync(factorId,userId);
+            return await _factorDetailRepository.GetOpenFactorAsync(userId,factorId);
         }
         public async Task SoftDeleteAsync(IEnumerable<int> factorDetailIds)
         {
