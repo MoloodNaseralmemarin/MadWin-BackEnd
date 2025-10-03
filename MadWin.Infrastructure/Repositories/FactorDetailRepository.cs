@@ -69,7 +69,7 @@ namespace MadWin.Infrastructure.Repositories
                     .OrderByDescending(o => o.Id)
                     .Select(o => new FactorSummaryForAdminItemDto
                     {
-                        FactorId = o.Id,
+                        FactorId = o.Factor.Id,
                         CreateDate = o.CreateDate,
                         SubTotal = o.Factor.TotalPrice,
 

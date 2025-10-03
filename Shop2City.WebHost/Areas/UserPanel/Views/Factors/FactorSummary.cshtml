@@ -4,7 +4,7 @@
 @{
     var factorSummary = Model.FactorSummaryForAdmin;
     var factor = factorSummary.FactorSummary.FirstOrDefault();
-    var factorId = factor?.FactorId ?? 0;
+    var factorId = factor.FactorId;
     var createDate = factor.CreateDate;
     var totalPrice = factor.SubTotal; // یا TotalPrice اگه پراپرتی‌ات اینطوره
 }
