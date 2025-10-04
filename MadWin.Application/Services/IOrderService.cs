@@ -17,7 +17,7 @@ namespace MadWin.Application.Services
 
         Task UpdatePriceAndDeliveryAsync(int deliveryId,int orderId);
 
-        Task UpdateIsFinalyOrderAsync(Order order);
+        Task UpdateIsFinalyOrderAsync(int orderId);
         Task<Order> GetOrderByOrderIdAsync(int orderId);
 
         Task<int> CountOrders();

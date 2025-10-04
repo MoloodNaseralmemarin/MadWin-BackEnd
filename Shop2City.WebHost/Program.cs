@@ -150,15 +150,16 @@ builder.Services.AddHttpClient();
 var app = builder.Build();
 
 // ────── Error Handling ──────
-if (app.Environment.IsProduction())
-{
-    app.UseDeveloperExceptionPage();
-}
-else
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
+//if (app.Environment.IsProduction())
+//{
+//    app.UseDeveloperExceptionPage();
+//}
+//else
+//{
+//    app.UseExceptionHandler("/Home/Error");
+//    app.UseHsts();
+//}
+app.UseDeveloperExceptionPage();
 
 // ────── Middleware ──────
 app.UseHttpsRedirection();
@@ -182,5 +183,21 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
+
+
+//app.Use(async (context, next) =>
+//{
+//    try
+//    {
+//        await next();
+//    }
+//    catch (Exception ex)
+//    {
+//        await File.AppendAllTextAsync("log.txt", ex.ToString());
+//        throw;
+//    }
+//});
+
 // ────── Run ──────
 app.Run();
+

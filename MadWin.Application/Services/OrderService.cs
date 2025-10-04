@@ -2,6 +2,7 @@
 using MadWin.Core.DTOs.Orders;
 using MadWin.Core.Entities.Common;
 using MadWin.Core.Entities.CurtainComponents;
+using MadWin.Core.Entities.Factors;
 using MadWin.Core.Entities.Orders;
 using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
@@ -80,12 +81,14 @@ namespace MadWin.Application.Services
         {
             return await _orderRepository.GetByIdAsync(orderId);
         }
-        public async Task UpdateIsFinalyOrderAsync(Order order)
+        public async Task UpdateIsFinalyOrderAsync(int orderId)
         {
+            var order = await _orderRepository.GetByIdAsync(orderId); // یا FindAsync
+            if (order == null) return;
+
             order.IsFinaly = true;
-            order.TotalAmount = order.PriceWithFee + order.DeliveryMethodAmount - order.DisTotal;
-            order.TotalCost = order.TotalAmount * order.Count;
-            _orderRepository.Update(order);
+            order.TotalAmount = order.TotalAmount + order.DeliveryMethodAmount - order.DisTotal;
+
             await _orderRepository.SaveChangesAsync();
         }
 

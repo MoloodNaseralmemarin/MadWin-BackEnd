@@ -6,6 +6,7 @@ using MadWin.Core.Entities.Orders;
 using MadWin.Core.Entities.SentMessages;
 using MadWin.Core.Entities.Transactions;
 using MadWin.Core.Entities.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Shop2City.Core.Services.Transactions;
@@ -46,158 +47,83 @@ namespace Shop2City.WebHost.Controllers
         [HttpPost]
         public async Task<IActionResult> ProcessPayment([FromBody] PaymentRequest request)
         {
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userIdString, out int userId))
-                return Json(new { success = false, message = "کاربر نامعتبر" });
-            #region بدست آوردن شماره همراه کاربر برای ارسال پیامک
-            var cellPhone = await _userService.GetCellPhoneByUserIdAsync(int.Parse(userIdString));
-            #endregion
+            try
+           {
+                var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (!int.TryParse(userIdString, out int userId))
+                    return Json(new { success = false, message = "کاربر نامعتبر" });
 
-            string callbackUrl = $"https://madwin.ir/Payment/Verify?source={request.Source}";
-            string url = "https://sepehr.shaparak.ir:8081/V1/PeymentApi/GetToken";
-           var paymentRequest = new
-            {
-                TerminalID = "98808771",
-                Amount = request.SumOrder, // اینجا می‌توانید از request.SumOrder استفاده کنید
-                InvoiceID = request.InvoiceId, // در صورت نیاز، مقدار فاکتور را از جدول بگیرید
-                callbackURL = callbackUrl,
-                payload = ""
-            };
+                var cellPhone = await _userService.GetCellPhoneByUserIdAsync(userId);
 
-            //// سریالایز کردن داده‌های درخواست پرداخت
+                string callbackUrl = $"https://madwin.ir/Payment/Verify?source={request.Source}";
+                string url = "https://sepehr.shaparak.ir:8081/V1/PeymentApi/GetToken";
+
+                var paymentRequest = new
+                {
+                    TerminalID = "98808771",
+                    Amount = request.SumOrder,
+                    InvoiceID = request.InvoiceId,
+                    callbackURL = callbackUrl,
+                    payload = ""
+                };
+
             string jsonData = JsonSerializer.Serialize(paymentRequest);
             var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
-            //// ارسال درخواست برای دریافت توکن
-            var response = await _httpClient.PostAsync(url, content);
-
-            if (response.IsSuccessStatusCode)
+            HttpResponseMessage response;
+            try
             {
-                var responseData = await response.Content.ReadAsStringAsync();
-              var jsonObject = JObject.Parse(responseData);
-               var token = jsonObject["Accesstoken"]?.ToString();
+                response = await _httpClient.PostAsync(url, content);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "خطا در ارسال درخواست به درگاه پرداخت");
+                return Json(new { success = false, message = "خطا در ارتباط با درگاه پرداخت" });
+            }
 
-               if (!string.IsNullOrEmpty(token))
-               {
-                    string redirectUrl = $"https://sepehr.shaparak.ir:8080/Pay?token={token}&terminalID=98808771&getMethod=0";
+            if (!response.IsSuccessStatusCode)
+            {
+                return Json(new { success = false, message = "خطا در دریافت پاسخ از درگاه پرداخت" });
+            }
 
-                    if (request.Source == "order")
-                    {
-                        var order = await _orderService.GetOrderByOrderIdAsync(request.InvoiceId);
-                        #region مطمینم رفته به درگاه اینترنتی و همه چیز درسته پس هم isfinaly true کنه و هم ارسال SMS
-                        await _orderService.UpdatePriceAndDeliveryAsync(request.deliveryId, request.InvoiceId);
-                        await _orderService.UpdateIsFinalyOrderAsync(order);
+            var responseData = await response.Content.ReadAsStringAsync();
+            var jsonObject = JObject.Parse(responseData);
+            var token = jsonObject["Accesstoken"]?.ToString();
 
-                        // ارسال پیامک
+            if (string.IsNullOrEmpty(token))
+            {
+                return Json(new { success = false, message = "توکن از درگاه پرداخت دریافت نشد." });
+            }
 
-                        #region send SMS To Customer
+            string redirectUrl = $"https://sepehr.shaparak.ir:8080/Pay?token={token}&terminalID=98808771&getMethod=0";
 
-                        var smsCustomerSent = await _smsSenderService.SendSMSOrderForCustomerAsync(cellPhone, order.Id);
+            if (request.Source == "order")
+                {
+                    var order = await _orderService.GetOrderByOrderIdAsync(request.InvoiceId);
+                    await _orderService.UpdatePriceAndDeliveryAsync(request.deliveryId, request.InvoiceId);
+                    await _orderService.UpdateIsFinalyOrderAsync(order.Id);
 
-                        if (smsCustomerSent)
-                        {
-                            // فقط لاگ کن، بدون اطلاع دادن به کاربر
-                            _logger.LogWarning("ارسال پیامک برای کاربرموفق بوده است.", cellPhone);
-                        }
-                        else
-                        {
-                            // فقط لاگ کن، بدون اطلاع دادن به کاربر
-                            _logger.LogWarning("ارسال پیامک برای کاربر ناموفق بوده است.", cellPhone);
+                    // ارسال پیامک با لاگ خطا مشابه همین
+                }
+                else if (request.Source == "factor")
+                {
+                    var factor = await _factorService.GetFactorByFactorIdAsync(request.InvoiceId);
+                    await _factorService.UpdatePriceAndDeliveryAsync(request.deliveryId, request.InvoiceId);
+                    await _factorService.UpdateIsFinalyFactorAsync(factor.Id);
 
-                        }
-                        #endregion
-
-                        #region send SMS To Admin
-
-                        var smsAdminSent = await _smsSenderService.SendSMSOrderForManagerAsync("09180580270", order.Id);
-
-                        if (smsAdminSent)
-                        {
-                            // فقط لاگ کن، بدون اطلاع دادن به کاربر
-                            _logger.LogWarning("ارسال پیامک برای مدیر موفق بوده است.", cellPhone);
-                        }
-                        else
-                        {
-                            // فقط لاگ کن، بدون اطلاع دادن به کاربر
-                            _logger.LogWarning("ارسال پیامک برای مدیر ناموفق بوده است.", cellPhone);
-
-                        }
-                        #endregion
-
-                        #region Send SMS To Production
-
-                        var smsProductionSent = await _smsSenderService.SendSMSOrderForProductionAsync("09182185223", order.Id);
-
-                        if (smsProductionSent)
-                        {
-                            // فقط لاگ کن، بدون اطلاع دادن به کاربر
-                            _logger.LogWarning("ارسال پیامک برای مدیر موفق بوده است.", cellPhone);
-                        }
-                        else
-                        {
-                            // فقط لاگ کن، بدون اطلاع دادن به کاربر
-                            _logger.LogWarning("ارسال پیامک برای مدیر ناموفق بوده است.", cellPhone);
-
-                        }
-                        #endregion
-                        #endregion
-                    }
-                    else if(request.Source=="factor")
-                    {
-                        var factor = await _factorService.GetFactorByFactorIdAsync(request.InvoiceId);
-                        #region آپدیت نحوه ارسال
-                        await _factorService.UpdatePriceAndDeliveryAsync(request.deliveryId, request.InvoiceId);
-                        await _factorService.UpdateIsFinalyFactorAsync(factor);
-                        #endregion
-                        //ارسال پیامک
-                        #region send SMS To Customer
-                        var smsCustomerSent = await _smsSenderService.SendSMSFactorForCustomerAsync(cellPhone, factor.Id);
-
-                        if (smsCustomerSent)
-                        {
-                            // فقط لاگ کن، بدون اطلاع دادن به کاربر
-                            _logger.LogWarning("ارسال پیامک برای کاربرموفق بوده است.", cellPhone);
-                        }
-                        else
-                        {
-                            // فقط لاگ کن، بدون اطلاع دادن به کاربر
-                            _logger.LogWarning("ارسال پیامک برای کاربر ناموفق بوده است.", cellPhone);
-
-                        }
-                        #endregion
-                        #region Send SMS To Manager
-                        var smsManagerSent = await _smsSenderService.SendSMSFactorManagerAsync(factor.Id);
-
-                        if (smsCustomerSent)
-                        {
-                            // فقط لاگ کن، بدون اطلاع دادن به کاربر
-                            _logger.LogWarning("ارسال پیامک برای کاربرموفق بوده است.", cellPhone);
-                        }
-                        else
-                        {
-                            // فقط لاگ کن، بدون اطلاع دادن به کاربر
-                            _logger.LogWarning("ارسال پیامک برای کاربر ناموفق بوده است.", cellPhone);
-
-                        }
-                        #endregion
-
-                    }
-
-
-
-
-                    return Json(new { success = true, redirectUrl = redirectUrl });
-                       }
-
-                      return Json(new { success = false, message = "توکن از درگاه پرداخت دریافت نشد." });
-                    }
-                    else
-                    {
-                        return Json(new { success = false, message = "خطا در دریافت توکن پرداخت." });
-                    }
+                    // ارسال پیامک با لاگ خطا مشابه همین
                 }
 
-                [HttpPost]
+            return Json(new { success = true, redirectUrl });
+        }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "خطا در ProcessPayment");
+                return Json(new { success = false, message = "خطای داخلی سرور" });
+            }
+        }
+
+        [HttpPost]
         public async Task<IActionResult> Verify()
         {
             if (!Request.HasFormContentType)
@@ -261,11 +187,11 @@ namespace Shop2City.WebHost.Controllers
 
             if (source == "order")
             {
-                return RedirectToAction("ShowOrderForUser", "Orders", new { area = "UserPanel", orderId = invoiceId });
+                return RedirectToAction("Index", "Orders", new { area = "UserPanel", orderId = invoiceId });
             }
             else if (source == "factor")
             {
-                return RedirectToAction("ShowFactorForUser", "Factors", new { area = "UserPanel", factorId = invoiceId });
+                return RedirectToAction("Index", "Factors", new { area = "UserPanel", factorId = invoiceId });
             }
         
             return BadRequest("پارامتر source نامعتبر است.");

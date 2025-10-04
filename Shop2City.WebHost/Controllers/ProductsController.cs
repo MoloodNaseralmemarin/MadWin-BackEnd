@@ -1,9 +1,7 @@
 ﻿using MadWin.Application.DTOs.Cart;
 using MadWin.Application.Services;
-using MadWin.Infrastructure.Context;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Shop2City.Core.Services.Products;
 using System.Security.Claims;
 
 

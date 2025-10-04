@@ -156,31 +156,27 @@
 
 @section Scripts {
     <script>
-        let selectedDeliveryId = null; // متغیر سراسری
-
-        function updateTotal() {
-            let subtotalText = $("#SubtotalPrice").text();
-            let subtotal = Number(subtotalText.replace(/[^\d]/g, ''));
-
-            let deliveryText = $("#deliveryPrice").text();
-            let delivery = Number(deliveryText.replace(/,/g, ''));
-
-            let disTotalText = $("#disTotal").text();
-            let disTotal = Number(disTotalText.replace(/,/g, ''));
-
-            let total = subtotal - disTotal + delivery;
-
-            $("#sumOrder").text(total.toLocaleString());
-            $("#sumOrderBtn").text(total.toLocaleString()); // دکمه پرداخت هم آپدیت بشه
-        }
-
         $(document).ready(function () {
-            // بارگذاری اولیه
+
+            function parseNumber(text) {
+                return Number(text.replace(/,/g, '').replace(/[^\d.-]/g, '')) || 0;
+            }
+
+            function updateTotal() {
+                const subtotal = parseNumber($("#SubtotalPrice").text());
+                const delivery = parseNumber($("#deliveryPrice").text());
+                const discount = parseNumber($("#disTotal").text());
+                const total = subtotal - discount + delivery;
+
+                $("#sumOrder").text(total.toLocaleString());
+                $("#sumOrderBtn").text(total.toLocaleString());
+            }
+
             updateTotal();
 
-            // وقتی delivery تغییر می‌کنه
+            // 🟦 تغییر روش ارسال
             $("input:radio[name=selection]").on("change", function () {
-                selectedDeliveryId = $(this).val();
+                const selectedDeliveryId = $(this).val();
                 $("#postButton").prop("disabled", false);
 
                 $.ajax({
@@ -191,73 +187,109 @@
                         if (result.success) {
                             $("#deliveryPrice").text(result.price.toLocaleString());
                             updateTotal();
+                        } else {
+                            toastr.error(result.message || "خطا در دریافت هزینه ارسال");
                         }
+                    },
+                    error: function () {
+                        toastr.error("خطا در ارتباط با سرور برای دریافت هزینه ارسال");
                     }
                 });
             });
 
-            // اعمال کد تخفیف
+            // 🟩 اعمال کد تخفیف
             $("#applyDiscountBtn").click(function (e) {
                 e.preventDefault();
 
-                var factorId = $("#factorId").val();
-                var discountCode = $("#discountCode").val();
+                const factorId = $("#factorId").val();
+                const discountCode = $("#discountCode").val().trim();
+
+                if (!discountCode) {
+                    toastr.warning("لطفاً کد تخفیف را وارد کنید.");
+                    return;
+                }
 
                 $.ajax({
                     url: '/Factors/UseDiscountForFactor',
                     type: 'GET',
-                    data: {
-                        factorId: factorId,
-                        discountCode: discountCode
-                    },
+                    data: { factorId, discountCode },
                     success: function (response) {
                         if (response.success) {
                             $("#disTotal").text(response.discountAmount.toLocaleString());
                             updateTotal();
-                            toastr.success(response.message, "");
+                            toastr.success(response.message || "تخفیف با موفقیت اعمال شد.");
                         } else {
-                            toastr.error(response.message, "");
+                            toastr.error(response.message || "کد تخفیف معتبر نیست.");
                         }
                     },
                     error: function () {
-                        toastr.error("بسیبسیسش", "");
+                        toastr.error("خطا در اعمال کد تخفیف");
                     }
                 });
             });
 
-            // پرداخت آنلاین
+            // 🟥 پرداخت آنلاین
             $('#postButton').click(function () {
-                var sumOrderText = $("#sumOrder").text();
-                var sumOrder = Number(sumOrderText.replace(/,/g, ''));
+                const $btn = $(this);
+                $btn.prop('disabled', true);
+
+                const sumOrder = parseNumber($("#sumOrder").text());
+                const factorId = parseInt($('#factorId').val());
+                const selectedDelivery = parseInt($('input[name="selection"]:checked').val());
+
+                if (!selectedDelivery) {
+                    toastr.warning("لطفاً روش ارسال را انتخاب کنید.");
+                    $btn.prop('disabled', false);
+                    return;
+                }
+
+                if (!factorId || isNaN(factorId)) {
+                    toastr.error("شناسه فاکتور نامعتبر است.");
+                    $btn.prop('disabled', false);
+                    return;
+                }
 
                 const dataToSend = {
-                    sumOrder: sumOrder,
-                    invoiceId: 0,
-                    deliveryId: selectedDeliveryId,
-                    source: 'order'
+                    sumOrder,
+                    invoiceId: factorId,
+                    deliveryId: selectedDelivery,
+                    source: 'factor'
                 };
-
-                console.log(dataToSend);
 
                 $.ajax({
                     url: '/Payment/ProcessPayment',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(dataToSend),
+                    xhrFields: { withCredentials: true },
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() || ''
+                    },
                     success: function (response) {
                         if (response.success) {
                             window.location.href = response.redirectUrl;
                         } else {
-                            alert(response.message);
+                            toastr.error(response.message || "پرداخت موفق نبود.");
                         }
                     },
-                    error: function (xhr, status, error) {
-                        console.error(error);
-                        alert("An error occurred while sending the request.");
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            toastr.error("برای پرداخت باید وارد حساب کاربری شوید.");
+                            window.location.href = "/Account/Login";
+                        } else if (xhr.status === 403) {
+                            toastr.error("دسترسی غیرمجاز.");
+                        } else {
+                            console.error(xhr.responseText);
+                            toastr.error("خطایی در ارسال درخواست رخ داد.");
+                        }
+                    },
+                    complete: function () {
+                        $btn.prop('disabled', false);
                     }
                 });
             });
         });
     </script>
 }
+
 

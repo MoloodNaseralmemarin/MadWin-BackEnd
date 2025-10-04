@@ -56,13 +56,17 @@ namespace MadWin.Application.Services
             return await _factorRepository.GetFactorByFactorIdAsync(factorId);
         }
 
-        public async Task UpdateIsFinalyFactorAsync(Factor factor)
+        public async Task UpdateIsFinalyFactorAsync(int factorId)
         {
+            var factor = await _factorRepository.GetByIdAsync(factorId); // یا FindAsync
+            if (factor == null) return;
+
             factor.IsFinaly = true;
             factor.TotalAmount = factor.TotalPrice + factor.DeliveryMethodAmount - factor.DisTotal;
-            _factorRepository.Update(factor);
+
             await _factorRepository.SaveChangesAsync();
         }
+
 
         public async Task UpdatePriceAndDeliveryAsync(int deliveryId, int factorId)
         {

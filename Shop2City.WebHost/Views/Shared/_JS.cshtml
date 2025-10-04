@@ -82,37 +82,6 @@
         };
     });
 </script>
-<!--پرداخت فاکتور-->
-<script>
-    $("#postButton").on("click", function () {
-        const sumOrder = parseFloat($("#sumOrder").text().replace(/,/g, "")) || 0;
-        const invoiceId=("#factorId").text;
-        var selectedDeliveryId = $(this).attr('id');
-        const dataToSend = {
-            sumOrder,
-            invoiceId: invoiceId,
-            deliveryId: selectedDeliveryId,
-            source: "factor"
-        };
-
-        $.ajax({
-            url: "/Payment/ProcessPayment",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify(dataToSend),
-            success: function (response) {
-                if (response.success && response.redirectUrl) {
-                    window.location.href = response.redirectUrl;
-                } else {
-                    toastr.error("پرداخت ناموفق بود")
-                }
-            },
-            error: function (xhr, status, error) {
-                 toastr.error("مشکلی در ارتباط با سرور پیش آمد")
-            }
-        });
-    });
-</script>
 
 
 

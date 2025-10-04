@@ -9,7 +9,7 @@ namespace MadWin.Application.Services
         Task<Factor> GetFactorByFactorIdAsync(int factorId);
 
         Task UpdatePriceAndDeliveryAsync(int deliveryId, int factorId);
-        Task UpdateIsFinalyFactorAsync(Factor factor);
+        Task UpdateIsFinalyFactorAsync(int factorId);
 
         Task<int> CreateOrGetOpenFactorAsync(int userId);
         Task AddOrUpdateFactorDetailAsync(int factorId, int productId, int count);
