@@ -39,32 +39,28 @@
                     @foreach (var item in Model.OrderSummaryForAdmin.OrderSummary)
                     {
                         var statusClass = item.IsEqualParts ? "bg-success text-white" : "bg-warning text-dark";
-
-                        <!-- ردیف اصلی -->
-                        <tr>
-                            <td rowspan="2" class="text-center align-middle">
+                        <tr data-orderid="@item.OrderId">
+                            <td class="text-center align-middle">
                                 <input type="checkbox" class="delete-checkbox" value="@item.OrderId" />
                             </td>
-                            <td rowspan="2">@item.OrderId</td>
+                            <td>@item.OrderId</td>
                             <td>@item.CreateDate.ToShamsi()</td>
                             <td>@item.CreateDate.ToString("HH:mm:ss")</td>
                             <td>@item.CategoryGroup</td>
                             <td><span class="badge bg-info">@item.Count</span></td>
                             <td><span>@item.PriceWithFee.ToString("N0") ریال</span></td>
                             <td><span class="item-price">@((item.PriceWithFee * item.Count).ToString("N0")) ریال</span></td>
-                            <td rowspan="2" class="text-center align-middle">
-                                <a onclick="removeItems(@item.OrderId)" style="cursor:pointer;">
+                            <td class="text-center align-middle">
+                                <a class="remove-item-btn" data-orderid="@item.OrderId" style="cursor:pointer;">
                                     <i class="fa fa-trash text-danger"></i>
                                 </a>
                             </td>
                         </tr>
-
-                        <!-- ردیف جزئیات -->
                         <tr class="detail-row" data-orderid="@item.OrderId">
                             <td>@(item.IsEqualParts ? "قطعات مساوی هستند" : "قطعات اندازه‌های مختلف دارند")</td>
                             <td>تعداد قطعات: @item.PartCount</td>
                             <td>@item.Size</td>
-                            <td colspan="3">
+                            <td colspan="5">
                                 موقعیت قطعات:
                                 @for (int i = 0; i < item.WidthParts.Count; i++)
                                 {
@@ -76,14 +72,15 @@
                             </td>
                         </tr>
                     }
+                    <!-- حذف چندتایی -->
                     <tr>
                         <td colspan="9">
-                            <a onclick="removeItems()">
-                                <i class="fa fa-trash text-danger"></i>
-                            </a>
+                            <button id="deleteSelectedBtn" class="btn btn-danger btn-sm">
+                                حذف سفارشات انتخاب‌شده
+                            </button>
                         </td>
                     </tr>
-                    <!-- بخش انتخاب روش ارسال -->
+                    <!-- روش ارسال -->
                     <tr>
                         <td colspan="3"><strong>روش ارسال:</strong></td>
                         <td colspan="6">
@@ -96,14 +93,12 @@
                             </div>
                         </td>
                     </tr>
-                    <!-- بخش کد تخفیف -->
+                    <!-- کد تخفیف -->
                     <tr>
                         <td colspan="3"><strong>کد تخفیف:</strong></td>
-                        <td colspan="6" class="mt-2">
-                            <input type="text" class="discountCode form-control" />
-                            <button id="applyDiscountBtnMobile" class="btn btn-primary w-100 py-2">
-                                اعمال کد تخفیف
-                            </button>
+                        <td colspan="6">
+                            <input type="text" class="discountCode form-control mb-2" />
+                            <button class="applyDiscountBtn btn btn-primary w-100 py-2">اعمال کد تخفیف</button>
                         </td>
                     </tr>
                 </tbody>
@@ -115,7 +110,7 @@
             @foreach (var item in Model.OrderSummaryForAdmin.OrderSummary)
             {
                 var statusBg = item.IsEqualParts ? "bg-success text-white" : "bg-warning text-dark";
-                <div class="card mb-3 shadow-sm border-0">
+                <div class="card mb-3 shadow-sm border-0" data-orderid="@item.OrderId">
                     <div class="card-header @statusBg d-flex justify-content-between align-items-center">
                         <span>@item.CategoryGroup</span>
                         <small>@item.CreateDate.ToShamsi() - @item.CreateDate.ToString("HH:mm:ss")</small>
@@ -130,10 +125,9 @@
                             <div class="col-6"><strong>قیمت کل:</strong> <span class="badge bg-primary item-price">@((item.PriceWithFee * item.Count).ToString("N0")) ریال</span></div>
                         </div>
                         <div class="row mb-2">
-                            <div class="col-6"><strong>ابعاد (ارتفاع × عرض):</strong> @item.Size</div>
+                            <div class="col-6"><strong>ابعاد:</strong> @item.Size</div>
                             <div class="col-6"><strong>تعداد قطعات:</strong> @item.PartCount</div>
                         </div>
-
                         @if (item.WidthParts.Count > 0)
                         {
                             <div class="mt-2">
@@ -151,36 +145,14 @@
                                 </div>
                             </div>
                         }
-
                         <div class="mt-2 d-flex justify-content-end">
-                            <a onclick="removeItems(@item.OrderId)" class="btn btn-sm btn-outline-danger" style="cursor:pointer;">
+                            <a class="remove-item-btn btn btn-sm btn-outline-danger" style="cursor:pointer;">
                                 <i class="fas fa-trash"></i> حذف
                             </a>
                         </div>
                     </div>
                 </div>
             }
-
-            <div class="card mb-3 shadow-sm border-0">
-                <div class="card-header bg-light">
-                    <strong>روش ارسال</strong>
-                </div>
-                <div class="card-body">
-                    <div class="radio-groups mb-3">
-                        @foreach (var delivery in Model.DeliveryMethods)
-                        {
-                            <input type="radio" name="selection" value="@delivery.DeliveryId" id="delivery_mobile_@delivery.DeliveryId" />
-                            <label for="delivery_mobile_@delivery.DeliveryId">@delivery.Name</label>
-                        }
-                    </div>
-                    <div>
-                        <strong>کد تخفیف:</strong>
-                        <input type="text" class="discountCode form-control mb-2" />
-                        <button id="applyDiscountBtnMobile" class="btn btn-primary btn-block">اعمال</button>
-                        <span id="discountMessageMobile" class="text-danger mt-1 d-block"></span>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- جدول نهایی مبلغ -->
@@ -215,4 +187,157 @@
     }
 </div>
 
-<script src="~/js/OrderSummary.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script>
+$(document).ready(function () {
+
+    const token = $('input[name="__RequestVerificationToken"]').val();
+    const orderId = parseInt($(".orderId").first().val());
+    let selectedDeliveryId = null;
+
+    // --- توابع کمکی ---
+    function parseNumber(text) {
+        return Number((text || "0").toString().replace(/[^\d]/g, '')) || 0;
+    }
+    function formatCurrency(num) {
+        return num.toLocaleString('fa-IR');
+    }
+
+    function updateTotal() {
+        let subtotal = 0;
+        $(".item-price").each(function () {
+            subtotal += parseNumber($(this).text());
+        });
+        let delivery = parseNumber($("#deliveryPrice").text());
+        let disTotal = parseNumber($("#disTotal").text());
+        let total = Math.max(subtotal - disTotal + delivery, 0);
+        $("#SubtotalPrice").text(formatCurrency(subtotal));
+        $("#sumOrder, #sumOrderBtn").text(formatCurrency(total));
+    }
+
+    // --- انتخاب همه ---
+    $("#selectAll").on("change", function () {
+        $(".delete-checkbox").prop("checked", $(this).is(":checked"));
+    });
+    $(document).on("change", ".delete-checkbox", function () {
+        $("#selectAll").prop(
+            "checked",
+            $(".delete-checkbox:checked").length === $(".delete-checkbox").length
+        );
+    });
+
+    // --- حذف سفارش‌ها ---
+    function removeItemsByIds(ids) {
+        if (!ids || !ids.length) {
+            toastr.warning('هیچ موردی انتخاب نشده است.');
+            return;
+        }
+
+        $.post("/Orders/RemoveItemsByOrder", 
+            { orderId: ids, __RequestVerificationToken: token })
+        .done(function (res) {
+            if (!res.success) {
+                toastr.error('خطا در حذف');
+                return;
+            }
+
+            toastr.success('حذف با موفقیت انجام شد');
+
+            ids.forEach(id => {
+                // حذف ردیف دسکتاپ
+                $(`tr[data-orderid='${id}']`).remove();
+
+                // حذف کارت موبایل
+                $(`.card[data-orderid='${id}']`).remove();
+            });
+
+            $("#selectAll").prop("checked", false);
+            updateTotal();
+        })
+        .fail(function () {
+            toastr.error('خطا در ارتباط با سرور');
+        });
+    }
+
+    // --- حذف تک مورد ---
+    $(document).on("click", ".remove-item-btn", function () {
+        const orderIdToRemove = $(this).data("orderid") || $(this).closest(".card").data("orderid");
+        if (!orderIdToRemove) return; // مطمئن شویم مقدار موجود است
+        removeItemsByIds([orderIdToRemove]);
+    });
+
+    // --- حذف چندتایی با چک‌باکس ---
+    $(document).on("click", "#deleteSelectedBtn", function () {
+        const selectedIds = $(".delete-checkbox:checked").map(function () {
+            return $(this).val();
+        }).get();
+        removeItemsByIds(selectedIds);
+    });
+
+    // --- تغییر روش ارسال ---
+    $(document).on("change", "input:radio[name=selection]", function () {
+        selectedDeliveryId = $(this).val();
+        $("#postButton").prop("disabled", false);
+
+        $.get("/Home/GetDeliveryPrice", { deliveryId: selectedDeliveryId })
+            .done(function (res) {
+                if (res.success) {
+                    $("#deliveryPrice").text(formatCurrency(res.price));
+                    updateTotal();
+                }
+            });
+    });
+
+    // --- اعمال کد تخفیف ---
+    $(document).on("click", "#applyDiscountBtnMobile, .applyDiscountBtn", function (e) {
+        e.preventDefault();
+        const discountCode = $(this).closest(".card-body").find(".discountCode").val() || $(".discountCode").first().val();
+
+        if (!discountCode) {
+            toastr.warning("لطفا کد تخفیف را وارد کنید.");
+            return;
+        }
+
+        $.post("/Orders/UseDiscount", { orderId: orderId, discountCode: discountCode, __RequestVerificationToken: token })
+            .done(function (res) {
+                if (res.success) {
+                    $("#disTotal").text(formatCurrency(res.discountAmount));
+                    updateTotal();
+                    toastr.success(res.message);
+                } else {
+                    toastr.error(res.message);
+                }
+            })
+            .fail(function () {
+                toastr.error("خطا در ارتباط با سرور");
+            });
+    });
+
+    // --- پرداخت آنلاین ---
+    $("#postButton").click(function () {
+        const sumOrder = parseNumber($("#sumOrder").text());
+        $.ajax({
+            url: '/Payment/ProcessPayment',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ sumOrder: sumOrder, invoiceId: orderId, deliveryId: selectedDeliveryId, source: 'order' }),
+            headers: { "RequestVerificationToken": token }
+        })
+        .done(function (res) {
+            if (res.success) window.location.href = res.redirectUrl;
+            else toastr.error(res.message);
+        })
+        .fail(function () {
+            toastr.error("خطا در ارسال درخواست پرداخت");
+        });
+    });
+
+    // --- مقداردهی اولیه جمع ---
+    updateTotal();
+});
+</script>
+

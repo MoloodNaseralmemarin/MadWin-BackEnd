@@ -493,6 +493,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
 
         #region حذف از سفارش
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveItemsByOrderAsync(int[] orderId)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);

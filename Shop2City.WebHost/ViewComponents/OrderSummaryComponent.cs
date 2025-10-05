@@ -15,18 +15,19 @@ namespace Shop2City.WebHost.ViewComponents
                 _deliveryMethodService = deliveryMethodService;
             }
 
-            public async Task<IViewComponentResult> InvokeAsync(int userId)
-            
+        public async Task<IViewComponentResult> InvokeAsync(int userId)
         {
             var orders = await _orderService.GetTodayOrdersAsync(userId);
             var deliveryMethods = await _deliveryMethodService.GetDeliveryMethodInfoAsync();
+
             var vm = new OrderSummaryViewModel
             {
                 OrderSummaryForAdmin = orders,
                 DeliveryMethods = deliveryMethods,
-
             };
-            return await Task.FromResult((IViewComponentResult)View("OrderSummary", vm));
+
+            return View("OrderSummary", vm);
         }
-        }
+
     }
+}

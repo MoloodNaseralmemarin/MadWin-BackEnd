@@ -113,7 +113,7 @@ namespace MadWin.Infrastructure.Repositories
         {
             var items = await _context.Set<ProductGroup>()
                 .AsNoTracking()
-                .Where(pg => pg.ParentId == categoryId && pg.IsActive)
+                .Where(pg => pg.ParentId == categoryId)
                 .OrderBy(pg => pg.Title)
                 .ToListAsync();
 

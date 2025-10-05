@@ -187,8 +187,9 @@ namespace MadWin.Infrastructure.Repositories
         }
         public async Task<OrderSummaryForAdminDto> GetTodayOrdersAsync(int userId)
         {
-            var today = DateTime.Today;
+            var today = DateTime.UtcNow.Date;
             var tomorrow = today.AddDays(1);
+
 
             // کوئری اصلی (فقط سفارش‌های همین کاربر)
             IQueryable<Order> query = GetQuery()
