@@ -1,6 +1,7 @@
 ﻿
 using MadWin.Application.Services;
 using MadWin.Core.DTOs.Orders;
+using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Lookups.CommissionRates;
 using Microsoft.AspNetCore.Authorization;
@@ -40,6 +41,9 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
         }
         public async Task<IActionResult> CreateOrder()
         {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+                return Unauthorized();
             // گرفتن دسته‌ها
             var categories = await _productService.GetCategoryForManageProduct(1);
 
@@ -55,6 +59,7 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
 
             var model = new OrderViewModel
             {
+                UserId= userId,
                 Categories = new SelectList(categories, "Value", "Text"),
                 SubCategories = new SelectList(subCategories, "Value", "Text")
             };

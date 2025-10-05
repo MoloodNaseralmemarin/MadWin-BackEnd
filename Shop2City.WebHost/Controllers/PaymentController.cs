@@ -67,54 +67,135 @@ namespace Shop2City.WebHost.Controllers
                     payload = ""
                 };
 
-            string jsonData = JsonSerializer.Serialize(paymentRequest);
-            var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+                string jsonData = JsonSerializer.Serialize(paymentRequest);
+                var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response;
-            try
-            {
-                response = await _httpClient.PostAsync(url, content);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "خطا در ارسال درخواست به درگاه پرداخت");
-                return Json(new { success = false, message = "خطا در ارتباط با درگاه پرداخت" });
-            }
+                HttpResponseMessage response;
+                try
+                {
+                    response = await _httpClient.PostAsync(url, content);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "خطا در ارسال درخواست به درگاه پرداخت");
+                    return Json(new { success = false, message = "خطا در ارتباط با درگاه پرداخت" });
+                }
 
-            if (!response.IsSuccessStatusCode)
-            {
-                return Json(new { success = false, message = "خطا در دریافت پاسخ از درگاه پرداخت" });
-            }
+                if (!response.IsSuccessStatusCode)
+                {
+                    return Json(new { success = false, message = "خطا در دریافت پاسخ از درگاه پرداخت" });
+                }
 
-            var responseData = await response.Content.ReadAsStringAsync();
-            var jsonObject = JObject.Parse(responseData);
-            var token = jsonObject["Accesstoken"]?.ToString();
+                var responseData = await response.Content.ReadAsStringAsync();
+                var jsonObject = JObject.Parse(responseData);
+                var token = jsonObject["Accesstoken"]?.ToString();
 
-            if (string.IsNullOrEmpty(token))
-            {
-                return Json(new { success = false, message = "توکن از درگاه پرداخت دریافت نشد." });
-            }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "توکن از درگاه پرداخت دریافت نشد." });
+                }
 
-            string redirectUrl = $"https://sepehr.shaparak.ir:8080/Pay?token={token}&terminalID=98808771&getMethod=0";
+                string redirectUrl = $"https://sepehr.shaparak.ir:8080/Pay?token={token}&terminalID=98808771&getMethod=0";
 
-            if (request.Source == "order")
+                if (request.Source == "order")
                 {
                     var order = await _orderService.GetOrderByOrderIdAsync(request.InvoiceId);
                     await _orderService.UpdatePriceAndDeliveryAsync(request.deliveryId, request.InvoiceId);
                     await _orderService.UpdateIsFinalyOrderAsync(order.Id);
 
-                    // ارسال پیامک با لاگ خطا مشابه همین
-                }
+                    // ارسال پیامک
+
+                    #region send SMS To Customer
+
+                    var smsCustomerSent = await _smsSenderService.SendSMSOrderForCustomerAsync(cellPhone, order.Id);
+
+                    if (smsCustomerSent)
+                    {
+                        // فقط لاگ کن، بدون اطلاع دادن به کاربر
+                        _logger.LogWarning("ارسال پیامک برای کاربرموفق بوده است.", cellPhone);
+                    }
+                    else
+                    {
+                        // فقط لاگ کن، بدون اطلاع دادن به کاربر
+                        _logger.LogWarning("ارسال پیامک برای کاربر ناموفق بوده است.", cellPhone);
+
+                    }
+                    #endregion
+
+                    #region send SMS To Admin
+
+                    var smsAdminSent = await _smsSenderService.SendSMSOrderForManagerAsync("09180580270", order.Id);
+
+                    if (smsAdminSent)
+                    {
+                        // فقط لاگ کن، بدون اطلاع دادن به کاربر
+                        _logger.LogWarning("ارسال پیامک برای مدیر موفق بوده است.", cellPhone);
+                    }
+                    else
+                    {
+                        // فقط لاگ کن، بدون اطلاع دادن به کاربر
+                        _logger.LogWarning("ارسال پیامک برای مدیر ناموفق بوده است.", cellPhone);
+
+                    }
+                    #endregion
+
+                    #region Send SMS To Production
+
+                    var smsProductionSent = await _smsSenderService.SendSMSOrderForProductionAsync("09182185223", order.Id);
+
+                    if (smsProductionSent)
+                    {
+                        // فقط لاگ کن، بدون اطلاع دادن به کاربر
+                        _logger.LogWarning("ارسال پیامک برای مدیر موفق بوده است.", cellPhone);
+                    }
+                    else
+                    {
+                        // فقط لاگ کن، بدون اطلاع دادن به کاربر
+                        _logger.LogWarning("ارسال پیامک برای مدیر ناموفق بوده است.", cellPhone);
+
+                    }
+                    #endregion
+            }
                 else if (request.Source == "factor")
                 {
                     var factor = await _factorService.GetFactorByFactorIdAsync(request.InvoiceId);
                     await _factorService.UpdatePriceAndDeliveryAsync(request.deliveryId, request.InvoiceId);
                     await _factorService.UpdateIsFinalyFactorAsync(factor.Id);
 
-                    // ارسال پیامک با لاگ خطا مشابه همین
+                    //ارسال پیامک
+                    #region send SMS To Customer
+                    var smsCustomerSent = await _smsSenderService.SendSMSFactorForCustomerAsync(cellPhone, factor.Id);
+
+                    if (smsCustomerSent)
+                    {
+                        // فقط لاگ کن، بدون اطلاع دادن به کاربر
+                        _logger.LogWarning("ارسال پیامک برای کاربرموفق بوده است.", cellPhone);
+                    }
+                    else
+                    {
+                        // فقط لاگ کن، بدون اطلاع دادن به کاربر
+                        _logger.LogWarning("ارسال پیامک برای کاربر ناموفق بوده است.", cellPhone);
+
+                    }
+                    #endregion
+                    #region Send SMS To Manager
+                    var smsManagerSent = await _smsSenderService.SendSMSFactorForManagerAsync(factor.Id);
+
+                    if (smsCustomerSent)
+                    {
+                        // فقط لاگ کن، بدون اطلاع دادن به کاربر
+                        _logger.LogWarning("ارسال پیامک برای کاربرموفق بوده است.", cellPhone);
+                    }
+                    else
+                    {
+                        // فقط لاگ کن، بدون اطلاع دادن به کاربر
+                        _logger.LogWarning("ارسال پیامک برای کاربر ناموفق بوده است.", cellPhone);
+
+                    }
+                    #endregion
                 }
 
-            return Json(new { success = true, redirectUrl });
+                return Json(new { success = true ,redirectUrl=redirectUrl});//
         }
             catch (Exception ex)
             {

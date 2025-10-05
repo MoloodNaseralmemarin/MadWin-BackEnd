@@ -16,6 +16,7 @@ namespace MadWin.Application.Services
         private readonly IOrderRepository _orderRepository;
         private readonly IOrderWidthPartRepository _orderWidthPartRepository;
         private readonly IFactorDetailService _factorDetailService;
+        private readonly IFactorService _factorService;
 
         public SmsSenderService(
             ISmsRepository smsRepository,
@@ -23,7 +24,8 @@ namespace MadWin.Application.Services
             IOptions<SmsSettings> smsSettings,
             IOrderRepository orderRepository,
             IOrderWidthPartRepository orderWidthPartRepository,
-            IFactorDetailService factorDetailService)
+            IFactorDetailService factorDetailService,
+            IFactorService factorService)
         {
             _smsRepository = smsRepository;
             _logger = logger;
@@ -31,6 +33,7 @@ namespace MadWin.Application.Services
             _orderRepository = orderRepository;
             _orderWidthPartRepository = orderWidthPartRepository;
             _factorDetailService = factorDetailService;
+            _factorService = factorService;
         }
         public async Task<bool> SendWelcomeSmsAsync(string cellPhone, string fullName, int smsCount)
         {
@@ -259,48 +262,62 @@ namespace MadWin.Application.Services
             }
         }
 
-        public async Task<bool> SendSMSFactorManagerAsync(int factorId)
+        public async Task<bool> SendSMSFactorForManagerAsync(int factorId)
         {
+
             //var message = $"Message = \"فاکتور\" + item.FactorId + \"-\" + listFactorDetails.Count + \"-\" + i + \" \" + \"نوع\" + item.Product.Title + \" \" + \"تعداد :\" + item.Quantity + \" \" + \"با تشکر پناه پلاست لغو 11\",";
-            //var listFactorDetails = await _factorDetailService.GetAllFactorDetailByFactorIdAsync(factorId);
+            var factorDetails = await _factorService.GetFactorDetailForSendSMSAsync(factorId);
+
+            if (factorDetails == null)
+            {
+                _logger.LogWarning("فاکتور یافت نشد.");
+                return false;
+            }
+
             try
             {
-            //    var i = 1;
-            //    foreach (var item in listFactorDetails)
-            //    {
-            //        var otpsms = new Api(_smsSettings.ApiKey);
-            //        var result = otpsms.VerifyAsync(1, "MadWinGetFactorForManager",
-            //        new string[] { "09180580270" },//09180580270
-            //        item.Factor.User.FirstName + " " + item.Factor.User.LastName,
-            //         item.FactorId + "-" + listFactorDetails.Count + "-" + i,
-            //        item.Product.Title,
-            //        item.Quantity.ToString(),
-            //        "ماد وین");
+                var i = 1;
+                foreach (var item in factorDetails.Details)
+                {
+                    var otpsms = new Api(_smsSettings.ApiKey);
 
-            //        if (result != null)
-            //        {
-            //            await SaveSmsAsync("09180580270", "MadWinGetFactorForCustomer", message, "سفارش دهنده", 2, "200", null, factorId);
-            //            _logger.LogInformation("پیامک ثبت فاکتور توسط مشتری با موفقیت ارسال شد.");
-            //            return true;
-            //        }
-            //        else
-            //        {
-            //            _logger.LogWarning("ارسال پیامک ثبت فاکتور توسط مشتری با خطا مواجه شد. نتیجه خالی بود.");
-            //            return false;
-            //        }
-            //    }
-            //    i++;
+                    // ساخت پیامک (مثلا می‌تونی هر متنی می‌خوای بسازی)
+                    string message = $"محصول: {item.ProductName}, تعداد: {item.Quantity}, سفارش‌دهنده: {factorDetails.FullName}, فاکتور: {factorDetails.FactorId}-{i}";
+
+                    var result = await otpsms.VerifyAsync(1, "MadWinGetFactorForManager",
+                                      new string[] { "09180580270" }, // شماره مقصد
+                                      message,
+                                      $"{factorDetails.FactorId}-{item.Quantity}-{i}", // شناسه پیامک یا کد دلخواه
+                                      item.ProductName,
+                                      item.Quantity.ToString(),
+                                      "ماد وین");
+
+                    if (result != null)
+                    {
+                        await SaveSmsAsync("09180580270", "MadWinGetFactorForCustomer", message, "سفارش دهنده", 2, "200", null, factorId);
+                        _logger.LogInformation($"پیامک محصول {item.ProductName} با موفقیت ارسال شد.");
+                    }
+                    else
+                    {
+                        _logger.LogWarning($"ارسال پیامک محصول {item.ProductName} با خطا مواجه شد. نتیجه خالی بود.");
+                        return false;
+                    }
+
+                    i++;
+                }
+
                 return true;
-
-
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "خطا در ارسال پیامک فاکتور مشتری‌.");
+                _logger.LogError(ex, "خطا در ارسال پیامک فاکتور");
                 return false;
             }
-        }
 
+
+
+        }
+       
         public async Task<bool> SendSMSForgotPasswordForCustomer(string cellPhone, string password)
         {
             var message = $"کلمه عبور جدید {password}اگر شما این درخواست را انجام نداده‌اید، لطفاً فوراً با پشتیبانی تماس بگیرید.با تشکر مادوین(نادری)لغو 11";

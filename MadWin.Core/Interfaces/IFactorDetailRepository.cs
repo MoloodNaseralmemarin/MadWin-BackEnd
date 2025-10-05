@@ -5,7 +5,7 @@ using MadWin.Core.Entities.Factors;
 
 namespace MadWin.Core.Interfaces
 {
-    public interface IFactorDetailRepository:IGenericRepository<FactorDetail>
+    public interface IFactorDetailRepository : IGenericRepository<FactorDetail>
     {
         Task<FactorDetail> AddFactorDetailAsync(int factorId, int count, int productId);
         Task<decimal> FactorSum(int factorId);
@@ -22,6 +22,5 @@ namespace MadWin.Core.Interfaces
         Task<FactorSummaryForAdminDto> GetOpenFactorAsync(int userId, int factorId);
 
         Task<IEnumerable<FactorDetailDto>> GetByFactorIdAsync(int factorId);
-
     }
 }

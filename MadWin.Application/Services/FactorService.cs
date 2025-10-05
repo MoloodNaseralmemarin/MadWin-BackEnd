@@ -1,4 +1,5 @@
-﻿using MadWin.Core.Entities.Factors;
+﻿using MadWin.Core.DTOs.Fators;
+using MadWin.Core.Entities.Factors;
 using MadWin.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -122,6 +123,11 @@ namespace MadWin.Application.Services
         {
             var countFactors = await _factorRepository.GetAllAsync();
             return countFactors.Count();
+        }
+
+        public async Task<FactorSummaryForSendSMS> GetFactorDetailForSendSMSAsync(int factorId)
+        {
+            return await _factorRepository.GetFactorDteailForSendSMSAsync(factorId);
         }
     }
 }

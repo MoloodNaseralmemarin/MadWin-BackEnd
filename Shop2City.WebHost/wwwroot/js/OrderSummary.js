@@ -1,4 +1,4 @@
-﻿// --- Helpers ---
+﻿// Helper functions
 function parseNumber(text) {
     return Number((text || "0").toString().replace(/[^\d]/g, '')) || 0;
 }
@@ -7,7 +7,7 @@ function formatCurrency(num) {
     return num.toLocaleString();
 }
 
-// --- محاسبه جمع ---
+// Update total calculation
 function updateTotal() {
     let subtotal = 0;
 
@@ -26,15 +26,13 @@ function updateTotal() {
     $("#sumOrderBtn").text(formatCurrency(total));
 }
 
-// --- حذف آیتم‌ها ---
+// Remove items function
 function removeItems(orderId = null) {
     let selectedIds = [];
 
     if (orderId) {
-        // حالت موبایل → فقط یک آیتم خاص
         selectedIds.push(orderId);
     } else {
-        // حالت دسکتاپ → همه چک‌باکس‌های انتخاب‌شده
         $(".delete-checkbox:checked").each(function () {
             selectedIds.push($(this).val());
         });
@@ -45,10 +43,13 @@ function removeItems(orderId = null) {
         }
     }
 
+    // Get CSRF token
+    const token = $('#csrfToken').val();
+
     $.ajax({
         url: '/Orders/RemoveItemsByOrder',
         type: 'POST',
-        data: { orderId: selectedIds },
+        data: { orderId: selectedIds, __RequestVerificationToken: token },
         traditional: true
     })
         .done(function (response) {
@@ -56,19 +57,17 @@ function removeItems(orderId = null) {
                 toastr.success('حذف با موفقیت انجام شد.');
 
                 selectedIds.forEach(id => {
-                    // حذف ردیف اصلی و جزئیات
                     let mainRow = $("input.delete-checkbox[value='" + id + "']").closest("tr");
                     let detailRow = $("tr.detail-row[data-orderid='" + id + "']");
                     mainRow.add(detailRow).remove();
 
-                    // موبایل
                     $(".card").has("a[onclick='removeItems(" + id + ")']").remove();
                 });
 
                 updateTotal();
                 $("#selectAll").prop("checked", false);
 
-                // بروزرسانی جمع کل از سرور
+                // Optional: Refresh subtotal from server
                 $.getJSON("/Orders/GetSumPriceWithFeeByOrder", { orderId: selectedIds[0] }, function (data) {
                     if (data && data.price !== undefined) {
                         $("#SubtotalPrice").text(formatCurrency(data.price));
@@ -85,20 +84,19 @@ function removeItems(orderId = null) {
         });
 }
 
-// --- رویدادها ---
 $(document).ready(function () {
     updateTotal();
 
     const orderId = $(".orderId").first().val();
-    const token = $('input[name="__RequestVerificationToken"]').val();
+    const token = $('#csrfToken').val();
     let selectedDeliveryId = null;
 
-    // انتخاب همه
+    // Select all checkboxes
     $("#selectAll").on("change", function () {
         $(".delete-checkbox").prop("checked", $(this).is(":checked"));
     });
 
-    // هماهنگ‌سازی selectAll
+    // Sync selectAll checkbox
     $(document).on("change", ".delete-checkbox", function () {
         $("#selectAll").prop(
             "checked",
@@ -106,8 +104,8 @@ $(document).ready(function () {
         );
     });
 
-    // تغییر روش ارسال
-    $("input:radio[name=selection]").on("change", function () {
+    // Change delivery method
+    $(document).on("change", "input:radio[name=selection]", function () {
         selectedDeliveryId = $(this).val();
         $("#postButton").prop("disabled", false);
 
@@ -120,10 +118,15 @@ $(document).ready(function () {
             });
     });
 
-    // اعمال کد تخفیف
-    $("#applyDiscountBtn, #applyDiscountBtnMobile").click(function (e) {
+    // Apply discount code (both desktop and mobile)
+    $(document).on("click", ".applyDiscountBtn", function (e) {
         e.preventDefault();
         let discountCode = $(this).siblings(".discountCode").val();
+
+        if (!discountCode) {
+            toastr.warning("لطفا کد تخفیف را وارد کنید.");
+            return;
+        }
 
         $.post("/Orders/UseDiscount", {
             orderId: parseInt(orderId),
@@ -145,7 +148,7 @@ $(document).ready(function () {
             });
     });
 
-    // پرداخت آنلاین
+    // Online payment
     $("#postButton").click(function () {
         let sumOrder = parseNumber($("#sumOrder").text());
 
@@ -158,7 +161,8 @@ $(document).ready(function () {
                 invoiceId: parseInt(orderId),
                 deliveryId: selectedDeliveryId,
                 source: 'order'
-            })
+            }),
+            headers: { "RequestVerificationToken": token }
         })
             .done(function (response) {
                 if (response.success) {

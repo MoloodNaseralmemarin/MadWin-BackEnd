@@ -9,7 +9,7 @@
 
         Task<bool> SendSMSFactorForCustomerAsync(string cellPhone, int factorId);
 
-        Task<bool> SendSMSFactorManagerAsync(int factorId);
+        Task<bool> SendSMSFactorForManagerAsync(int factorId);
 
         Task<bool> SendSMSForgotPasswordForCustomer(string cellPhone,string password);
 

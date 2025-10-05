@@ -1,4 +1,5 @@
-﻿using MadWin.Core.Entities.Factors;
+﻿using MadWin.Core.DTOs.Fators;
+using MadWin.Core.Entities.Factors;
 
 namespace MadWin.Application.Services
 {
@@ -17,6 +18,8 @@ namespace MadWin.Application.Services
         decimal GetSubtotal(int factorId);
 
         Task<int> CountFactors();
+
+        Task<FactorSummaryForSendSMS> GetFactorDetailForSendSMSAsync(int factorId);
 
 
     }

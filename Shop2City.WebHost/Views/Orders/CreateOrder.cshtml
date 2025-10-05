@@ -132,318 +132,187 @@
     </div>
 </div>
 
-@section Scripts {
+
+@section Scripts{
     <script>
-        (function(){
-          const form = document.getElementById('customSizeForm');
-          const submitBtn = document.getElementById('submitBtn');
-          const widthInput = document.getElementById('Width');
-          const countInput = document.getElementById('Count');
-          const countErrorEl = form.querySelector('.count-error');
-          const inputContainer = document.getElementById('input-container');
-          const widthInputsWrapper = document.getElementById('width-inputs');
-          const widthErrorEl = document.querySelector('.width-error');
-          const categoryEl = document.getElementById('CategoryId');
-          const subSelect = document.getElementById('SubCategoryId');
-          const divisionErrorEl = document.getElementById('division-error');
+    // Helper functions
+function parseNumber(text) {
+    return Number((text || "0").toString().replace(/[^\d]/g, '')) || 0;
+}
 
-          function qAll(sel, ctx=document){ return Array.from((ctx||document).querySelectorAll(sel)); }
-          function q(sel, ctx=document){ return (ctx||document).querySelector(sel); }
+function formatCurrency(num) {
+    return num.toLocaleString();
+}
 
-          // helper to show invalid-feedback in Persian
-          function showInvalid(el, msg){
-            if(!el) return;
-            el.classList.add('is-invalid');
-            let fb = el.parentNode.querySelector('.invalid-feedback');
-            if(!fb){
-              fb = document.createElement('div');
-              fb.className = 'invalid-feedback';
-              el.parentNode.appendChild(fb);
-            }
-            fb.textContent = msg;
-          }
-          function hideInvalid(el){
-            if(!el) return;
-            el.classList.remove('is-invalid');
-            const fb = el.parentNode.querySelector('.invalid-feedback');
-            if(fb) fb.textContent = '';
-          }
+// Update total calculation
+function updateTotal() {
+    let subtotal = 0;
 
-          // Validate form and set submit button
-          function validateForm(){
-            let valid = true;
+    $(".item-price").each(function () {
+        subtotal += parseNumber($(this).text());
+    });
 
-            // Required fields
-            const requiredFields = [
-              { name:'CategoryId', el: categoryEl, msg:'لطفا دسته را انتخاب کنید.' },
-              { name:'SubCategoryId', el: subSelect, msg:'لطفا زیر دسته را انتخاب کنید.' },
-              { name:'Height', el: document.getElementById('Height'), msg:'لطفا ارتفاع را وارد کنید.' },
-              { name:'Width', el: widthInput, msg:'لطفا عرض را وارد کنید.' },
-            ];
+    let delivery = parseNumber($("#deliveryPrice").text());
+    let disTotal = parseNumber($("#disTotal").text());
 
-            requiredFields.forEach(f=>{
-              if(!f.el || !f.el.value || String(f.el.value).trim()===''){
-                valid = false;
-                showInvalid(f.el, f.msg);
-              } else {
-                hideInvalid(f.el);
-              }
-            });
+    let total = subtotal - disTotal + delivery;
+    if (total < 0) total = 0;
 
-            // division selected?
-            const divChecked = form.querySelector('input[name="division"]:checked');
-            if(!divChecked){
-              valid = false;
-              divisionErrorEl.classList.remove('d-none');
-            } else {
-              divisionErrorEl.classList.add('d-none');
-            }
+    $("#SubtotalPrice").text(formatCurrency(subtotal));
+    $("#sumOrder").text(formatCurrency(total));
+    $("#sumOrderBtn").text(formatCurrency(total));
+}
 
-            // Count validation (فارسی)
-            const cnt = parseInt(countInput.value,10);
-            if(!countInput.value || isNaN(cnt) || cnt < 1){
-              valid = false;
-              showInvalid(countInput, 'لطفا تعداد را وارد کنید و عددی بزرگتر از صفر انتخاب کنید.');
-              countErrorEl.style.display = 'block';
-            } else {
-              hideInvalid(countInput);
-              countErrorEl.style.display = 'none';
-            }
+// Remove items function
+function removeItems(orderId = null) {
+    let selectedIds = [];
 
-            // اگر قسمت‌های عرض وجود دارد، مجموعشان باید برابر عرض کل باشد
-            const partEls = qAll('.width-input', inputContainer);
-            if(partEls.length){
-              const total = Number(widthInput.value) || 0;
-              let sum = 0;
-              partEls.forEach(pe => sum += Number(pe.value) || 0);
+    if (orderId) {
+        selectedIds.push(orderId);
+    } else {
+        $(".delete-checkbox:checked").each(function () {
+            selectedIds.push($(this).val());
+        });
 
-              if(Math.round(sum) !== Math.round(total)){
-                valid = false;
-                widthErrorEl.style.display = 'block';
-                partEls.forEach(pe => pe.classList.add('is-invalid'));
-              } else {
-                widthErrorEl.style.display = 'none';
-                partEls.forEach(pe => pe.classList.remove('is-invalid'));
-              }
-            } else {
-              widthErrorEl.style.display = 'none';
-            }
+        if (selectedIds.length === 0) {
+            toastr.warning('هیچ موردی انتخاب نشده است.');
+            return;
+        }
+    }
 
-            submitBtn.disabled = !valid;
-            return valid;
-          }
+    // Get CSRF token
+    const token = $('#csrfToken').val();
 
-          // Fetch subcategories when category changes — robust to different JSON shapes
-          if(categoryEl){
-            categoryEl.addEventListener('change', function(){
-              const catId = this.value;
-              subSelect.innerHTML = '<option value="">در حال بارگذاری...</option>';
-              subSelect.disabled = true;
+    $.ajax({
+        url: '/Orders/RemoveItemsByOrder',
+        type: 'POST',
+        data: { orderId: selectedIds, __RequestVerificationToken: token },
+        traditional: true
+    })
+        .done(function (response) {
+            if (response.success) {
+                toastr.success('حذف با موفقیت انجام شد.');
 
-              if(!catId){
-                subSelect.innerHTML = '<option value="">ابتدا دسته را انتخاب کنید</option>';
-                subSelect.disabled = true;
-                validateForm();
-                return;
-              }
+                selectedIds.forEach(id => {
+                    let mainRow = $("input.delete-checkbox[value='" + id + "']").closest("tr");
+                    let detailRow = $("tr.detail-row[data-orderid='" + id + "']");
+                    mainRow.add(detailRow).remove();
 
-          const url = '@Url.Action("GetSubCategories", "Orders")' + '?categoryId=' + encodeURIComponent(catId);
-              fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }})
-                .then(response => {
-                  if(!response.ok) throw new Error('network');
-                  return response.json();
-                })
-                .then(data => {
-                  // data may be an array or an object with items
-                  const items = Array.isArray(data) ? data : (data.items || data);
-                  subSelect.innerHTML = '<option value="">انتخاب کنید</option>';
-                  if(!Array.isArray(items) || items.length === 0){
-                    subSelect.innerHTML = '<option value="">زیر دسته‌ای موجود نیست</option>';
-                    subSelect.disabled = true;
-                  } else {
-                    items.forEach(item => {
-                      const opt = document.createElement('option');
-                      // support multiple possible property names
-                      opt.value = item.value ?? item.id ?? item.Value ?? item.Id ?? item.key ?? item.Key;
-                      opt.textContent = item.text ?? item.name ?? item.Text ?? item.Name ?? String(opt.value);
-                      subSelect.appendChild(opt);
-                    });
-                    subSelect.disabled = false;
-                  }
-                  validateForm();
-                })
-                .catch(()=> {
-                  subSelect.innerHTML = '<option value="">خطا در بارگذاری</option>';
-                  subSelect.disabled = true;
-                  validateForm();
+                    $(".card").has("a[onclick='removeItems(" + id + ")']").remove();
                 });
-            });
-          }
 
-          // ساخت ورودی‌های عرض (count + type)
-          window.updateInputs = function(count, type){
-            const total = Number(widthInput.value) || 0;
-            if(!total || total <= 0){
-              showInvalid(widthInput, 'لطفا ابتدا عرض کل را وارد کنید (باید عددی بزرگتر از صفر باشد).');
-              validateForm();
-              return;
+                updateTotal();
+                $("#selectAll").prop("checked", false);
+
+                // Optional: Refresh subtotal from server
+                $.getJSON("/Orders/GetSumPriceWithFeeByOrder", { orderId: selectedIds[0] }, function (data) {
+                    if (data && data.price !== undefined) {
+                        $("#SubtotalPrice").text(formatCurrency(data.price));
+                        updateTotal();
+                    }
+                });
+
             } else {
-              hideInvalid(widthInput);
+                toastr.error('خطا در حذف.');
             }
+        })
+        .fail(function () {
+            toastr.error('مشکلی در ارتباط با سرور رخ داد.');
+        });
+}
 
-            // hidden fields
-            const partCountHidden = form.querySelector('[name="PartCount"]');
-            const isEqualHidden = form.querySelector('[name="IsEqualParts"]');
-            const divisionHidden = form.querySelector('[name="DivisionType"]');
-            if(partCountHidden) partCountHidden.value = count;
-            if(isEqualHidden) isEqualHidden.value = (type === 'equal') ? 'true' : 'false';
-            if(divisionHidden) divisionHidden.value = `${count}-${type}`;
+$(document).ready(function () {
+    updateTotal();
 
-            inputContainer.innerHTML = '';
-            widthInputsWrapper.style.display = 'block';
+    const orderId = $(".orderId").first().val();
+    const token = $('#csrfToken').val();
+    let selectedDeliveryId = null;
 
-            // labels rtl order: راست - (وسط) - چپ
-            const labels = (count === 2) ? ['راست','چپ'] : ['راست','وسط','چپ'];
+    // Select all checkboxes
+    $("#selectAll").on("change", function () {
+        $(".delete-checkbox").prop("checked", $(this).is(":checked"));
+    });
 
-            if(type === 'equal'){
-              // پخش باقیمانده طوری که جمع دقیقاً برابر عرض شود
-              const base = Math.floor(total / count);
-              const remainder = total - (base * count);
-              for(let i=0;i<count;i++){
-                const wrapper = document.createElement('div');
-                wrapper.className = 'mb-2';
+    // Sync selectAll checkbox
+    $(document).on("change", ".delete-checkbox", function () {
+        $("#selectAll").prop(
+            "checked",
+            $(".delete-checkbox").length === $(".delete-checkbox:checked").length
+        );
+    });
 
-                const lbl = document.createElement('label');
-                lbl.className = 'form-label';
-                lbl.textContent = labels[i] || `بخش ${i+1}`;
+    // Change delivery method
+    $(document).on("change", "input:radio[name=selection]", function () {
+        selectedDeliveryId = $(this).val();
+        $("#postButton").prop("disabled", false);
 
-                const inp = document.createElement('input');
-                inp.type = 'number';
-                inp.className = 'form-control width-input';
-                inp.name = `WidthParts[${i}]`;
-                inp.min = 0;
-                inp.step = 1;
-                inp.readOnly = true;
-
-                // distribute remainder to the first `remainder` parts (برای RTL اول سمت راست)
-                const extra = (i < remainder) ? 1 : 0;
-                inp.value = String(base + extra);
-
-                wrapper.appendChild(lbl);
-                wrapper.appendChild(inp);
-                inputContainer.appendChild(wrapper);
-              }
-            } else {
-              for(let i=0;i<count;i++){
-                const wrapper = document.createElement('div');
-                wrapper.className = 'mb-2';
-
-                const lbl = document.createElement('label');
-                lbl.className = 'form-label';
-                lbl.textContent = labels[i] || `بخش ${i+1}`;
-
-                const inp = document.createElement('input');
-                inp.type = 'number';
-                inp.className = 'form-control width-input';
-                inp.name = `WidthParts[${i}]`;
-                inp.min = 0;
-                inp.step = 1;
-                inp.readOnly = false;
-                inp.value = '';
-
-                wrapper.appendChild(lbl);
-                wrapper.appendChild(inp);
-                inputContainer.appendChild(wrapper);
-              }
-            }
-
-            // focus اولین بخش برای UX موبایل
-            const first = inputContainer.querySelector('.width-input');
-            if(first) first.focus();
-
-            validateForm();
-          };
-
-          // اگر عرض تغییر کنه و تقسیم مساوی انتخاب شده، مقادیر قسمت‌ها رو بروزرسانی کن
-          widthInput && widthInput.addEventListener('input', function(){
-            const checked = form.querySelector('input[name="division"]:checked');
-            if(!checked) { validateForm(); return; }
-            const [cntStr, type] = checked.value.split('-');
-            const count = Number(cntStr) || 0;
-            if(type === 'equal' && count > 0){
-              // دوباره بساز یا بروزرسانی مقادیر قسمت‌ها بدون تغییر ساختار
-              // بهترین مسیر: فراخوانی updateInputs مجدد با همان پارامترها
-              window.updateInputs(count, 'equal');
-            } else {
-              validateForm();
-            }
-          });
-
-          // event delegation: وقتی هر یک از ورودی‌های بخش تغییر کنند validate کن
-          inputContainer.addEventListener('input', function(e){
-            if(e.target && e.target.classList.contains('width-input')){
-              // hide individual invalid
-              if(e.target.classList.contains('is-invalid')) e.target.classList.remove('is-invalid');
-              validateForm();
-            }
-          });
-
-          // وقتی مودال باز میشه: فقط فیلدهای موقتی ریست میشن، دسته (Category) نگه داشته میشه و در صورت وجود زیر دسته لود میشه
-          const modalEl = document.getElementById('customSizeModal');
-          if(modalEl){
-            modalEl.addEventListener('shown.bs.modal', function(){
-              // reset only inputs we want to clear (حفظ دسته در صورت پر بودن)
-              form.querySelectorAll('input').forEach(inp => {
-                const name = inp.getAttribute('name') || inp.getAttribute('id') || '';
-                if(name === 'CategoryId' || name === 'SubCategoryId') return;
-                if(inp.type === 'hidden') {
-                  // reset hidden parted fields
-                  inp.value = '';
-                } else {
-                  inp.value = '';
+        $.get("/Home/GetDeliveryPrice", { deliveryId: selectedDeliveryId })
+            .done(function (result) {
+                if (result.success) {
+                    $("#deliveryPrice").text(formatCurrency(result.price));
+                    updateTotal();
                 }
-                inp.classList.remove('is-invalid');
-              });
-
-              // clear selects except Category
-              if(subSelect) {
-                subSelect.innerHTML = '<option value="">ابتدا دسته را انتخاب کنید</option>';
-                subSelect.disabled = true;
-              }
-
-              inputContainer.innerHTML = '';
-              widthInputsWrapper.style.display = 'none';
-              widthErrorEl.style.display = 'none';
-              countErrorEl.style.display = 'none';
-              divisionErrorEl.classList.add('d-none');
-              submitBtn.disabled = true;
-
-              // اگر دسته پیش‌پر شده بود، زیر دسته‌ها را بارگذاری کن
-              if(categoryEl && categoryEl.value){
-                categoryEl.dispatchEvent(new Event('change'));
-              }
             });
-          }
+    });
 
-          // جلوگیری از ارسال فرم اگر نامعتبر است
-          form.addEventListener('submit', function(e){
-            if(!validateForm()){
-              e.preventDefault();
-              e.stopPropagation();
-              // نشان دادن پیام‌های خطا به کاربر (به صورت فارسی)
-            }
-            // در صورت درست بودن، ارسال به سرور ادامه پیدا می‌کند.
-          });
+    // Apply discount code (both desktop and mobile)
+    $(document).on("click", ".applyDiscountBtn", function (e) {
+        e.preventDefault();
+        let discountCode = $(this).siblings(".discountCode").val();
 
-          // هر تغییر در فرم -> اعتبارسنجی
-          form.addEventListener('input', function(e){
-            // اگر المان دارای کلاس is-invalid هست، پاکش کن
-            if(e.target && e.target.classList && e.target.classList.contains('is-invalid')){
-              e.target.classList.remove('is-invalid');
-            }
-            validateForm();
-          });
+        if (!discountCode) {
+            toastr.warning("لطفا کد تخفیف را وارد کنید.");
+            return;
+        }
 
-        })();
+        $.post("/Orders/UseDiscount", {
+            orderId: parseInt(orderId),
+            discountCode: discountCode,
+            __RequestVerificationToken: token
+        })
+            .done(function (response) {
+                if (response.success) {
+                    $("#disTotal").text(formatCurrency(response.discountAmount));
+                    updateTotal();
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+            })
+            .fail(function (xhr) {
+                console.error(xhr.responseText);
+                toastr.error("خطا در ارتباط با سرور");
+            });
+    });
+
+    // Online payment
+    $("#postButton").click(function () {
+        let sumOrder = parseNumber($("#sumOrder").text());
+
+        $.ajax({
+            url: '/Payment/ProcessPayment',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                sumOrder: sumOrder,
+                invoiceId: parseInt(orderId),
+                deliveryId: selectedDeliveryId,
+                source: 'order'
+            }),
+            headers: { "RequestVerificationToken": token }
+        })
+            .done(function (response) {
+                if (response.success) {
+                    window.location.href = response.redirectUrl;
+                } else {
+                    toastr.error(response.message);
+                }
+            })
+            .fail(function (xhr, status, error) {
+                console.error(error);
+                toastr.error("خطا در ارسال درخواست پرداخت");
+            });
+    });
+});
     </script>
 }

@@ -1,8 +1,10 @@
-﻿using MadWin.Core.Entities.Factors;
+﻿using MadWin.Core.DTOs.Fators;
+using MadWin.Core.Entities.Factors;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Lookups.Factors;
 using MadWin.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace MadWin.Infrastructure.Repositories
 {
@@ -95,6 +97,38 @@ namespace MadWin.Infrastructure.Repositories
                                           && !f.IsFinaly
                                           && !f.IsDelete);
         }
+
+
+        public async Task<FactorSummaryForSendSMS> GetFactorDteailForSendSMSAsync(int factorId)
+        {
+            var factor = await GetQuery()
+                .Include(f=>f.User)
+                .Include(f => f.FactorDetails)
+                    .ThenInclude(fd => fd.Product)
+
+                .Where(f => f.Id == factorId
+                            && f.IsFinaly
+                            && !f.IsDelete)
+                .FirstOrDefaultAsync();
+
+            if (factor == null)
+                return null;
+
+            var result = new FactorSummaryForSendSMS
+            {
+                FullName = factor.User?.FirstName + "" + factor.User?.LastName ?? "بدون نام",
+                FactorId = factor.Id,
+                Details = factor.FactorDetails
+                    .Where(fd => !fd.IsDelete)
+                    .Select(fd => new FactorDetailItemForSendSMS
+                    {
+                        ProductName = fd.Product.Title,
+                        Quantity = fd.Quantity
+                    }).ToList()
+            };
+            return result;
+        }
+
 
     }
 }

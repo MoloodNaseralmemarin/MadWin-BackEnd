@@ -62,4 +62,17 @@ public class FactorSummaryViewModel
     public IEnumerable<DeliveryMethodInfoLookup> DeliveryMethods { get; set; }
 
 }
+    public class FactorSummaryForSendSMS
+    {
+        public string FullName { get; set; }
+        public int FactorId { get; set; }
+        public List<FactorDetailItemForSendSMS> Details { get; set; } = new List<FactorDetailItemForSendSMS>();
+    }
+
+    public class FactorDetailItemForSendSMS
+    {
+        public string ProductName { get; set; }
+        public int Quantity { get; set; }
+    }
+
 }

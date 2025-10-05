@@ -65,7 +65,7 @@
                     <label asp-for="Address" class="form-label">آدرس پستی</label>
                     <input type="text"
                            asp-for="Address"
-                           id="address"
+                           id="Address"
                            class="form-control form-control-md d-md-block"
                            placeholder="همدان -همدان">
                 </div>
@@ -73,16 +73,16 @@
                     <label asp-for="Password" class="form-label">کلمه عبور</label>
                     <input type="Password"
                            asp-for="Password"
-                            id="password"
+                            id="Password"
                            class="form-control form-control-md d-md-block"
                            placeholder="کلمه عبور">
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Password" class="form-label">تکرار کلمه عبور</label>
+                    <label asp-for="ConfirmPassword" class="form-label">تکرار کلمه عبور</label>
                     <input type="password"
                            asp-for="ConfirmPassword"
-                           id="password"
+                           id="ConfirmPassword"
                            class="form-control form-control-md d-md-block"
                            placeholder="تکرار کلمه عبور">
                 </div>
@@ -125,24 +125,29 @@
                     shake("#lastName");
                     return false;
                 }
-                if (!$("#telPhone").val()) {
+                if (!$("#TelPhone").val()) {
                     toastr.error("شماره ثابت را وارد کنید");
-                    shake("#telPhone");
+                    shake("#TelPhone");
                     return false;
                 }
-                if (!$("#cellPhone").val()) {
+                if (!$("#CellPhone").val()) {
                     toastr.error("شماره همراه را وارد کنید");
-                    shake("#cellPhone");
+                    shake("#CellPhone");
                     return false;
                 }
-                if (!$("#address").val()) {
+                if (!$("#Address").val()) {
                     toastr.error("آدرس پستی را وارد کنید");
-                    shake("#address");
+                    shake("#Address");
                     return false;
                 }
-                if (!$("#password").val()) {
+                if (!$("#Password").val()) {
                     toastr.error("لطفاً کلمه عبور را وارد کنید");
-                    shake("#password");
+                    shake("#Password");
+                    return false;
+                }
+                  if (!$("#ConfirmPassword").val()) {
+                    toastr.error("لطفاً کلمه عبور را وارد کنید");
+                    shake("#ConfirmPassword");
                     return false;
                 }
                 return true;

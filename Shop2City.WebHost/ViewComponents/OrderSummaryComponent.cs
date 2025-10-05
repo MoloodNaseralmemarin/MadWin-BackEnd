@@ -16,7 +16,8 @@ namespace Shop2City.WebHost.ViewComponents
             }
 
             public async Task<IViewComponentResult> InvokeAsync(int userId)
-            {
+            
+        {
             var orders = await _orderService.GetTodayOrdersAsync(userId);
             var deliveryMethods = await _deliveryMethodService.GetDeliveryMethodInfoAsync();
             var vm = new OrderSummaryViewModel
