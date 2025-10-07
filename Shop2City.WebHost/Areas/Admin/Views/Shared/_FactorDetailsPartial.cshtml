@@ -19,7 +19,7 @@
                     <td class="text-wrap">@item.ProductTitle</td>
                     <td>@item.Price.ToString("N0")</td>
                     <td>@item.Quantity</td>
-                    <td>@item..ToString("N0")</td>
+                    <td>(@item.Quantity * @item.Price).ToString("N0")</td>
                 </tr>
             }
         </tbody>

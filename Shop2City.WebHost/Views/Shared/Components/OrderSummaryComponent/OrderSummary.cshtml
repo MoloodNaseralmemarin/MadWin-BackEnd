@@ -1,6 +1,13 @@
 ﻿@using MadWin.Core.DTOs.Orders
 @using Shop2City.Core.Convertors
 @model OrderSummaryViewModel
+@{
+    var orderSummary = Model.OrderSummaryForAdmin;
+    var order = orderSummary.OrderSummary.FirstOrDefault();
+    var orderId = order.OrderId;
+    var createDate = order.CreateDate;
+    var totalPrice = order.TotalPrice; // یا TotalPrice اگه پراپرتی‌ات اینطوره
+}
 
 @Html.AntiForgeryToken() <!-- توکن CSRF -->
 
@@ -20,7 +27,11 @@
         <input type="hidden" class="orderId" value="@Model.OrderSummaryForAdmin.OrderSummary.First().OrderId" />
 
         <!-- جدول دسکتاپ -->
-        <div class="table-responsive d-none d-md-block">
+        <div class="card shadow border-0 rounded-3">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fa fa-shopping-basket"></i>خلاصه فاکتور</h5>
+                <span class="badge bg-light text-dark">شماره فاکتور: @orderId</span>
+            </div>
             <table class="table table-bordered table-hover order-table align-middle">
                 <thead class="table-light">
                     <tr>
@@ -177,7 +188,7 @@
                     <tr>
                         <td colspan="2">
                             <button class="btn btn-success w-100 py-2" id="postButton" disabled>
-                                پرداخت آنلاین - <span id="sumOrderBtn">0</span>
+                                <i class="fa fa-credit-card"></i> پرداخت آنلاین <span id="sumOrderBtn">0</span>
                             </button>
                         </td>
                     </tr>
@@ -190,154 +201,190 @@
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-<script>
-$(document).ready(function () {
 
-    const token = $('input[name="__RequestVerificationToken"]').val();
-    const orderId = parseInt($(".orderId").first().val());
-    let selectedDeliveryId = null;
 
-    // --- توابع کمکی ---
-    function parseNumber(text) {
-        return Number((text || "0").toString().replace(/[^\d]/g, '')) || 0;
-    }
-    function formatCurrency(num) {
-        return num.toLocaleString('fa-IR');
-    }
+@section Scripts {
+    <script src="~/js/discounts/discountOrder.js"></script>
+    <script>
+        $(document).ready(function () {
 
-    function updateTotal() {
-        let subtotal = 0;
-        $(".item-price").each(function () {
-            subtotal += parseNumber($(this).text());
-        });
-        let delivery = parseNumber($("#deliveryPrice").text());
-        let disTotal = parseNumber($("#disTotal").text());
-        let total = Math.max(subtotal - disTotal + delivery, 0);
-        $("#SubtotalPrice").text(formatCurrency(subtotal));
-        $("#sumOrder, #sumOrderBtn").text(formatCurrency(total));
-    }
-
-    // --- انتخاب همه ---
-    $("#selectAll").on("change", function () {
-        $(".delete-checkbox").prop("checked", $(this).is(":checked"));
-    });
-    $(document).on("change", ".delete-checkbox", function () {
-        $("#selectAll").prop(
-            "checked",
-            $(".delete-checkbox:checked").length === $(".delete-checkbox").length
-        );
-    });
-
-    // --- حذف سفارش‌ها ---
-    function removeItemsByIds(ids) {
-        if (!ids || !ids.length) {
-            toastr.warning('هیچ موردی انتخاب نشده است.');
-            return;
-        }
-
-        $.post("/Orders/RemoveItemsByOrder", 
-            { orderId: ids, __RequestVerificationToken: token })
-        .done(function (res) {
-            if (!res.success) {
-                toastr.error('خطا در حذف');
-                return;
+            // 🔹 تابع تبدیل متن عددی به عدد
+            function parseNumber(text) {
+                return Number(text.replace(/,/g, '').replace(/[^\d.-]/g, '')) || 0;
             }
 
-            toastr.success('حذف با موفقیت انجام شد');
+            // 🔹 تابع محاسبه مبلغ نهایی
+            function updateTotal() {
+                const subtotal = parseNumber($("#SubtotalPrice").text());
+                const delivery = parseNumber($("#deliveryPrice").text());
+                const discount = parseNumber($("#disTotal").text());
+                const total = subtotal - discount + delivery;
 
-            ids.forEach(id => {
-                // حذف ردیف دسکتاپ
-                $(`tr[data-orderid='${id}']`).remove();
+                $("#sumOrder").text(total.toLocaleString());
+                $("#sumOrderBtn").text(total.toLocaleString());
+            }
 
-                // حذف کارت موبایل
-                $(`.card[data-orderid='${id}']`).remove();
-            });
-
-            $("#selectAll").prop("checked", false);
             updateTotal();
-        })
-        .fail(function () {
-            toastr.error('خطا در ارتباط با سرور');
-        });
-    }
 
-    // --- حذف تک مورد ---
-    $(document).on("click", ".remove-item-btn", function () {
-        const orderIdToRemove = $(this).data("orderid") || $(this).closest(".card").data("orderid");
-        if (!orderIdToRemove) return; // مطمئن شویم مقدار موجود است
-        removeItemsByIds([orderIdToRemove]);
-    });
-
-    // --- حذف چندتایی با چک‌باکس ---
-    $(document).on("click", "#deleteSelectedBtn", function () {
-        const selectedIds = $(".delete-checkbox:checked").map(function () {
-            return $(this).val();
-        }).get();
-        removeItemsByIds(selectedIds);
-    });
-
-    // --- تغییر روش ارسال ---
-    $(document).on("change", "input:radio[name=selection]", function () {
-        selectedDeliveryId = $(this).val();
-        $("#postButton").prop("disabled", false);
-
-        $.get("/Home/GetDeliveryPrice", { deliveryId: selectedDeliveryId })
-            .done(function (res) {
-                if (res.success) {
-                    $("#deliveryPrice").text(formatCurrency(res.price));
-                    updateTotal();
+            // ✅ تعریف تابع در سطح global تا از onclick در HTML کار کند
+            window.removeItems = function (selectedIds) {
+                if (!selectedIds || selectedIds.length === 0) {
+                    toastr.warning('هیچ موردی انتخاب نشده است.');
+                    return;
                 }
-            });
-    });
 
-    // --- اعمال کد تخفیف ---
-    $(document).on("click", "#applyDiscountBtnMobile, .applyDiscountBtn", function (e) {
-        e.preventDefault();
-        const discountCode = $(this).closest(".card-body").find(".discountCode").val() || $(".discountCode").first().val();
-
-        if (!discountCode) {
-            toastr.warning("لطفا کد تخفیف را وارد کنید.");
-            return;
-        }
-
-        $.post("/Orders/UseDiscount", { orderId: orderId, discountCode: discountCode, __RequestVerificationToken: token })
-            .done(function (res) {
-                if (res.success) {
-                    $("#disTotal").text(formatCurrency(res.discountAmount));
-                    updateTotal();
-                    toastr.success(res.message);
-                } else {
-                    toastr.error(res.message);
+                // اگر فقط یک عدد باشد، تبدیل به آرایه شود
+                if (!Array.isArray(selectedIds)) {
+                    selectedIds = [selectedIds];
                 }
-            })
-            .fail(function () {
-                toastr.error("خطا در ارتباط با سرور");
+
+                $.ajax({
+                    url: '/Orders/RemoveItemsByOrder',
+                    type: 'POST',
+                    data: { factorDetailIds: selectedIds },
+                    traditional: true,
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success("آیتم‌ها با موفقیت حذف شدند.");
+                            location.reload();
+                        } else {
+                            toastr.error(response.message || "خطا در حذف آیتم‌ها.");
+                        }
+                    },
+                    error: function () {
+                        toastr.error("مشکلی در برقراری ارتباط با سرور رخ داد.");
+                    }
+                });
+            };
+
+            // 🟦 انتخاب همه چک‌باکس‌ها
+            $("#selectAll").on("change", function () {
+                $(".delete-checkbox").prop("checked", this.checked);
             });
-    });
 
-    // --- پرداخت آنلاین ---
-    $("#postButton").click(function () {
-        const sumOrder = parseNumber($("#sumOrder").text());
-        $.ajax({
-            url: '/Payment/ProcessPayment',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ sumOrder: sumOrder, invoiceId: orderId, deliveryId: selectedDeliveryId, source: 'order' }),
-            headers: { "RequestVerificationToken": token }
-        })
-        .done(function (res) {
-            if (res.success) window.location.href = res.redirectUrl;
-            else toastr.error(res.message);
-        })
-        .fail(function () {
-            toastr.error("خطا در ارسال درخواست پرداخت");
+            // 🟥 حذف انتخاب‌شده‌ها (دکمه پایین جدول)
+            $(document).on("click", "#deleteSelected", function () {
+                const selectedIds = $(".delete-checkbox:checked").map(function () {
+                    return $(this).val();
+                }).get();
+
+                removeItems(selectedIds);
+            });
+
+            // 🟩 تغییر روش ارسال
+            $("input:radio[name=selection]").on("change", function () {
+                const selectedDeliveryId = $(this).val();
+                $("#postButton").prop("disabled", false);
+
+                $.ajax({
+                    type: "GET",
+                    url: "/Home/GetDeliveryPrice",
+                    data: { deliveryId: selectedDeliveryId },
+                    success: function (result) {
+                        if (result.success) {
+                            $("#deliveryPrice").text(result.price.toLocaleString());
+                            updateTotal();
+                        } else {
+                            toastr.error(result.message || "خطا در دریافت هزینه ارسال");
+                        }
+                    },
+                    error: function () {
+                        toastr.error("خطا در ارتباط با سرور برای دریافت هزینه ارسال");
+                    }
+                });
+            });
+
+            // 🟨 اعمال کد تخفیف
+            $("#applyDiscountBtn").click(function (e) {
+                e.preventDefault();
+
+                const orderId = $("#orderId").val();
+                const discountCode = $("#discountCode").val().trim();
+
+                if (!discountCode) {
+                    toastr.warning("لطفاً کد تخفیف را وارد کنید.");
+                    return;
+                }
+
+                $.ajax({
+                    url: '/Orders/UseDiscountForOrder',
+                    type: 'GET',
+                    data: { orderId, discountCode },
+                    success: function (response) {
+                        if (response.success) {
+                            $("#disTotal").text(response.discountAmount.toLocaleString());
+                            updateTotal();
+                            toastr.success(response.message || "تخفیف با موفقیت اعمال شد.");
+                        } else {
+                            toastr.error(response.message || "کد تخفیف معتبر نیست.");
+                        }
+                    },
+                    error: function () {
+                        toastr.error("خطا در اعمال کد تخفیف");
+                    }
+                });
+            });
+
+            // 🟩 پرداخت آنلاین
+            $('#postButton').click(function () {
+                const $btn = $(this);
+                $btn.prop('disabled', true);
+
+                const sumOrder = parseNumber($("#sumOrder").text());
+                const orderId = parseInt($('#orderId').val());
+                const selectedDelivery = parseInt($('input[name="selection"]:checked').val());
+
+                if (!selectedDelivery) {
+                    toastr.warning("لطفاً روش ارسال را انتخاب کنید.");
+                    $btn.prop('disabled', false);
+                    return;
+                }
+
+                if (!orderId || isNaN(orderId)) {
+                    toastr.error("شناسه فاکتور نامعتبر است.");
+                    $btn.prop('disabled', false);
+                    return;
+                }
+
+                const dataToSend = {
+                    sumOrder,
+                    invoiceId: orderId,
+                    deliveryId: selectedDelivery,
+                    source: 'order'
+                };
+
+                $.ajax({
+                    url: '/Payment/ProcessPayment',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(dataToSend),
+                    xhrFields: { withCredentials: true },
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() || ''
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            window.location.href = response.redirectUrl;
+                        } else {
+                            toastr.error(response.message || "پرداخت موفق نبود.");
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            toastr.error("برای پرداخت باید وارد حساب کاربری شوید.");
+                            window.location.href = "/Account/Login";
+                        } else if (xhr.status === 403) {
+                            toastr.error("دسترسی غیرمجاز.");
+                        } else {
+                            toastr.error("خطایی در ارسال درخواست رخ داد.");
+                        }
+                    },
+                    complete: function () {
+                        $btn.prop('disabled', false);
+                    }
+                });
+            });
         });
-    });
-
-    // --- مقداردهی اولیه جمع ---
-    updateTotal();
-});
-</script>
-
+    </script>
+}

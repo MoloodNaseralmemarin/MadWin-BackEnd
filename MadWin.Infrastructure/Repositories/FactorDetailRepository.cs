@@ -181,6 +181,7 @@ namespace MadWin.Infrastructure.Repositories
                         FullName = (f.Factor.User != null
                             ? (f.Factor.User.FirstName ?? "") + " " + (f.Factor.User.LastName ?? "")
                             : "نامشخص"),
+                        CellPhone=f.Factor.User.CellPhone,
                         CreateDate = f.Factor.CreateDate,
                         DeliveryPrice = f.Factor.DeliveryMethodAmount, // قیمت ارسال
                         Discount = f.Factor.DisTotal, // مبلغ تخفیف

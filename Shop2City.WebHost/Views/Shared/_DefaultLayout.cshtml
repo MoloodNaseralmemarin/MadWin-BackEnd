@@ -1,30 +1,27 @@
-﻿<!doctype html>
+﻿<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8" />
-    <meta name="format-detection" content="telephone=no" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <link href="images/favicon.png" rel="icon" />
-    <title>فروشگاه اینترنتی ماد وین</title>
-    <meta name="description" content="فروش">
-    <meta name="enamad" content="49461584"/>
-    <!-- CSS Part Start-->
-    <partial name="_CSS"/>
-    <!-- CSS Part End-->
+    <title>@ViewData["Title"]</title>
+
+    <partial name="_CSS" />
 </head>
 <body class="bg-light">
-    <!-- هدر -->
-    <header class="text-white shadow-sm pb-1" dir="rtl">
-        <partial name="_Nav"/>
+
+    <header>
+        <partial name="_Nav" />
     </header>
+
     @RenderBody()
 
-<!--Footer Start-->
-<partial name="_Footer"/>
-<!--Footer End-->
-    <!-- JS Part Start-->
-        <partial name="_JS"/>
-   
+    <partial name="_Footer" />
+
+    <!-- کتابخانه‌ها -->
+    <partial name="_JS" />
+
+    <!-- Section برای فایل‌های JS اختصاصی صفحات -->
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>

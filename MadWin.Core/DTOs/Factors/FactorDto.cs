@@ -10,6 +10,8 @@ public class FactorSummaryForAdminItemDto
 
     public DateTime CreateDate { get; set; }
     public string FullName { get; set; }
+    
+    public string CellPhone { get; set; }
 
     // لیست جزئیات (هر محصول)
     public List<FactorDetailDto> FactorDetails { get; set; } = new();

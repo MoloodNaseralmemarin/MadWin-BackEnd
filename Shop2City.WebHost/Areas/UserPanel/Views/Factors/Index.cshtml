@@ -31,11 +31,11 @@
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label for="FromDate" class="form-label">از تاریخ:</label>
-                        <input type="date" id="FromDate" name="FromDate" value="@currentFromDate" class="form-control" />
+                        <input id="FromDate" name="FromDate" value="@currentFromDate" class="form-control" />
                     </div>
                     <div class="col-md-3">
                         <label for="ToDate" class="form-label">تا تاریخ:</label>
-                        <input type="date" id="ToDate" name="ToDate" value="@currentToDate" class="form-control" />
+                        <input id="ToDate" name="ToDate" value="@currentToDate" class="form-control" />
                     </div>
                     <div class="col-md-3">
                         <label for="OrderId" class="form-label">کد سفارش:</label>
@@ -187,6 +187,25 @@ else
 
 @section Scripts {
     <script>
+                $(document).ready(function () {
+              $('#FromDate').persianDatepicker(
+                  {
+                      observer: true,
+                      format: 'YYYY/MM/DD',
+                      Datepicker: '#FromDate',
+                      autoClose: true,
+                      minDate: new persianDate().unix()
+
+                  });
+              $('#ToDate').persianDatepicker(
+                  {
+                      observer: true,
+                      format: 'YYYY/MM/DD',
+                      Datepicker: '#ToDate',
+                      autoClose: true
+                  });
+
+          });
         function showFactorDetails(factorId) {
             // نمایش لودر
             document.getElementById("factorDetailsLoader").style.display = "block";

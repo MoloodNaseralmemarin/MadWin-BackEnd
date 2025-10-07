@@ -46,9 +46,14 @@ namespace Shop2City.WebHost.Controllers
                 return View(model);
             if (await _userService.IsExistCellPhoneAsync(model.CellPhone))
             {
-                TempData["ToastrError"] = ErrorMessage.InvalidCellPhone;
+                ModelState.AddModelError("CellPhone", ErrorMessage.InvalidCellPhone);
                 return View(model);
             }
+            //if (await _userService.IsExistCellPhoneAsync(model.CellPhone))
+            //{
+            //    TempData["ToastrError"] = ErrorMessage.InvalidCellPhone;
+            //    return View(model);
+            //}
 
             #region Add User
             model.Password = _passwordHasher.HashPassword(model.Password);
@@ -68,14 +73,10 @@ namespace Shop2City.WebHost.Controllers
             #region welcome SMS
             var smsSent = await _smsSenderService.SendWelcomeSmsAsync(model.CellPhone, model.FullName, 2);
             _logger.LogWarning($"ارسال پیامک به {model.CellPhone} {(smsSent ? "موفقیت‌آمیز" : "ناموفق")} بود.");
+
             #endregion
-            TempData["ToastrSuccess"] = "ثبت‌نام با موفقیت انجام شد.";
             return RedirectToAction("Login");
         }
-
-
-   
-
         #endregion
         #region Login
         [HttpGet]
@@ -95,8 +96,8 @@ namespace Shop2City.WebHost.Controllers
                     _logger.LogWarning("ModelState is invalid during login for {User}", model.userName);
                     return View(model);
                 }
-               // try
-                //{
+                try
+                {
                     var result = await _userService.LoginAsync(new LoginResultDto
                     {
                         UserName = model.userName,
@@ -132,14 +133,14 @@ namespace Shop2City.WebHost.Controllers
 
                     ModelState.AddModelError("", "نام کاربری یا رمز عبور نادرست است.");
                     return View(model);
-            //    }
-                //catch (Exception ex)
-                //{
-                //    _logger.LogError(ex, "Login error for {User}", model.userName);
-                //    ModelState.AddModelError("", "خطایی در ورود رخ داد.");
-                //    return View(model);
-                //}
+                }
+                catch (Exception ex)
+                {
+                _logger.LogError(ex, "Login error for {User}", model.userName);
+                ModelState.AddModelError("", "خطایی در ورود رخ داد.");
+                return View(model);
             }
+        }
         #endregion
         #region ForgotPassword
         [Route("ForgotPassword")]

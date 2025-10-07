@@ -16,6 +16,8 @@ namespace MadWin.Core.Interfaces
 
         Task<User?> GetUserIdByUserId(int userId);
 
+        Task<User?> GetUserByUsernameAsync(string username, string hashPassword);
+
         Task<User?> GetUserByUsernameAsync(string username);
 
         Task<string> GetCellPhoneByUserIdAsync(int userId);

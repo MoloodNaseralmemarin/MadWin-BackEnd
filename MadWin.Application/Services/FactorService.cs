@@ -121,8 +121,7 @@ namespace MadWin.Application.Services
 
         public async Task<int> CountFactors()
         {
-            var countFactors = await _factorRepository.GetAllAsync();
-            return countFactors.Count();
+            return await _factorRepository.CountFactors();
         }
 
         public async Task<FactorSummaryForSendSMS> GetFactorDetailForSendSMSAsync(int factorId)

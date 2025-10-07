@@ -70,7 +70,7 @@
                     <div class="card h-100 shadow-sm @(item.IsFinaly ? "border-success" : "border-secondary")">
                         <div class="card-body">
                             <h5 class="card-title">کد سفارش: @item.OrderId</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">@item.FullName</h6>
+                            <h6 class="card-subtitle mb-2 text-success">@item.FullName (@item.CellPhone)</h6>
                             <p class="card-text"><strong>تاریخ:</strong> @item.CreateDate.ToShamsi()</p>
                             <p class="card-text"><strong>دسته‌بندی:</strong> @item.CategoryGroup</p>
                             <p class="card-text"><strong>ابعاد:</strong> @item.Size</p>

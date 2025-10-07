@@ -50,7 +50,7 @@ namespace MadWin.Application.Services
         public async Task<LoginResultDto?> LoginAsync(LoginResultDto loginDto)
         {
             var hashPassword = _passwordHasher.HashPassword(loginDto.Password);
-            var user = await _userRepository.GetUserByUsernameAsync(loginDto.UserName);
+            var user = await _userRepository.GetUserByUsernameAsync(loginDto.UserName,hashPassword);
 
             if (user == null)
                 return null;
