@@ -235,7 +235,7 @@ namespace MadWin.Application.Services
 
         public async Task<bool> SendSMSFactorForCustomerAsync(string cellPhone, int factorId)
         {
-            var message = $"در سامانه ثبت شده است." + factorId + "فاکتور شما با کد پیگیری.\r\nفروشگاه آنلاین ماد وین \r\n لغو 11";
+            var message = $"با موفقیت ثبت شد." + factorId + "فاکتور شما با کد پیگیری.\r\nبا تشکر از خرید شما مادوین(نادری)\r\n لغو 11";
             try
             {
                 var otpsms = new Api(_smsSettings.ApiKey);

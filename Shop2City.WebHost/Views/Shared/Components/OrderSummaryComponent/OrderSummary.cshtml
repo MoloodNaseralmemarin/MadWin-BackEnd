@@ -1,14 +1,11 @@
 ﻿@using MadWin.Core.DTOs.Orders
 @using Shop2City.Core.Convertors
 @model OrderSummaryViewModel
-@{
-    var orderSummary = Model.OrderSummaryForAdmin;
-    var order = orderSummary.OrderSummary.FirstOrDefault();
-    var orderId = order.OrderId;
-    var createDate = order.CreateDate;
-    var totalPrice = order.TotalPrice; // یا TotalPrice اگه پراپرتی‌ات اینطوره
-}
 
+@{
+
+    var orderId = @Model.OrderSummaryForAdmin.OrderSummary.First().OrderId;
+}
 @Html.AntiForgeryToken() <!-- توکن CSRF -->
 
 <div class="container mt-3">
@@ -27,11 +24,7 @@
         <input type="hidden" class="orderId" value="@Model.OrderSummaryForAdmin.OrderSummary.First().OrderId" />
 
         <!-- جدول دسکتاپ -->
-        <div class="card shadow border-0 rounded-3">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fa fa-shopping-basket"></i>خلاصه فاکتور</h5>
-                <span class="badge bg-light text-dark">شماره فاکتور: @orderId</span>
-            </div>
+        <div class="table-responsive d-none d-md-block">
             <table class="table table-bordered table-hover order-table align-middle">
                 <thead class="table-light">
                     <tr>
@@ -51,7 +44,7 @@
                     {
                         var statusClass = item.IsEqualParts ? "bg-success text-white" : "bg-warning text-dark";
                         <tr data-orderid="@item.OrderId">
-                            <td class="text-center align-middle">
+                            <td rowspan="2" class="text-center align-middle">
                                 <input type="checkbox" class="delete-checkbox" value="@item.OrderId" />
                             </td>
                             <td>@item.OrderId</td>
@@ -61,17 +54,17 @@
                             <td><span class="badge bg-info">@item.Count</span></td>
                             <td><span>@item.PriceWithFee.ToString("N0") ریال</span></td>
                             <td><span class="item-price">@((item.PriceWithFee * item.Count).ToString("N0")) ریال</span></td>
-                            <td class="text-center align-middle">
+                            <td rowspan="2" class="text-center align-middle">
                                 <a class="remove-item-btn" data-orderid="@item.OrderId" style="cursor:pointer;">
                                     <i class="fa fa-trash text-danger"></i>
                                 </a>
                             </td>
                         </tr>
                         <tr class="detail-row" data-orderid="@item.OrderId">
-                            <td>@(item.IsEqualParts ? "قطعات مساوی هستند" : "قطعات اندازه‌های مختلف دارند")</td>
+                            <td colspan="2">@(item.IsEqualParts ? "قطعات مساوی هستند" : "قطعات اندازه‌های مختلف دارند")</td>
                             <td>تعداد قطعات: @item.PartCount</td>
                             <td>@item.Size</td>
-                            <td colspan="5">
+                            <td colspan="3">
                                 موقعیت قطعات:
                                 @for (int i = 0; i < item.WidthParts.Count; i++)
                                 {
@@ -86,9 +79,9 @@
                     <!-- حذف چندتایی -->
                     <tr>
                         <td colspan="9">
-                            <button id="deleteSelectedBtn" class="btn btn-danger btn-sm">
-                                حذف سفارشات انتخاب‌شده
-                            </button>
+                            <a class="remove-item-btn" style="cursor:pointer;">
+                                <i class="fa fa-trash text-danger"></i>
+                            </a>
                         </td>
                     </tr>
                     <!-- روش ارسال -->
@@ -188,7 +181,7 @@
                     <tr>
                         <td colspan="2">
                             <button class="btn btn-success w-100 py-2" id="postButton" disabled>
-                                <i class="fa fa-credit-card"></i> پرداخت آنلاین <span id="sumOrderBtn">0</span>
+                                پرداخت آنلاین - <span id="sumOrderBtn">0</span>
                             </button>
                         </td>
                     </tr>
@@ -198,14 +191,10 @@
     }
 </div>
 
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-@section Scripts {
-    <script src="~/js/discounts/discountOrder.js"></script>
     <script>
         $(document).ready(function () {
 
@@ -240,7 +229,7 @@
                 }
 
                 $.ajax({
-                    url: '/Orders/RemoveItemsByOrder',
+                    url: '/Orders/RemoveItemsByFactor',
                     type: 'POST',
                     data: { factorDetailIds: selectedIds },
                     traditional: true,
@@ -308,7 +297,7 @@
                 }
 
                 $.ajax({
-                    url: '/Orders/UseDiscountForOrder',
+                    url: '/Factors/UseDiscountForFactor',
                     type: 'GET',
                     data: { orderId, discountCode },
                     success: function (response) {
@@ -332,7 +321,7 @@
                 $btn.prop('disabled', true);
 
                 const sumOrder = parseNumber($("#sumOrder").text());
-                const orderId = parseInt($('#orderId').val());
+                const orderId =@orderId;
                 const selectedDelivery = parseInt($('input[name="selection"]:checked').val());
 
                 if (!selectedDelivery) {
@@ -341,7 +330,7 @@
                     return;
                 }
 
-                if (!orderId || isNaN(orderId)) {
+        if (!orderId || isNaN(orderId)) {
                     toastr.error("شناسه فاکتور نامعتبر است.");
                     $btn.prop('disabled', false);
                     return;
@@ -353,7 +342,7 @@
                     deliveryId: selectedDelivery,
                     source: 'order'
                 };
-
+            console.log(dataToSend);
                 $.ajax({
                     url: '/Payment/ProcessPayment',
                     type: 'POST',
@@ -387,4 +376,3 @@
             });
         });
     </script>
-}
