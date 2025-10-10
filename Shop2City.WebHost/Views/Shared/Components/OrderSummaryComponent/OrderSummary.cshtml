@@ -1,0 +1,378 @@
+﻿@using MadWin.Core.DTOs.Orders
+@using Shop2City.Core.Convertors
+@model OrderSummaryViewModel
+
+@{
+
+    var orderId = @Model.OrderSummaryForAdmin.OrderSummary.First().OrderId;
+}
+@Html.AntiForgeryToken() <!-- توکن CSRF -->
+
+<div class="container mt-3">
+    <h4 class="mb-3">
+        سفارشات امروز
+        <span class="badge bg-primary">@Model.OrderSummaryForAdmin.OrderSummary.Count</span>
+    </h4>
+
+    @if (Model.OrderSummaryForAdmin.OrderSummary == null || !Model.OrderSummaryForAdmin.OrderSummary.Any())
+    {
+        <p>هیچ سفارشی برای امروز ثبت نشده است.</p>
+    }
+    else
+    {
+        <!-- Hidden orderId -->
+        <input type="hidden" class="orderId" value="@Model.OrderSummaryForAdmin.OrderSummary.First().OrderId" />
+
+        <!-- جدول دسکتاپ -->
+        <div class="table-responsive d-none d-md-block">
+            <table class="table table-bordered table-hover order-table align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th><input type="checkbox" id="selectAll" /></th>
+                        <th>شماره  سفارش</th>
+                        <th>تاریخ</th>
+                        <th>ساعت</th>
+                        <th>نام محصول</th>
+                        <th>تعداد</th>
+                        <th>قیمت واحد</th>
+                        <th>قیمت کل</th>
+                        <th>عملیات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.OrderSummaryForAdmin.OrderSummary)
+                    {
+                        var statusClass = item.IsEqualParts ? "bg-success text-white" : "bg-warning text-dark";
+                        <tr data-orderid="@item.OrderId">
+                            <td rowspan="2" class="text-center align-middle">
+                                <input type="checkbox" class="delete-checkbox" value="@item.OrderId" />
+                            </td>
+                            <td>@item.OrderId</td>
+                            <td>@item.CreateDate.ToShamsi()</td>
+                            <td>@item.CreateDate.ToString("HH:mm:ss")</td>
+                            <td>@item.CategoryGroup</td>
+                            <td><span class="badge bg-info">@item.Count</span></td>
+                            <td><span>@item.PriceWithFee.ToString("N0") ریال</span></td>
+                            <td><span class="item-price">@((item.PriceWithFee * item.Count).ToString("N0")) ریال</span></td>
+                            <td rowspan="2" class="text-center align-middle">
+                                <a class="remove-item-btn" data-orderid="@item.OrderId" style="cursor:pointer;">
+                                    <i class="fa fa-trash text-danger"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr class="detail-row" data-orderid="@item.OrderId">
+                            <td colspan="2">@(item.IsEqualParts ? "قطعات مساوی هستند" : "قطعات اندازه‌های مختلف دارند")</td>
+                            <td>تعداد قطعات: @item.PartCount</td>
+                            <td>@item.Size</td>
+                            <td colspan="3">
+                                موقعیت قطعات:
+                                @for (int i = 0; i < item.WidthParts.Count; i++)
+                                {
+                                    string position = item.WidthParts.Count == 3
+                                    ? (i == 0 ? "چپ" : i == 1 ? "وسط" : "راست")
+                                    : (i % 2 == 0 ? "راست" : "چپ");
+                                    <span class="d-inline-block me-3"><strong>@position:</strong> @item.WidthParts[i].WidthValue</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    <!-- حذف چندتایی -->
+                    <tr>
+                        <td colspan="9">
+                            <a class="remove-item-btn" style="cursor:pointer;">
+                                <i class="fa fa-trash text-danger"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <!-- روش ارسال -->
+                    <tr>
+                        <td colspan="3"><strong>روش ارسال:</strong></td>
+                        <td colspan="6">
+                            <div class="radio-groups">
+                                @foreach (var delivery in Model.DeliveryMethods)
+                                {
+                                    <input type="radio" name="selection" value="@delivery.DeliveryId" id="delivery_@delivery.DeliveryId" />
+                                    <label for="delivery_@delivery.DeliveryId">@delivery.Name</label>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- کد تخفیف -->
+                    <tr>
+                        <td colspan="3"><strong>کد تخفیف:</strong></td>
+                        <td colspan="6">
+                            <input type="text" class="discountCode form-control mb-2" />
+                            <button class="applyDiscountBtn btn btn-primary w-100 py-2">اعمال کد تخفیف</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- کارت موبایل -->
+        <div class="d-block d-md-none">
+            @foreach (var item in Model.OrderSummaryForAdmin.OrderSummary)
+            {
+                var statusBg = item.IsEqualParts ? "bg-success text-white" : "bg-warning text-dark";
+                <div class="card mb-3 shadow-sm border-0" data-orderid="@item.OrderId">
+                    <div class="card-header @statusBg d-flex justify-content-between align-items-center">
+                        <span>@item.CategoryGroup</span>
+                        <small>@item.CreateDate.ToShamsi() - @item.CreateDate.ToString("HH:mm:ss")</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-6"><strong>تعداد انتخاب‌شده:</strong> <span class="badge bg-info">@item.Count</span></div>
+                            <div class="col-6"><strong>وضعیت قطعات:</strong> @(item.IsEqualParts ? "قطعات مساوی هستند" : "قطعات اندازه‌های مختلف دارند")</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-6"><strong>قیمت واحد:</strong> <span class="badge bg-secondary">@item.PriceWithFee.ToString("N0") ریال</span></div>
+                            <div class="col-6"><strong>قیمت کل:</strong> <span class="badge bg-primary item-price">@((item.PriceWithFee * item.Count).ToString("N0")) ریال</span></div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-6"><strong>ابعاد:</strong> @item.Size</div>
+                            <div class="col-6"><strong>تعداد قطعات:</strong> @item.PartCount</div>
+                        </div>
+                        @if (item.WidthParts.Count > 0)
+                        {
+                            <div class="mt-2">
+                                <strong>محل نصب و عرض:</strong>
+                                <div class="row">
+                                    @for (int i = 0; i < item.WidthParts.Count; i++)
+                                    {
+                                        string position = item.WidthParts.Count == 3
+                                        ? (i == 0 ? "چپ" : i == 1 ? "وسط" : "راست")
+                                        : (i % 2 == 0 ? "راست" : "چپ");
+                                        <div class="col-6 mb-1">
+                                            <span class="fw-bold">@position:</span> @item.WidthParts[i].WidthValue
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        <div class="mt-2 d-flex justify-content-end">
+                            <a class="remove-item-btn btn btn-sm btn-outline-danger" style="cursor:pointer;">
+                                <i class="fas fa-trash"></i> حذف
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- جدول نهایی مبلغ -->
+        <div class="d-flex justify-content-center mt-4">
+            <div class="w-100" style="max-width: 500px;">
+                <table class="table table-bordered text-center">
+                    <tr>
+                        <td><strong>جمع کل قبل از تخفیف :</strong></td>
+                        <td id="SubtotalPrice">@Model.OrderSummaryForAdmin.TotalPrice.ToString("N0")</td>
+                    </tr>
+                    <tr>
+                        <td><strong>مبلغ تخفیف :</strong></td>
+                        <td><span id="disTotal">0</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>هزینه ارسال و بسته‌بندی :</strong></td>
+                        <td><span id="deliveryPrice">0</span></td>
+                    </tr>
+                    <tr class="h4 text-primary">
+                        <td colspan="2"><strong>مبلغ قابل پرداخت :</strong> <span id="sumOrder">0</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <button class="btn btn-success w-100 py-2" id="postButton" disabled>
+                                پرداخت آنلاین - <span id="sumOrderBtn">0</span>
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            // 🔹 تابع تبدیل متن عددی به عدد
+            function parseNumber(text) {
+                return Number(text.replace(/,/g, '').replace(/[^\d.-]/g, '')) || 0;
+            }
+
+            // 🔹 تابع محاسبه مبلغ نهایی
+            function updateTotal() {
+                const subtotal = parseNumber($("#SubtotalPrice").text());
+                const delivery = parseNumber($("#deliveryPrice").text());
+                const discount = parseNumber($("#disTotal").text());
+                const total = subtotal - discount + delivery;
+
+                $("#sumOrder").text(total.toLocaleString());
+                $("#sumOrderBtn").text(total.toLocaleString());
+            }
+
+            updateTotal();
+
+            // ✅ تعریف تابع در سطح global تا از onclick در HTML کار کند
+            window.removeItems = function (selectedIds) {
+                if (!selectedIds || selectedIds.length === 0) {
+                    toastr.warning('هیچ موردی انتخاب نشده است.');
+                    return;
+                }
+
+                // اگر فقط یک عدد باشد، تبدیل به آرایه شود
+                if (!Array.isArray(selectedIds)) {
+                    selectedIds = [selectedIds];
+                }
+
+                $.ajax({
+                    url: '/Orders/RemoveItemsByFactor',
+                    type: 'POST',
+                    data: { factorDetailIds: selectedIds },
+                    traditional: true,
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success("آیتم‌ها با موفقیت حذف شدند.");
+                            location.reload();
+                        } else {
+                            toastr.error(response.message || "خطا در حذف آیتم‌ها.");
+                        }
+                    },
+                    error: function () {
+                        toastr.error("مشکلی در برقراری ارتباط با سرور رخ داد.");
+                    }
+                });
+            };
+
+            // 🟦 انتخاب همه چک‌باکس‌ها
+            $("#selectAll").on("change", function () {
+                $(".delete-checkbox").prop("checked", this.checked);
+            });
+
+            // 🟥 حذف انتخاب‌شده‌ها (دکمه پایین جدول)
+            $(document).on("click", "#deleteSelected", function () {
+                const selectedIds = $(".delete-checkbox:checked").map(function () {
+                    return $(this).val();
+                }).get();
+
+                removeItems(selectedIds);
+            });
+
+            // 🟩 تغییر روش ارسال
+            $("input:radio[name=selection]").on("change", function () {
+                const selectedDeliveryId = $(this).val();
+                $("#postButton").prop("disabled", false);
+
+                $.ajax({
+                    type: "GET",
+                    url: "/Home/GetDeliveryPrice",
+                    data: { deliveryId: selectedDeliveryId },
+                    success: function (result) {
+                        if (result.success) {
+                            $("#deliveryPrice").text(result.price.toLocaleString());
+                            updateTotal();
+                        } else {
+                            toastr.error(result.message || "خطا در دریافت هزینه ارسال");
+                        }
+                    },
+                    error: function () {
+                        toastr.error("خطا در ارتباط با سرور برای دریافت هزینه ارسال");
+                    }
+                });
+            });
+
+            // 🟨 اعمال کد تخفیف
+            $("#applyDiscountBtn").click(function (e) {
+                e.preventDefault();
+
+                const orderId = $("#orderId").val();
+                const discountCode = $("#discountCode").val().trim();
+
+                if (!discountCode) {
+                    toastr.warning("لطفاً کد تخفیف را وارد کنید.");
+                    return;
+                }
+
+                $.ajax({
+                    url: '/Factors/UseDiscountForFactor',
+                    type: 'GET',
+                    data: { orderId, discountCode },
+                    success: function (response) {
+                        if (response.success) {
+                            $("#disTotal").text(response.discountAmount.toLocaleString());
+                            updateTotal();
+                            toastr.success(response.message || "تخفیف با موفقیت اعمال شد.");
+                        } else {
+                            toastr.error(response.message || "کد تخفیف معتبر نیست.");
+                        }
+                    },
+                    error: function () {
+                        toastr.error("خطا در اعمال کد تخفیف");
+                    }
+                });
+            });
+
+            // 🟩 پرداخت آنلاین
+            $('#postButton').click(function () {
+                const $btn = $(this);
+                $btn.prop('disabled', true);
+
+                const sumOrder = parseNumber($("#sumOrder").text());
+                const orderId =@orderId;
+                const selectedDelivery = parseInt($('input[name="selection"]:checked').val());
+
+                if (!selectedDelivery) {
+                    toastr.warning("لطفاً روش ارسال را انتخاب کنید.");
+                    $btn.prop('disabled', false);
+                    return;
+                }
+
+        if (!orderId || isNaN(orderId)) {
+                    toastr.error("شناسه فاکتور نامعتبر است.");
+                    $btn.prop('disabled', false);
+                    return;
+                }
+
+                const dataToSend = {
+                    sumOrder,
+                    invoiceId: orderId,
+                    deliveryId: selectedDelivery,
+                    source: 'order'
+                };
+            console.log(dataToSend);
+                $.ajax({
+                    url: '/Payment/ProcessPayment',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(dataToSend),
+                    xhrFields: { withCredentials: true },
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() || ''
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            window.location.href = response.redirectUrl;
+                        } else {
+                            toastr.error(response.message || "پرداخت موفق نبود.");
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            toastr.error("برای پرداخت باید وارد حساب کاربری شوید.");
+                            window.location.href = "/Account/Login";
+                        } else if (xhr.status === 403) {
+                            toastr.error("دسترسی غیرمجاز.");
+                        } else {
+                            toastr.error("خطایی در ارسال درخواست رخ داد.");
+                        }
+                    },
+                    complete: function () {
+                        $btn.prop('disabled', false);
+                    }
+                });
+            });
+        });
+    </script>

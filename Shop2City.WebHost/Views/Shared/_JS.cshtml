@@ -1,0 +1,64 @@
+﻿<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script src="~/js/toastrHelper.js" asp-append-version="true"></script>
+<script src="~/js/toastrMessage.js" asp-append-version="true"></script>
+
+
+
+<!--Start AddToCart-->
+<script type="text/javascript">
+        function addToCart(productId) {
+        $.ajax({
+            url: '/Cart/AddToCart', // مسیر اکشن در Controller
+            type: 'POST',
+            data: { productId : productId }, // ارسال id محصول
+            success: function (response) {
+                // آپدیت تعداد و جمع کل در صفحه
+                $("#Cart-total").text(response.totalCount);
+                $("#Price-total").text(response.totalPrice.toLocaleString());
+
+                // نمایش پیام موفقیت با Toastr
+                toastr.success('با موفقیت به سبد خرید اضافه شد.', 'پیام سیستم');
+            },
+            error: function () {
+                toastr.error('خطا در افزودن محصول به سبد خرید.', 'پیام سیستم');
+            }
+        });
+    }
+
+    function updateCartUI(response) {
+        $("#Cart-total").text(response.totalCount);
+        $("#Price-total").text(response.totalPrice.toLocaleString());
+        location.reload(); // یا بعداً با Ajax فقط ردیف رو آپدیت می‌کنیم
+        return false;
+    }
+
+    function increaseCart(productId) {
+        $.post('/Cart/Increase', { productId: productId }, function (response) {
+            updateCartUI(response);
+            return false;
+        });
+    }
+
+    function decreaseCart(productId) {
+        $.post('/Cart/Decrease', { productId: productId }, function (response) {
+            updateCartUI(response);
+             return false;
+        });
+    }
+
+    function removeCart(productId) {
+        $.post('/Cart/Remove', { productId: productId }, function (response) {
+            updateCartUI(response);
+             return false;
+        });
+    }
+</script>
+
+
+
+
+
+
+

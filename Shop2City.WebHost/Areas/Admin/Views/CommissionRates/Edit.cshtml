@@ -1,0 +1,37 @@
+﻿@using Shop2City.WebHost.ViewModels.CommissionRates
+@model DiscountsEditViewModel
+@{
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <h2 class="mb-4">ویرایش</h2>
+
+            <form asp-action="Edit" method="post" novalidate>
+                @Html.AntiForgeryToken()
+
+                <div class="row g-3">
+                    <!-- PartCount -->
+                    <div class="col-12 col-md-12">
+                        <label>@Model.PartCount قسمت @(Model.IsEqualParts ? "مساوی" : "نامساوی")</label>
+                    </div>
+                    <!-- CommissionPercent -->
+                    <div class="col-12 col-md-6">
+                        <label asp-for="CommissionPercent" class="form-label"></label>
+                        <input asp-for="CommissionPercent" class="form-control" type="text" />
+                        <div class="invalid-feedback">
+                            <span asp-validation-for="CommissionPercent"></span>
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="col-12 d-flex justify-content-end mt-2">
+                        <a asp-action="Index" class="btn btn-secondary me-2">انصراف</a>
+                        <button type="submit" class="btn btn-success">ثبت</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
