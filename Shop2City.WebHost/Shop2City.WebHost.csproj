@@ -9,17 +9,22 @@
 
   <ItemGroup>
     <Compile Remove="wwwroot\assets\**" />
+    <Compile Remove="wwwroot\images\slider\**" />
     <Compile Remove="wwwroot\lib\**" />
     <Content Remove="wwwroot\assets\**" />
+    <Content Remove="wwwroot\images\slider\**" />
     <Content Remove="wwwroot\lib\**" />
     <EmbeddedResource Remove="wwwroot\assets\**" />
+    <EmbeddedResource Remove="wwwroot\images\slider\**" />
     <EmbeddedResource Remove="wwwroot\lib\**" />
     <None Remove="wwwroot\assets\**" />
+    <None Remove="wwwroot\images\slider\**" />
     <None Remove="wwwroot\lib\**" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Areas\Admin\Views\Shared\_AdminLayout.cshtml~RF3b1d5c.TMP" />
+    <None Remove="Views\Shared\_SideBar.cshtml~RF368c969.TMP" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,10 +47,6 @@
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="8.2.1-dev-00131" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\images\slider\" />
   </ItemGroup>
 
   <ItemGroup>

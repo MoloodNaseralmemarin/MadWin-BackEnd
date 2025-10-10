@@ -58,9 +58,7 @@
                                     @foreach (var detail in factor.FactorDetails)
                                     {
                                         <tr>
-                                            <td>
                                             <td><input type="checkbox" class="delete-checkbox" value="@detail.Id" /></td>
-                                            </td>
                                             <td>@detail.ProductTitle</td>
                                             <td>@detail.Price.ToString("N0") ریال</td>
                                             <td>@detail.Quantity</td>
@@ -127,7 +125,7 @@
                                         <tr>
                                             <td colspan="2">
                                                 <button class="btn btn-success w-100 py-2" id="postButton" disabled>
-                                                    پرداخت آنلاین - <span id="sumOrderBtn">0</span>
+                                                    <i class="fa fa-credit-card"></i> پرداخت آنلاین - <span id="sumOrderBtn">0</span>
                                                 </button>
                                             </td>
                                         </tr>

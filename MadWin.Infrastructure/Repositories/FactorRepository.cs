@@ -129,6 +129,11 @@ namespace MadWin.Infrastructure.Repositories
             return result;
         }
 
-
+        public async Task<int> CountFactors()
+        {
+            return await _context.Factors
+                .Where(o => o.IsFinaly)
+                .CountAsync();
+        }
     }
 }

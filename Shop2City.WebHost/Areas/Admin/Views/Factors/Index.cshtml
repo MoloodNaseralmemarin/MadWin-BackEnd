@@ -71,7 +71,7 @@
                     <div class="card h-100 shadow-sm @(item.IsFinaly ? "border-success" : "border-secondary")">
                         <div class="card-body">
                             <h5 class="card-title">کد سفارش: @item.FactorId</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">@item.FullName</h6>
+                            <h6 class="card-subtitle mb-2 text-success">@item.FullName (@item.CellPhone)</h6>
                             <p class="card-text"><strong>تاریخ:</strong> @item.CreateDate.ToShamsi()</p>
                             <p class="card-text"><strong>تعداد آیتم:</strong> @item.FactorDetailItemCount</p>
                             <p class="card-text"><strong>قیمت کل:</strong> @item.FinalTotal.ToString("N0") تومان</p>

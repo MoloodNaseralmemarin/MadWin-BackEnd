@@ -18,6 +18,7 @@ namespace MadWin.Core.Interfaces
 
         Task<Factor?> GetOpenFactorByUserIdAsync(int userId);
         Task<FactorSummaryForSendSMS> GetFactorDteailForSendSMSAsync(int factorId);
+        Task<int> CountFactors();
 
 
     }

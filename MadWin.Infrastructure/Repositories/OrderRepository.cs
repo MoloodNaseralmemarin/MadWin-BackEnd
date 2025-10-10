@@ -330,7 +330,7 @@ namespace MadWin.Infrastructure.Repositories
                             (o.OrderSubCategory != null && !string.IsNullOrEmpty(o.OrderSubCategory.Title)
                                 ? " / " + o.OrderSubCategory.Title
                                 : ""),
-
+                        CellPhone=o.User.CellPhone,
                         Size = $"ارتفاع: {o.Height} - عرض: {o.Width}",
                         SizeSMS = $"w: {o.Width} * h: {o.Height}",
                         Count = o.Count,

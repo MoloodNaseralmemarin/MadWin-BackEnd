@@ -66,6 +66,11 @@ namespace MadWin.Infrastructure.Repositories
                            .FirstOrDefaultAsync(u => u.Id == userId);
         }
 
+        public async Task<User?> GetUserByUsernameAsync(string username,string hashPassword)
+        {
+            return await _context.Users
+                .FirstOrDefaultAsync(u => u.UserName == username && u.Password==hashPassword);
+        }
         public async Task<User?> GetUserByUsernameAsync(string username)
         {
             return await _context.Users
