@@ -3,6 +3,7 @@ using MadWin.Core.DTOs.Orders;
 using MadWin.Core.DTOs.Users;
 using MadWin.Core.Entities.Common;
 using MadWin.Core.Entities.CurtainComponents;
+using MadWin.Core.Entities.DeliveryMethods;
 using MadWin.Core.Entities.Orders;
 using MadWin.Core.Entities.Products;
 using MadWin.Core.Entities.Users;
@@ -325,6 +326,9 @@ namespace MadWin.Infrastructure.Repositories
                         FullName = (o.User != null
                             ? (o.User.FirstName ?? "") + " " + (o.User.LastName ?? "")
                             : "نامشخص"),
+                        Address = (o.User != null
+                            ? o.User.Address ?? ""
+                            : "نامشخص"),
                         CategoryGroup =
                             (o.OrderCategory != null ? o.OrderCategory.Title : "") +
                             (o.OrderSubCategory != null && !string.IsNullOrEmpty(o.OrderSubCategory.Title)
@@ -339,6 +343,8 @@ namespace MadWin.Infrastructure.Repositories
                         PartCount = o.PartCount,
                         IsFinaly = o.IsFinaly,
                         BasePrice=o.BasePrice,
+                        DisPercent=o.DisPercent,
+                        DisTotal=o.DisTotal,
                         TotalPrice=o.TotalCost,
                         WidthParts = new List<OrderWidthPartDto>() // همیشه لیست خالی
                     }).ToListAsync()

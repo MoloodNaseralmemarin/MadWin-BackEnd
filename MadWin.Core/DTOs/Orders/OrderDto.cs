@@ -12,6 +12,8 @@ namespace MadWin.Core.DTOs.Orders
         public DateTime CreateDate { get; set; }
         public string FullName { get; set; }
 
+        public string Address { get; set; }
+
         public string CellPhone { get;set; }
         public string CategoryGroup { get; set; }
         public string Size { get; set; }
@@ -25,7 +27,11 @@ namespace MadWin.Core.DTOs.Orders
         public decimal BasePrice { get; set; }
 
         public decimal TotalPrice { get; set; }
+        /// <summary>درصد کد تخفیف</summary>
+        public int DisPercent { get; set; }
 
+        /// <summary>قیمت تخفیف محاسبه شده</summary>
+        public decimal DisTotal { get; set; }
         public List<OrderWidthPartDto> WidthParts { get; set; } = new();
     }
 
