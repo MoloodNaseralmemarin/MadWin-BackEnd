@@ -1,6 +1,8 @@
 ﻿<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script src="~/js/toastrHelper.js" asp-append-version="true"></script>
+<script src="~/js/toastrMessage.js" asp-append-version="true"></script>
 
 
 <!--Start AddToCart-->
@@ -52,36 +54,7 @@
         });
     }
 </script>
-<!--Login-->
-<script type="text/javascript">
-    $(function() {
-        // فقط اعداد در فیلد شماره همراه
-        $("#userName").on("input", function() {
-            this.value = this.value.replace(/\D/g, "");
-        });
 
-        // افکت لرزش کوتاه
-        const shake = (element) => {
-            $(element).addClass("shake");
-            setTimeout(() => $(element).removeClass("shake"), 500);
-        };
-
-        // اعتبارسنجی فرم
-        window.validateData = () => {
-            if (!$("#userName").val()) {
-                toastr.error("لطفاً نام کاربری (شماره همراه) را وارد کنید");
-                shake("#userName");
-                return false;
-            }
-            if (!$("#password").val()) {
-                toastr.error("لطفاً کلمه عبور را وارد کنید");
-                shake("#password");
-                return false;
-            }
-            return true;
-        };
-    });
-</script>
 
 
 

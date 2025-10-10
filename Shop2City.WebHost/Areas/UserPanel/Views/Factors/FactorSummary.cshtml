@@ -59,7 +59,7 @@
                                     {
                                         <tr>
                                             <td>
-                                                <input type="checkbox" class="delete-checkbox" value="@detail.Id" />
+                                            <td><input type="checkbox" class="delete-checkbox" value="@detail.Id" /></td>
                                             </td>
                                             <td>@detail.ProductTitle</td>
                                             <td>@detail.Price.ToString("N0") ریال</td>
@@ -75,9 +75,9 @@
                                 </tbody>
                                 <tr>
                                     <td colspan="6">
-                                        <a onclick="removeItems()">
-                                            <i class="fa fa-trash text-danger"></i>
-                                        </a>
+                                        <button class="btn btn-danger" onclick="removeItems(@factorId)">
+                                            <i class="fa fa-trash"></i> حذف انتخاب‌شده‌ها
+                                        </button>
                                     </td>
                                 </tr>
                                 <!-- بخش انتخاب روش ارسال -->
@@ -158,10 +158,12 @@
     <script>
         $(document).ready(function () {
 
+            // 🔹 تابع تبدیل متن عددی به عدد
             function parseNumber(text) {
                 return Number(text.replace(/,/g, '').replace(/[^\d.-]/g, '')) || 0;
             }
 
+            // 🔹 تابع محاسبه مبلغ نهایی
             function updateTotal() {
                 const subtotal = parseNumber($("#SubtotalPrice").text());
                 const delivery = parseNumber($("#deliveryPrice").text());
@@ -174,7 +176,52 @@
 
             updateTotal();
 
-            // 🟦 تغییر روش ارسال
+            // ✅ تعریف تابع در سطح global تا از onclick در HTML کار کند
+            window.removeItems = function (selectedIds) {
+                if (!selectedIds || selectedIds.length === 0) {
+                    toastr.warning('هیچ موردی انتخاب نشده است.');
+                    return;
+                }
+
+                // اگر فقط یک عدد باشد، تبدیل به آرایه شود
+                if (!Array.isArray(selectedIds)) {
+                    selectedIds = [selectedIds];
+                }
+
+                $.ajax({
+                    url: '/Factors/RemoveItemsByFactor',
+                    type: 'POST',
+                    data: { factorDetailIds: selectedIds },
+                    traditional: true,
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success("آیتم‌ها با موفقیت حذف شدند.");
+                            location.reload();
+                        } else {
+                            toastr.error(response.message || "خطا در حذف آیتم‌ها.");
+                        }
+                    },
+                    error: function () {
+                        toastr.error("مشکلی در برقراری ارتباط با سرور رخ داد.");
+                    }
+                });
+            };
+
+            // 🟦 انتخاب همه چک‌باکس‌ها
+            $("#selectAll").on("change", function () {
+                $(".delete-checkbox").prop("checked", this.checked);
+            });
+
+            // 🟥 حذف انتخاب‌شده‌ها (دکمه پایین جدول)
+            $(document).on("click", "#deleteSelected", function () {
+                const selectedIds = $(".delete-checkbox:checked").map(function () {
+                    return $(this).val();
+                }).get();
+
+                removeItems(selectedIds);
+            });
+
+            // 🟩 تغییر روش ارسال
             $("input:radio[name=selection]").on("change", function () {
                 const selectedDeliveryId = $(this).val();
                 $("#postButton").prop("disabled", false);
@@ -197,7 +244,7 @@
                 });
             });
 
-            // 🟩 اعمال کد تخفیف
+            // 🟨 اعمال کد تخفیف
             $("#applyDiscountBtn").click(function (e) {
                 e.preventDefault();
 
@@ -228,7 +275,7 @@
                 });
             });
 
-            // 🟥 پرداخت آنلاین
+            // 🟩 پرداخت آنلاین
             $('#postButton').click(function () {
                 const $btn = $(this);
                 $btn.prop('disabled', true);
@@ -279,7 +326,6 @@
                         } else if (xhr.status === 403) {
                             toastr.error("دسترسی غیرمجاز.");
                         } else {
-                            console.error(xhr.responseText);
                             toastr.error("خطایی در ارسال درخواست رخ داد.");
                         }
                     },
@@ -291,5 +337,6 @@
         });
     </script>
 }
+
 
 

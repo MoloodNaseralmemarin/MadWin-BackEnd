@@ -46,7 +46,7 @@ namespace Shop2City.WebHost.Controllers
                 return View(model);
             if (await _userService.IsExistCellPhoneAsync(model.CellPhone))
             {
-                ModelState.AddModelError("CellPhone", ErrorMessage.InvalidCellPhone);
+                TempData["ToastrError"] = ErrorMessage.InvalidCellPhone;
                 return View(model);
             }
 
@@ -55,6 +55,7 @@ namespace Shop2City.WebHost.Controllers
             var user = new User
             {
                 Address = model.Address,
+                TelPhone=model.TelPhone,
                 CellPhone = model.CellPhone,
                 FirstName=model.FirstName,
                 LastName=model.LastName,
@@ -65,16 +66,10 @@ namespace Shop2City.WebHost.Controllers
             await _userService.CreateUser(user);
             #endregion
             #region welcome SMS
-
             var smsSent = await _smsSenderService.SendWelcomeSmsAsync(model.CellPhone, model.FullName, 2);
-
-            if (smsSent)
-            {
-                // فقط لاگ کن، بدون اطلاع دادن به کاربر
-                _logger.LogWarning("ارسال پیامک خوش‌آمدگویی برای {Phone} موفق نبود. احتمالاً API پیامک خطا داده.", model.CellPhone);
-            }
-
+            _logger.LogWarning($"ارسال پیامک به {model.CellPhone} {(smsSent ? "موفقیت‌آمیز" : "ناموفق")} بود.");
             #endregion
+            TempData["ToastrSuccess"] = "ثبت‌نام با موفقیت انجام شد.";
             return RedirectToAction("Login");
         }
 
@@ -85,9 +80,8 @@ namespace Shop2City.WebHost.Controllers
         #region Login
         [HttpGet]
         [Route("Login")]
-        public IActionResult Login(bool editProfile = false)
+        public IActionResult Login()
             {
-                ViewBag.EditProfile = editProfile;
                 return View();
             }
 

@@ -79,6 +79,5 @@ namespace MadWin.Application.Services
         {
             return await _factorDetailRepository.GetByFactorIdAsync(factorId);
         }
-
     }
 }

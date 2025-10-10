@@ -14,6 +14,7 @@ namespace Shop2City.WebHost.Areas.UserPanel.Controllers
     {
         private readonly IFactorDetailService _factorDetailService;
         private readonly IDeliveryMethodService _deliveryMethodService;
+        private readonly IUserService _userService;
 
         public FactorsController(IFactorDetailService factorDetailService, IDeliveryMethodService deliveryMethodService)
         {
@@ -30,7 +31,20 @@ namespace Shop2City.WebHost.Areas.UserPanel.Controllers
             return View(result);
         }
 
+        #region حذف آیتم از فاکتور
+        public async Task<IActionResult> RemoveItemsByFactorAsync(int factorId, int[] factorDetailIds)
+        {
+            if (factorDetailIds == null || !factorDetailIds.Any())
+                return Json(new { success = false });
 
+            await _factorDetailService.SoftDeleteAsync(factorDetailIds);
+
+            // حالا می‌توانیم اطلاعات فاکتور را دوباره بگیریم
+            var updatedList = await FactorSummary(factorId);
+
+            return Json(new { success = true, data = updatedList });
+        }
+        #endregion
         public async Task<IActionResult> ShowFactorDetails(int id)
         {
             var getAllOrderDetails = await _factorDetailService.GetByFactorIdAsync(id);

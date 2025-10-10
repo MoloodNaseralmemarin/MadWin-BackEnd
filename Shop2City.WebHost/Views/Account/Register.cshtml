@@ -22,6 +22,8 @@
             <form asp-action="Register"  method="post" class="card p-4 shadow-sm">
 
                 <h4 class="mb-4 text-center">ثبت اطلاعات شخصی شما</h4>
+     @*            <input type="hidden" id="toastrError" value="@TempData["ToastrError"]" />
+                <input type="hidden" id="toastrSuccess" value="@TempData["ToastrSuccess"]" /> *@
                 <div asp-validation-summary="All" class="text-danger mt-1"></div>
                 <div class="mb-3">
                     <label asp-for="FirstName" class="form-label">نام </label>
@@ -45,7 +47,7 @@
                     <label asp-for="TelPhone" class="form-label">شماره ثابت </label>
                     <input type="text"
                            asp-for="TelPhone"
-                           id="TelPhone"
+                           id="telPhone"
                            class="form-control form-control-md d-md-block"
                            pattern="[0-9]*"
                            inputmode="numeric"
@@ -55,7 +57,7 @@
                     <label asp-for="CellPhone" class="form-label">شماره همراه </label>
                     <input type="text"
                            asp-for="CellPhone"
-                           id="CellPhone"
+                           id="cellPhone"
                            class="form-control form-control-md d-md-block"
                            pattern="[0-9]*"
                            inputmode="numeric"
@@ -65,7 +67,7 @@
                     <label asp-for="Address" class="form-label">آدرس پستی</label>
                     <input type="text"
                            asp-for="Address"
-                           id="Address"
+                           id="address"
                            class="form-control form-control-md d-md-block"
                            placeholder="همدان -همدان">
                 </div>
@@ -73,7 +75,7 @@
                     <label asp-for="Password" class="form-label">کلمه عبور</label>
                     <input type="Password"
                            asp-for="Password"
-                            id="Password"
+                            id="password"
                            class="form-control form-control-md d-md-block"
                            placeholder="کلمه عبور">
                 </div>
@@ -82,7 +84,7 @@
                     <label asp-for="ConfirmPassword" class="form-label">تکرار کلمه عبور</label>
                     <input type="password"
                            asp-for="ConfirmPassword"
-                           id="ConfirmPassword"
+                           id="confirmPassword"
                            class="form-control form-control-md d-md-block"
                            placeholder="تکرار کلمه عبور">
                 </div>
@@ -98,60 +100,7 @@
     </div>
 </div>
 
-
 @section Scripts {
-    <script type="text/javascript">
-        $(function() {
-            // فقط اعداد در فیلد شماره همراه
-            $("#userName").on("input", function() {
-                this.value = this.value.replace(/\D/g, "");
-            });
-
-            // افکت لرزش کوتاه
-            const shake = (element) => {
-                $(element).addClass("shake");
-                setTimeout(() => $(element).removeClass("shake"), 500);
-            };
-
-            // اعتبارسنجی فرم
-            window.validateData = () => {
-                if (!$("#firstName").val()) {
-                    toastr.error("نام را وارد کنید");
-                    shake("#firstName");
-                    return false;
-                }
-                   if (!$("#lastName").val()) {
-                    toastr.error("نام خانوادگی را وارد کنید");
-                    shake("#lastName");
-                    return false;
-                }
-                if (!$("#TelPhone").val()) {
-                    toastr.error("شماره ثابت را وارد کنید");
-                    shake("#TelPhone");
-                    return false;
-                }
-                if (!$("#CellPhone").val()) {
-                    toastr.error("شماره همراه را وارد کنید");
-                    shake("#CellPhone");
-                    return false;
-                }
-                if (!$("#Address").val()) {
-                    toastr.error("آدرس پستی را وارد کنید");
-                    shake("#Address");
-                    return false;
-                }
-                if (!$("#Password").val()) {
-                    toastr.error("لطفاً کلمه عبور را وارد کنید");
-                    shake("#Password");
-                    return false;
-                }
-                  if (!$("#ConfirmPassword").val()) {
-                    toastr.error("لطفاً کلمه عبور را وارد کنید");
-                    shake("#ConfirmPassword");
-                    return false;
-                }
-                return true;
-            };
-        });
-    </script>
+    <script src="~/js/validation/user/validateDataUser.js"></script>
 }
+
