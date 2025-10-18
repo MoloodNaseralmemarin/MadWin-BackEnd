@@ -1,0 +1,92 @@
+﻿﻿@using MadWin.Core.DTOs.DisCounts
+@model AddDiscountForAdminViewModel
+@{
+}
+<div class="container" dir="rtl">
+    <div class="card my-3">
+        <div class="card-body">
+            <h4 class="card-title mb-3">ثبت کد تخفیف جدید</h4>
+
+            <form method="post" class="row g-3">
+                <!-- نوع سفارش -->
+                <div class="col-12">
+                    <label class="form-label">نوع سفارش</label>
+                    <select asp-for="Item" class="form-select" aria-label="نوع سفارش">
+                        <option value="O">سفارش با اندازه دلخواه</option>
+                        <option value="F">سفارش آماده</option>
+                    </select>
+                    <span class="text-danger" asp-validation-for="Item"></span>
+                </div>
+
+                <!-- درصد، کد، تعداد قابل استفاده -->
+                <div class="col-12 col-md-4">
+                    <label asp-for="DiscountCode" class="form-label"></label>
+                    <input type="number" step="0.01" min="0" class="form-control" asp-for="DiscountCode" id="DiscountCode" />
+                    <span class="text-danger" asp-validation-for="DiscountCode"></span>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label asp-for="Percentage" class="form-label"></label>
+                    <input type="text" class="form-control" asp-for="Percentage" />
+                    <span class="text-danger" asp-validation-for="Percentage"></span>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label asp-for="UseableCount" class="form-label"></label>
+                    <input type="number" min="0" class="form-control" asp-for="UseableCount" />
+                    <span class="text-danger" asp-validation-for="UseableCount"></span>
+                </div>
+
+                <!-- تاریخ شروع و پایان -->
+                <!-- تاریخ شروع -->
+
+
+                <!-- تاریخ پایان -->
+                <div class="col-md-6">
+                    <label asp-for="ExpiryDate" class="form-label"></label>
+                    <!-- نمایش تاریخ شمسی -->
+                    <input type="text" id="expiryDateView" class="form-control" />
+
+                    <!-- مقدار اصلی برای ارسال به مدل -->
+                    <input type="hidden" asp-for="ExpiryDate" id="ExpiryDate" />
+                    <span class="text-danger" asp-validation-for="ExpiryDate"></span>
+                </div>
+
+
+
+
+                <!-- دکمه‌ها -->
+                <div class="col-12 d-flex gap-2 justify-content-start">
+                    <input type="submit" class="btn btn-success" value="ذخیره اطلاعات" />
+                    <a class="btn btn-outline-info">پاک کردن</a>
+                    <a class="btn btn-primary" data-bs-toggle="tooltip" title="مشاهده لیست محصولات درج شده">بازگشت به فهرست</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label>تاریخ شروع</label>
+    <input type="text" id="startDate" name="StartDate" class="form-control" autocomplete="off" />
+</div>
+
+
+ @section Scripts {
+
+
+<script>
+                $(function () {
+            $('#startDate').persianDatepicker({
+                format: 'YYYY/MM/DD',
+                autoClose: true,
+                initialValueType: 'gregorian',
+                calendar: {
+                    persian: { locale: 'fa', leapYearMode: 'algorithmic' }
+                }
+            });
+        });
+
+
+</script>
+}

@@ -1,0 +1,72 @@
+﻿/* فونت‌ها */
+@font-face {
+    font-family: 'WYekan';
+    src: url('../fonts/WYekan.eot?#') format('eot'), url('../fonts/WYekan.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'IRANSans';
+    src: url('../fonts/IRANSans.eot?#') format('eot'), url('../fonts/IRANSans.ttf') format('truetype');
+}
+
+/* اعمال فونت عمومی */
+* {
+    font-family: 'IRANSans', sans-serif;
+    font-size: 14px;
+}
+
+/* فضای خالی سمت راست برای main وقتی سایدبار در دسکتاپ هست */
+main {
+    margin-right: 280px;
+    padding: 1rem;
+}
+
+/* استایل فوتر ثابت */
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    background-color: #f8f9fa;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    font-size: 13px;
+}
+
+/* حالت موبایل */
+@media (max-width: 768px) {
+    main {
+        margin-right: 0;
+    }
+
+    .card {
+        margin: 30px;
+    }
+
+
+    .card {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        max-width: 400px;
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .icon {
+        font-size: 4rem;
+        color: #ffcccb;
+        margin-bottom: 1rem;
+    }
+
+    .btn-retry {
+        background-color: #ff6f61;
+        border: none;
+    }
+
+        .btn-retry:hover {
+            background-color: #d84315;
+        }
+}

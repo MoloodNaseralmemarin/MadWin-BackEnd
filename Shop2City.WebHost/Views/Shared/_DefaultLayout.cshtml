@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <link href="images/favicon.png" rel="icon" />
+
+    <title>فروشگاه اینترنتی مادوین - @ViewData["Title"]</title>
+
+    <partial name="_CSS" />
+</head>
+<body class="bg-light">
+
+    <header>
+        <partial name="_Nav" />
+    </header>
+
+    @RenderBody()
+
+    <partial name="_Footer" />
+
+    <!-- کتابخانه‌ها -->
+    <partial name="_JS" />
+
+    <!-- Section برای فایل‌های JS اختصاصی صفحات -->
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

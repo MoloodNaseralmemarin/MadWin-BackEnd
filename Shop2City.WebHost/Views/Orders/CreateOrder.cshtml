@@ -1,0 +1,448 @@
+﻿@using Shop2City.WebHost.ViewModels.Orders
+@model OrderViewModel
+@{
+    ViewData["Title"] = "ثبت سفارش جدید با اندازه دلخواه";
+}
+
+<div class="container my-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-controller="Home" asp-action="Index"><i class="fa fa-home"></i></a>
+            </li>
+            <li class="breadcrumb-item">
+                <a asp-area="UserPanel" asp-controller="Home" asp-action="Index">پنل کاربری</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">سفارش با اندازه دلخواه</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <partial name="_SideBar" />
+        <div class="col-lg-9">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#customSizeModal">
+                سفارش با اندازه دلخواه
+            </button>
+
+            @await Component.InvokeAsync("OrderSummaryComponent", new { userId = Model.UserId })
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="customSizeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">سفارش با اندازه دلخواه</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="بستن"></button>
+            </div>
+
+            <div class="modal-body">
+                <form asp-action="CreateOrder" method="post" id="customSizeForm" novalidate>
+                    <input type="hidden" asp-for="PartCount" />
+                    <input type="hidden" asp-for="IsEqualParts" />
+                    <input type="hidden" asp-for="DivisionType" />
+
+                    <!-- دسته و زیر دسته -->
+                    <div class="row">
+                        <div class="col-12 col-md-6 mb-2">
+                            <label asp-for="CategoryId" class="form-label"></label>
+                            <select asp-for="CategoryId" id="CategoryId" class="form-select" required>
+                                <option value="">انتخاب کنید</option>
+                                @* items from Model.Categories *@
+                                @foreach (var it in Model.Categories)
+                                {
+                                    <option value="@it.Value">@it.Text</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback">لطفا دسته را انتخاب کنید.</div>
+                        </div>
+
+                        <div class="col-12 col-md-6 mb-2">
+                            <label asp-for="SubCategoryId" class="form-label"></label>
+                            <select asp-for="SubCategoryId" id="SubCategoryId" class="form-select" required disabled>
+                                <option value="">ابتدا دسته را انتخاب کنید</option>
+                            </select>
+                            <div class="invalid-feedback">لطفا زیر دسته را انتخاب کنید.</div>
+                        </div>
+                    </div>
+
+                    <!-- ارتفاع و عرض -->
+                    <div class="row">
+                        <div class="col-12 col-md-6 mb-2">
+                            <label asp-for="Height" class="form-label"></label>
+                            <input asp-for="Height" id="Height" class="form-control" required />
+                            <div class="invalid-feedback">لطفا ارتفاع را وارد کنید.</div>
+                        </div>
+                        <div class="col-12 col-md-6 mb-2">
+                            <label asp-for="Width" class="form-label"></label>
+                            <input asp-for="Width" id="Width" name="Width" class="form-control" required />
+                            <div class="invalid-feedback">لطفا عرض را وارد کنید.</div>
+                        </div>
+                    </div>
+
+                    <!-- تقسیم‌بندی (رادیوها داخل UL برای UX بهتر روی موبایل) -->
+                    <div class="mb-2">
+                        <label class="form-label">تقسیم‌بندی</label>
+                        <ul id="divisionList" class="list-unstyled d-flex gap-2 flex-wrap">
+                            <li>
+                                <input class="btn-check" type="radio" name="division" id="div-2-equal" value="2-equal" onclick="updateInputs(2,'equal')" required>
+                                <label class="btn btn-outline-primary" for="div-2-equal">۲ مساوی</label>
+                            </li>
+                            <li>
+                                <input class="btn-check" type="radio" name="division" id="div-2-unequal" value="2-unequal" onclick="updateInputs(2,'unequal')">
+                                <label class="btn btn-outline-primary" for="div-2-unequal">۲ نامساوی</label>
+                            </li>
+                            <li>
+                                <input class="btn-check" type="radio" name="division" id="div-3-equal" value="3-equal" onclick="updateInputs(3,'equal')">
+                                <label class="btn btn-outline-primary" for="div-3-equal">۳ مساوی</label>
+                            </li>
+                            <li>
+                                <input class="btn-check" type="radio" name="division" id="div-3-unequal" value="3-unequal" onclick="updateInputs(3,'unequal')">
+                                <label class="btn btn-outline-primary" for="div-3-unequal">۳ نامساوی</label>
+                            </li>
+                        </ul>
+                        <div class="invalid-feedback d-none" id="division-error">لطفا نوع تقسیم‌بندی را انتخاب کنید.</div>
+                    </div>
+
+                    <!-- ورودی‌های بخش‌ها -->
+                    <div id="width-inputs" style="display:none;">
+                        <label class="form-label">اندازه‌ها (cm)</label>
+                        <div id="input-container"></div>
+                        <div class="small text-danger width-error" style="display:none;">
+                            مجموع قسمت‌ها باید برابر عرض کل باشد.
+                        </div>
+                    </div>
+
+                    <!-- تعداد -->
+                    <div class="mt-3">
+                        <label asp-for="Count" class="form-label"></label>
+                        <input asp-for="Count" id="Count" name="Count" class="form-control" min="1" required />
+                        <div class="invalid-feedback count-error">لطفا تعداد را وارد کنید.</div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" id="submitBtn" class="btn btn-primary w-100" disabled>ثبت سفارش</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function(){
+          const form = document.getElementById('customSizeForm');
+          const submitBtn = document.getElementById('submitBtn');
+          const widthInput = document.getElementById('Width');
+          const countInput = document.getElementById('Count');
+          const countErrorEl = form.querySelector('.count-error');
+          const inputContainer = document.getElementById('input-container');
+          const widthInputsWrapper = document.getElementById('width-inputs');
+          const widthErrorEl = document.querySelector('.width-error');
+          const categoryEl = document.getElementById('CategoryId');
+          const subSelect = document.getElementById('SubCategoryId');
+          const divisionErrorEl = document.getElementById('division-error');
+
+          function qAll(sel, ctx=document){ return Array.from((ctx||document).querySelectorAll(sel)); }
+          function q(sel, ctx=document){ return (ctx||document).querySelector(sel); }
+
+          // helper to show invalid-feedback in Persian
+          function showInvalid(el, msg){
+            if(!el) return;
+            el.classList.add('is-invalid');
+            let fb = el.parentNode.querySelector('.invalid-feedback');
+            if(!fb){
+              fb = document.createElement('div');
+              fb.className = 'invalid-feedback';
+              el.parentNode.appendChild(fb);
+            }
+            fb.textContent = msg;
+          }
+          function hideInvalid(el){
+            if(!el) return;
+            el.classList.remove('is-invalid');
+            const fb = el.parentNode.querySelector('.invalid-feedback');
+            if(fb) fb.textContent = '';
+          }
+
+          // Validate form and set submit button
+          function validateForm(){
+            let valid = true;
+
+            // Required fields
+            const requiredFields = [
+              { name:'CategoryId', el: categoryEl, msg:'لطفا دسته را انتخاب کنید.' },
+              { name:'SubCategoryId', el: subSelect, msg:'لطفا زیر دسته را انتخاب کنید.' },
+              { name:'Height', el: document.getElementById('Height'), msg:'لطفا ارتفاع را وارد کنید.' },
+              { name:'Width', el: widthInput, msg:'لطفا عرض را وارد کنید.' },
+            ];
+
+            requiredFields.forEach(f=>{
+              if(!f.el || !f.el.value || String(f.el.value).trim()===''){
+                valid = false;
+                showInvalid(f.el, f.msg);
+              } else {
+                hideInvalid(f.el);
+              }
+            });
+
+            // division selected?
+            const divChecked = form.querySelector('input[name="division"]:checked');
+            if(!divChecked){
+              valid = false;
+              divisionErrorEl.classList.remove('d-none');
+            } else {
+              divisionErrorEl.classList.add('d-none');
+            }
+
+            // Count validation (فارسی)
+            const cnt = parseInt(countInput.value,10);
+            if(!countInput.value || isNaN(cnt) || cnt < 1){
+              valid = false;
+              showInvalid(countInput, 'لطفا تعداد را وارد کنید و عددی بزرگتر از صفر انتخاب کنید.');
+              countErrorEl.style.display = 'block';
+            } else {
+              hideInvalid(countInput);
+              countErrorEl.style.display = 'none';
+            }
+
+            // اگر قسمت‌های عرض وجود دارد، مجموعشان باید برابر عرض کل باشد
+            const partEls = qAll('.width-input', inputContainer);
+            if(partEls.length){
+              const total = Number(widthInput.value) || 0;
+              let sum = 0;
+              partEls.forEach(pe => sum += Number(pe.value) || 0);
+
+              if(Math.round(sum) !== Math.round(total)){
+                valid = false;
+                widthErrorEl.style.display = 'block';
+                partEls.forEach(pe => pe.classList.add('is-invalid'));
+              } else {
+                widthErrorEl.style.display = 'none';
+                partEls.forEach(pe => pe.classList.remove('is-invalid'));
+              }
+            } else {
+              widthErrorEl.style.display = 'none';
+            }
+
+            submitBtn.disabled = !valid;
+            return valid;
+          }
+
+          // Fetch subcategories when category changes — robust to different JSON shapes
+          if(categoryEl){
+            categoryEl.addEventListener('change', function(){
+              const catId = this.value;
+              subSelect.innerHTML = '<option value="">در حال بارگذاری...</option>';
+              subSelect.disabled = true;
+
+              if(!catId){
+                subSelect.innerHTML = '<option value="">ابتدا دسته را انتخاب کنید</option>';
+                subSelect.disabled = true;
+                validateForm();
+                return;
+              }
+
+          const url = '@Url.Action("GetSubCategories", "Orders")' + '?categoryId=' + encodeURIComponent(catId);
+              fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }})
+                .then(response => {
+                  if(!response.ok) throw new Error('network');
+                  return response.json();
+                })
+                .then(data => {
+                  // data may be an array or an object with items
+                  const items = Array.isArray(data) ? data : (data.items || data);
+                  subSelect.innerHTML = '<option value="">انتخاب کنید</option>';
+                  if(!Array.isArray(items) || items.length === 0){
+                    subSelect.innerHTML = '<option value="">زیر دسته‌ای موجود نیست</option>';
+                    subSelect.disabled = true;
+                  } else {
+                    items.forEach(item => {
+                      const opt = document.createElement('option');
+                      // support multiple possible property names
+                      opt.value = item.value ?? item.id ?? item.Value ?? item.Id ?? item.key ?? item.Key;
+                      opt.textContent = item.text ?? item.name ?? item.Text ?? item.Name ?? String(opt.value);
+                      subSelect.appendChild(opt);
+                    });
+                    subSelect.disabled = false;
+                  }
+                  validateForm();
+                })
+                .catch(()=> {
+                  subSelect.innerHTML = '<option value="">خطا در بارگذاری</option>';
+                  subSelect.disabled = true;
+                  validateForm();
+                });
+            });
+          }
+
+          // ساخت ورودی‌های عرض (count + type)
+          window.updateInputs = function(count, type){
+            const total = Number(widthInput.value) || 0;
+            if(!total || total <= 0){
+              showInvalid(widthInput, 'لطفا ابتدا عرض کل را وارد کنید (باید عددی بزرگتر از صفر باشد).');
+              validateForm();
+              return;
+            } else {
+              hideInvalid(widthInput);
+            }
+
+            // hidden fields
+            const partCountHidden = form.querySelector('[name="PartCount"]');
+            const isEqualHidden = form.querySelector('[name="IsEqualParts"]');
+            const divisionHidden = form.querySelector('[name="DivisionType"]');
+            if(partCountHidden) partCountHidden.value = count;
+            if(isEqualHidden) isEqualHidden.value = (type === 'equal') ? 'true' : 'false';
+            if(divisionHidden) divisionHidden.value = `${count}-${type}`;
+
+            inputContainer.innerHTML = '';
+            widthInputsWrapper.style.display = 'block';
+
+            // labels rtl order: راست - (وسط) - چپ
+            const labels = (count === 2) ? ['راست','چپ'] : ['راست','وسط','چپ'];
+
+            if(type === 'equal'){
+              // پخش باقیمانده طوری که جمع دقیقاً برابر عرض شود
+              const base = Math.floor(total / count);
+              const remainder = total - (base * count);
+              for(let i=0;i<count;i++){
+                const wrapper = document.createElement('div');
+                wrapper.className = 'mb-2';
+
+                const lbl = document.createElement('label');
+                lbl.className = 'form-label';
+                lbl.textContent = labels[i] || `بخش ${i+1}`;
+
+                const inp = document.createElement('input');
+                inp.type = 'number';
+                inp.className = 'form-control width-input';
+                inp.name = `WidthParts[${i}]`;
+                inp.min = 0;
+                inp.step = 1;
+                inp.readOnly = true;
+
+                // distribute remainder to the first `remainder` parts (برای RTL اول سمت راست)
+                const extra = (i < remainder) ? 1 : 0;
+                inp.value = String(base + extra);
+
+                wrapper.appendChild(lbl);
+                wrapper.appendChild(inp);
+                inputContainer.appendChild(wrapper);
+              }
+            } else {
+              for(let i=0;i<count;i++){
+                const wrapper = document.createElement('div');
+                wrapper.className = 'mb-2';
+
+                const lbl = document.createElement('label');
+                lbl.className = 'form-label';
+                lbl.textContent = labels[i] || `بخش ${i+1}`;
+
+                const inp = document.createElement('input');
+                inp.type = 'number';
+                inp.className = 'form-control width-input';
+                inp.name = `WidthParts[${i}]`;
+                inp.min = 0;
+                inp.step = 1;
+                inp.readOnly = false;
+                inp.value = '';
+
+                wrapper.appendChild(lbl);
+                wrapper.appendChild(inp);
+                inputContainer.appendChild(wrapper);
+              }
+            }
+
+            // focus اولین بخش برای UX موبایل
+            const first = inputContainer.querySelector('.width-input');
+            if(first) first.focus();
+
+            validateForm();
+          };
+
+          // اگر عرض تغییر کنه و تقسیم مساوی انتخاب شده، مقادیر قسمت‌ها رو بروزرسانی کن
+          widthInput && widthInput.addEventListener('input', function(){
+            const checked = form.querySelector('input[name="division"]:checked');
+            if(!checked) { validateForm(); return; }
+            const [cntStr, type] = checked.value.split('-');
+            const count = Number(cntStr) || 0;
+            if(type === 'equal' && count > 0){
+              // دوباره بساز یا بروزرسانی مقادیر قسمت‌ها بدون تغییر ساختار
+              // بهترین مسیر: فراخوانی updateInputs مجدد با همان پارامترها
+              window.updateInputs(count, 'equal');
+            } else {
+              validateForm();
+            }
+          });
+
+          // event delegation: وقتی هر یک از ورودی‌های بخش تغییر کنند validate کن
+          inputContainer.addEventListener('input', function(e){
+            if(e.target && e.target.classList.contains('width-input')){
+              // hide individual invalid
+              if(e.target.classList.contains('is-invalid')) e.target.classList.remove('is-invalid');
+              validateForm();
+            }
+          });
+
+          // وقتی مودال باز میشه: فقط فیلدهای موقتی ریست میشن، دسته (Category) نگه داشته میشه و در صورت وجود زیر دسته لود میشه
+          const modalEl = document.getElementById('customSizeModal');
+          if(modalEl){
+            modalEl.addEventListener('shown.bs.modal', function(){
+              // reset only inputs we want to clear (حفظ دسته در صورت پر بودن)
+              form.querySelectorAll('input').forEach(inp => {
+                const name = inp.getAttribute('name') || inp.getAttribute('id') || '';
+                if(name === 'CategoryId' || name === 'SubCategoryId') return;
+                if(inp.type === 'hidden') {
+                  // reset hidden parted fields
+                  inp.value = '';
+                } else {
+                  inp.value = '';
+                }
+                inp.classList.remove('is-invalid');
+              });
+
+              // clear selects except Category
+              if(subSelect) {
+                subSelect.innerHTML = '<option value="">ابتدا دسته را انتخاب کنید</option>';
+                subSelect.disabled = true;
+              }
+
+              inputContainer.innerHTML = '';
+              widthInputsWrapper.style.display = 'none';
+              widthErrorEl.style.display = 'none';
+              countErrorEl.style.display = 'none';
+              divisionErrorEl.classList.add('d-none');
+              submitBtn.disabled = true;
+
+              // اگر دسته پیش‌پر شده بود، زیر دسته‌ها را بارگذاری کن
+              if(categoryEl && categoryEl.value){
+                categoryEl.dispatchEvent(new Event('change'));
+              }
+            });
+          }
+
+          // جلوگیری از ارسال فرم اگر نامعتبر است
+          form.addEventListener('submit', function(e){
+            if(!validateForm()){
+              e.preventDefault();
+              e.stopPropagation();
+              // نشان دادن پیام‌های خطا به کاربر (به صورت فارسی)
+            }
+            // در صورت درست بودن، ارسال به سرور ادامه پیدا می‌کند.
+          });
+
+          // هر تغییر در فرم -> اعتبارسنجی
+          form.addEventListener('input', function(e){
+            // اگر المان دارای کلاس is-invalid هست، پاکش کن
+            if(e.target && e.target.classList && e.target.classList.contains('is-invalid')){
+              e.target.classList.remove('is-invalid');
+            }
+            validateForm();
+          });
+
+        })();
+    </script>
+}

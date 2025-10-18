@@ -1,0 +1,178 @@
+﻿@using MadWin.Core.DTOs.Orders
+@using Shop2City.Core.Convertors
+@using Shop2City.WebHost.ViewModels.Orders
+@model OrderForAdminViewModel
+
+@{
+    ViewBag.Title = "لیست سفارش‌ها";
+
+    var currentFromDate = Context.Request.Query["FromDate"].ToString() ?? "";
+    var currentToDate = Context.Request.Query["ToDate"].ToString() ?? "";
+    var currentOrderId = Context.Request.Query["OrderId"].ToString() ?? "";
+    var currentFullName = Context.Request.Query["FullName"].ToString() ?? "";
+    var currentFromPrice = Context.Request.Query["FromPrice"].ToString() ?? "";
+    var currentToPrice = Context.Request.Query["ToPrice"].ToString() ?? "";
+
+    int visiblePages = 3;
+    int startPage = Math.Max(Model.CurrentPage - visiblePages, 1);
+    int endPage = Math.Min(Model.CurrentPage + visiblePages, Model.CountPage);
+}
+
+<!-- فیلتر جستجو -->
+<div class="container mt-3">
+    <div class="card border-info shadow-sm">
+        <div class="card-header bg-info text-white fs-5">فیلتر جستجو</div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="FromDate" class="form-label">از تاریخ:</label>
+                    <input type="date" id="FromDate" name="FromDate" value="@currentFromDate" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label for="ToDate" class="form-label">تا تاریخ:</label>
+                    <input type="date" id="ToDate" name="ToDate" value="@currentToDate" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label for="OrderId" class="form-label">کد سفارش:</label>
+                    <input type="number" id="OrderId" name="OrderId" value="@currentOrderId" class="form-control" placeholder="کد سفارش" />
+                </div>
+                <div class="col-md-3">
+                    <label for="FullName" class="form-label">نام مشتری:</label>
+                    <input type="text" id="FullName" name="FullName" value="@currentFullName" class="form-control" placeholder="نام کامل" />
+                </div>
+                <div class="col-md-3">
+                    <label for="FromPrice" class="form-label">از مبلغ:</label>
+                    <input type="number" id="FromPrice" name="FromPrice" value="@currentFromPrice" class="form-control" placeholder="حداقل مبلغ" />
+                </div>
+                <div class="col-md-3">
+                    <label for="ToPrice" class="form-label">تا مبلغ:</label>
+                    <input type="number" id="ToPrice" name="ToPrice" value="@currentToPrice" class="form-control" placeholder="حداکثر مبلغ" />
+                </div>
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary">جستجو</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- لیست سفارش‌ها -->
+@if (Model.OrderSummary != null && Model.OrderSummary.Any())
+{
+    <div class="container mt-4">
+        <h4 class="mb-3">لیست سفارش‌ها</h4>
+        <div class="row g-3">
+            @foreach (var item in Model.OrderSummary)
+            {
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm @(item.IsFinaly ? "border-success" : "border-secondary")">
+                        <div class="card-body">
+                            <h5 class="card-title">کد سفارش: @item.OrderId</h5>
+                            <h6 class="card-subtitle mb-2 text-success">@item.FullName (@item.CellPhone)</h6>
+                            <p class="card-text"><strong>تاریخ:</strong> @item.CreateDate.ToShamsi() - @item.CreateDate.ToString("HH:mm:ss")</p>
+                            <p class="card-text"><strong>نوع:</strong> @item.CategoryGroup</p>
+                            <p class="card-text"><strong>ابعاد:</strong> @item.Size</p>
+                            <p class="card-text"><strong>تعداد:</strong> @item.Count</p>
+
+                            @if (item.WidthParts != null && item.WidthParts.Any())
+                            {
+                                <p class="card-text">
+                                    <strong>تکه‌ها:</strong> @(item.IsEqualParts ? "قطعات مساوی هستند" : "قطعات اندازه‌های مختلف دارند")
+                                </p>
+                                <p class="card-text">
+                                    <strong>موقعیت قطعات:</strong>
+                                    @for (int i = 0; i < item.WidthParts.Count; i++)
+                                    {
+                                        string position = item.WidthParts.Count == 3
+                                        ? (i == 0 ? "چپ" : i == 1 ? "وسط" : "راست")
+                                        : (i % 2 == 0 ? "راست" : "چپ");
+                                        <strong>@position:</strong> 
+                                        @item.WidthParts[i].WidthValue
+                                    }
+                                </p>
+                            }
+
+                            <p class="card-text"><strong>قیمت پایه:</strong> @item.BasePrice.ToString("N0") ریال</p>
+                            <p class="card-text"><strong>میزان تخفیف:</strong> @item.DisTotal.ToString("N0") ریال (@item.DisPercent%)</p>
+                            <p class="card-text"><strong>قیمت کل:</strong> @item.TotalPrice.ToString("N0") ریال</p>
+                            <p class="card-text"><strong>آدرس:</strong> @item.Address</p>
+                            <p class="card-text">
+                                <strong>وضعیت:</strong>
+                                @if (item.IsFinaly)
+                                {
+                                    <span class="text-success">تسویه شد</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger">تسویه نشده</span>
+                                }
+                            </p>
+                            <div class="d-grid">
+                                <button class="btn btn-outline-primary" onclick="showOrderDetails(@item.OrderId)">
+                                    <i class="fas fa-eye"></i> مشاهده جزئیات
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- صفحه‌بندی -->
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination pagination-sm justify-content-center flex-wrap">
+                <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Index", "Orders", new { area = "Admin", pageId = Model.CurrentPage - 1 })">قبل</a>
+                </li>
+                @for (var i = startPage; i <= endPage; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Index", "Orders", new { area = "Admin", pageId = i })">@i</a>
+                    </li>
+                }
+                <li class="page-item @(Model.CurrentPage == Model.CountPage ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Index", "Orders", new { area = "Admin", pageId = Model.CurrentPage + 1 })">بعد</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning mt-4 text-center">هیچ سفارشی یافت نشد.</div>
+}
+
+<!-- Modal جزئیات سفارش -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderDetailsModalLabel">جزئیات مواد مصرفی</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="orderDetailsContent"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showOrderDetails(orderId) {
+            const loader = `<div class="text-center my-4"><div class="spinner-border" role="status"></div></div>`;
+            document.getElementById("orderDetailsContent").innerHTML = loader;
+
+            fetch(`/Admin/Orders/ShowOrderDetails?id=${orderId}`)
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById("orderDetailsContent").innerHTML = html;
+                    new bootstrap.Modal(document.getElementById('orderDetailsModal')).show();
+                })
+                .catch(() => {
+                    document.getElementById("orderDetailsContent").innerHTML = "<div class='text-danger text-center'>خطا در بارگذاری اطلاعات</div>";
+                });
+        }
+    </script>
+}

@@ -1,0 +1,63 @@
+﻿@using MadWin.Application.DTOs.CommissionRates
+@using Shop2City.Core.Convertors
+@using Shop2City.WebHost.ViewModels.Orders
+@model IEnumerable<CurtainComponentDto>
+@{
+    ViewData["Title"] = "لیست مواد مصرفی";
+}
+<div class="container-fluid my-3">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">لیست موارد مصرفی</h5>
+        </div>
+            <!-- نمایش به صورت جدول در دسکتاپ -->
+        <div class="table-responsive-md d-none d-md-block">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
+                        <tr>
+                            <th>تاریخ ویرایش</th>
+                            <th>عنوان</th>
+                            <th>قیمت</th>
+                            <th>توضیحات</th>
+                            <th>ویرایش</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.LastUpdateDate.ToShamsi()</td>
+                                <td>@item.Name</td>
+                                <td>@item.Cost.ToString("N0")ریال</td>
+                                <td>@item.Description</td>
+                                <td class="text-center">
+                                    <a asp-controller="CurtainComponents" asp-action="Edit" asp-route-id="@item.Id">
+                                    <i class="fas fa-edit text-danger"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- نمایش به صورت کارت در موبایل -->
+            <div class="d-block d-md-none">
+                @foreach (var item in Model)
+                {
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">@item.Name</h5>
+                            <p class="card-text"><strong>تاریخ:</strong> @item.LastUpdateDate.ToShamsi()</p>
+                            <p class="card-text"><strong>قیمت:</strong> @item.Cost.ToString("N0")ریال</p>
+                            <p class="card-text"><strong>توضیحات:</strong> @item.Description</p>
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <a asp-controller="CurtainComponents" asp-action="Edit" asp-route-id="@item.Id">
+                                <i class="fas fa-edit"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            </div>
+</div>
