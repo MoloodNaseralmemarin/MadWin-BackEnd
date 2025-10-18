@@ -73,12 +73,14 @@
                         <div class="col-12 col-md-6 mb-2">
                             <label asp-for="Height" class="form-label"></label>
                             <input asp-for="Height" id="Height" class="form-control" required />
-                            <div class="invalid-feedback">لطفا ارتفاع را وارد کنید.</div>
+                           @*  <div class="invalid-feedback">لطفا ارتفاع را وارد کنید.</div> *@
+                            <div class="invalid-feedback">ارتفاع باید بین ۰ تا ۴۰۰ باشد.</div>
                         </div>
                         <div class="col-12 col-md-6 mb-2">
                             <label asp-for="Width" class="form-label"></label>
                             <input asp-for="Width" id="Width" name="Width" class="form-control" required />
-                            <div class="invalid-feedback">لطفا عرض را وارد کنید.</div>
+                            @* <div class="invalid-feedback">لطفا عرض را وارد کنید.</div> *@
+                            <div class="invalid-feedback">ارتفاع باید بین ۰ تا ۴۰۰ باشد.</div>
                         </div>
                     </div>
 
@@ -137,6 +139,7 @@
           const form = document.getElementById('customSizeForm');
           const submitBtn = document.getElementById('submitBtn');
           const widthInput = document.getElementById('Width');
+          const heightInput = document.getElementById('Height');
           const countInput = document.getElementById('Count');
           const countErrorEl = form.querySelector('.count-error');
           const inputContainer = document.getElementById('input-container');
@@ -147,9 +150,7 @@
           const divisionErrorEl = document.getElementById('division-error');
 
           function qAll(sel, ctx=document){ return Array.from((ctx||document).querySelectorAll(sel)); }
-          function q(sel, ctx=document){ return (ctx||document).querySelector(sel); }
 
-          // helper to show invalid-feedback in Persian
           function showInvalid(el, msg){
             if(!el) return;
             el.classList.add('is-invalid');
@@ -161,6 +162,7 @@
             }
             fb.textContent = msg;
           }
+
           function hideInvalid(el){
             if(!el) return;
             el.classList.remove('is-invalid');
@@ -168,28 +170,49 @@
             if(fb) fb.textContent = '';
           }
 
-          // Validate form and set submit button
+          // پیام راهنما برای ارتفاع و عرض
+          [heightInput, widthInput].forEach(input => {
+            input.addEventListener('focus', () => {
+              let hint = input.parentNode.querySelector('.hint-feedback');
+              if(!hint){
+                hint = document.createElement('div');
+                hint.className = 'hint-feedback text-primary small mt-1';
+                hint.textContent = 'مقدار باید بین ۵۰ تا ۴۰۰ سانتی‌متر باشد.';
+                input.parentNode.appendChild(hint);
+              }
+            });
+            input.addEventListener('blur', () => {
+              const hint = input.parentNode.querySelector('.hint-feedback');
+              if(hint) hint.remove();
+            });
+          });
+
+          // اعتبارسنجی فرم
           function validateForm(){
             let valid = true;
 
-            // Required fields
-            const requiredFields = [
-              { name:'CategoryId', el: categoryEl, msg:'لطفا دسته را انتخاب کنید.' },
-              { name:'SubCategoryId', el: subSelect, msg:'لطفا زیر دسته را انتخاب کنید.' },
-              { name:'Height', el: document.getElementById('Height'), msg:'لطفا ارتفاع را وارد کنید.' },
-              { name:'Width', el: widthInput, msg:'لطفا عرض را وارد کنید.' },
+            const fields = [
+              {el: categoryEl, msg:'لطفا دسته را انتخاب کنید.'},
+              {el: subSelect, msg:'لطفا زیر دسته را انتخاب کنید.'},
+              {el: heightInput, msg:'ارتفاع باید بین ۵۰ تا ۴۰۰ باشد.'},
+              {el: widthInput, msg:'عرض باید بین ۵۰ تا ۴۰۰ باشد.'}
             ];
 
-            requiredFields.forEach(f=>{
+            fields.forEach(f=>{
               if(!f.el || !f.el.value || String(f.el.value).trim()===''){
                 valid = false;
                 showInvalid(f.el, f.msg);
               } else {
-                hideInvalid(f.el);
+                if(f.el===heightInput || f.el===widthInput){
+                  const val = Number(f.el.value);
+                  if(val < 50 || val > 400){
+                    valid = false;
+                    showInvalid(f.el, f.msg);
+                  } else hideInvalid(f.el);
+                } else hideInvalid(f.el);
               }
             });
 
-            // division selected?
             const divChecked = form.querySelector('input[name="division"]:checked');
             if(!divChecked){
               valid = false;
@@ -198,25 +221,30 @@
               divisionErrorEl.classList.add('d-none');
             }
 
-            // Count validation (فارسی)
             const cnt = parseInt(countInput.value,10);
             if(!countInput.value || isNaN(cnt) || cnt < 1){
               valid = false;
-              showInvalid(countInput, 'لطفا تعداد را وارد کنید و عددی بزرگتر از صفر انتخاب کنید.');
+              showInvalid(countInput, 'لطفا تعداد را وارد کنید و عددی بزرگتر از صفر وارد کنید.');
               countErrorEl.style.display = 'block';
             } else {
               hideInvalid(countInput);
               countErrorEl.style.display = 'none';
             }
 
-            // اگر قسمت‌های عرض وجود دارد، مجموعشان باید برابر عرض کل باشد
+            // بررسی مجموع عرض‌ها
             const partEls = qAll('.width-input', inputContainer);
             if(partEls.length){
               const total = Number(widthInput.value) || 0;
               let sum = 0;
-              partEls.forEach(pe => sum += Number(pe.value) || 0);
+              let zeroOrEmpty = false;
 
-              if(Math.round(sum) !== Math.round(total)){
+              partEls.forEach(pe => {
+                const val = Number(pe.value) || 0;
+                if(val <= 0) zeroOrEmpty = true;
+                sum += val;
+              });
+
+              if(zeroOrEmpty || Math.round(sum) !== Math.round(total)){
                 valid = false;
                 widthErrorEl.style.display = 'block';
                 partEls.forEach(pe => pe.classList.add('is-invalid'));
@@ -224,15 +252,13 @@
                 widthErrorEl.style.display = 'none';
                 partEls.forEach(pe => pe.classList.remove('is-invalid'));
               }
-            } else {
-              widthErrorEl.style.display = 'none';
-            }
+            } else widthErrorEl.style.display = 'none';
 
             submitBtn.disabled = !valid;
             return valid;
           }
 
-          // Fetch subcategories when category changes — robust to different JSON shapes
+          // بارگذاری زیر دسته‌ها
           if(categoryEl){
             categoryEl.addEventListener('change', function(){
               const catId = this.value;
@@ -246,14 +272,10 @@
                 return;
               }
 
-          const url = '@Url.Action("GetSubCategories", "Orders")' + '?categoryId=' + encodeURIComponent(catId);
+              const url = '@Url.Action("GetSubCategories", "Orders")' + '?categoryId=' + encodeURIComponent(catId);
               fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }})
-                .then(response => {
-                  if(!response.ok) throw new Error('network');
-                  return response.json();
-                })
-                .then(data => {
-                  // data may be an array or an object with items
+                .then(r=>r.json())
+                .then(data=>{
                   const items = Array.isArray(data) ? data : (data.items || data);
                   subSelect.innerHTML = '<option value="">انتخاب کنید</option>';
                   if(!Array.isArray(items) || items.length === 0){
@@ -262,8 +284,7 @@
                   } else {
                     items.forEach(item => {
                       const opt = document.createElement('option');
-                      // support multiple possible property names
-                      opt.value = item.value ?? item.id ?? item.Value ?? item.Id ?? item.key ?? item.Key;
+                      opt.value = item.value ?? item.id ?? item.Value ?? item.Id ?? '';
                       opt.textContent = item.text ?? item.name ?? item.Text ?? item.Name ?? String(opt.value);
                       subSelect.appendChild(opt);
                     });
@@ -279,170 +300,107 @@
             });
           }
 
-          // ساخت ورودی‌های عرض (count + type)
+          // ساخت ورودی‌های بخش‌ها
           window.updateInputs = function(count, type){
             const total = Number(widthInput.value) || 0;
             if(!total || total <= 0){
-              showInvalid(widthInput, 'لطفا ابتدا عرض کل را وارد کنید (باید عددی بزرگتر از صفر باشد).');
+              showInvalid(widthInput, 'لطفا ابتدا عرض کل را وارد کنید (عدد بزرگتر از صفر).');
               validateForm();
               return;
-            } else {
-              hideInvalid(widthInput);
-            }
+            } else hideInvalid(widthInput);
 
-            // hidden fields
-            const partCountHidden = form.querySelector('[name="PartCount"]');
-            const isEqualHidden = form.querySelector('[name="IsEqualParts"]');
-            const divisionHidden = form.querySelector('[name="DivisionType"]');
-            if(partCountHidden) partCountHidden.value = count;
-            if(isEqualHidden) isEqualHidden.value = (type === 'equal') ? 'true' : 'false';
-            if(divisionHidden) divisionHidden.value = `${count}-${type}`;
+            form.querySelector('[name="PartCount"]').value = count;
+            form.querySelector('[name="IsEqualParts"]').value = (type==='equal')?'true':'false';
+            form.querySelector('[name="DivisionType"]').value = `${count}-${type}`;
 
             inputContainer.innerHTML = '';
             widthInputsWrapper.style.display = 'block';
+            const labels = (count===2)?['راست','چپ']:['راست','وسط','چپ'];
 
-            // labels rtl order: راست - (وسط) - چپ
-            const labels = (count === 2) ? ['راست','چپ'] : ['راست','وسط','چپ'];
-
-            if(type === 'equal'){
-              // پخش باقیمانده طوری که جمع دقیقاً برابر عرض شود
-              const base = Math.floor(total / count);
-              const remainder = total - (base * count);
+            if(type==='equal'){
+              const base = Math.floor(total/count);
+              const remainder = total - (base*count);
               for(let i=0;i<count;i++){
-                const wrapper = document.createElement('div');
-                wrapper.className = 'mb-2';
-
-                const lbl = document.createElement('label');
-                lbl.className = 'form-label';
-                lbl.textContent = labels[i] || `بخش ${i+1}`;
-
-                const inp = document.createElement('input');
-                inp.type = 'number';
-                inp.className = 'form-control width-input';
-                inp.name = `WidthParts[${i}]`;
-                inp.min = 0;
-                inp.step = 1;
-                inp.readOnly = true;
-
-                // distribute remainder to the first `remainder` parts (برای RTL اول سمت راست)
-                const extra = (i < remainder) ? 1 : 0;
-                inp.value = String(base + extra);
-
-                wrapper.appendChild(lbl);
-                wrapper.appendChild(inp);
-                inputContainer.appendChild(wrapper);
+                const wrapper = document.createElement('div'); wrapper.className='mb-2';
+                const lbl = document.createElement('label'); lbl.className='form-label'; lbl.textContent = labels[i] || `بخش ${i+1}`;
+                const inp = document.createElement('input'); inp.type='number'; inp.className='form-control width-input'; inp.name=`WidthParts[${i}]`; inp.readOnly=true;
+                const extra = (i<remainder)?1:0; inp.value = String(base+extra);
+                wrapper.appendChild(lbl); wrapper.appendChild(inp); inputContainer.appendChild(wrapper);
               }
             } else {
               for(let i=0;i<count;i++){
-                const wrapper = document.createElement('div');
-                wrapper.className = 'mb-2';
-
-                const lbl = document.createElement('label');
-                lbl.className = 'form-label';
-                lbl.textContent = labels[i] || `بخش ${i+1}`;
-
-                const inp = document.createElement('input');
-                inp.type = 'number';
-                inp.className = 'form-control width-input';
-                inp.name = `WidthParts[${i}]`;
-                inp.min = 0;
-                inp.step = 1;
-                inp.readOnly = false;
-                inp.value = '';
-
-                wrapper.appendChild(lbl);
-                wrapper.appendChild(inp);
-                inputContainer.appendChild(wrapper);
+                const wrapper = document.createElement('div'); wrapper.className='mb-2';
+                const lbl = document.createElement('label'); lbl.className='form-label'; lbl.textContent = labels[i] || `بخش ${i+1}`;
+                const inp = document.createElement('input'); inp.type='number'; inp.className='form-control width-input'; inp.name=`WidthParts[${i}]`;
+                wrapper.appendChild(lbl); wrapper.appendChild(inp); inputContainer.appendChild(wrapper);
               }
             }
-
-            // focus اولین بخش برای UX موبایل
-            const first = inputContainer.querySelector('.width-input');
-            if(first) first.focus();
-
             validateForm();
           };
 
-          // اگر عرض تغییر کنه و تقسیم مساوی انتخاب شده، مقادیر قسمت‌ها رو بروزرسانی کن
-          widthInput && widthInput.addEventListener('input', function(){
+          // بروزرسانی خودکار بخش‌های مساوی هنگام تغییر عرض
+          widthInput.addEventListener('input', function(){
             const checked = form.querySelector('input[name="division"]:checked');
             if(!checked) { validateForm(); return; }
             const [cntStr, type] = checked.value.split('-');
-            const count = Number(cntStr) || 0;
-            if(type === 'equal' && count > 0){
-              // دوباره بساز یا بروزرسانی مقادیر قسمت‌ها بدون تغییر ساختار
-              // بهترین مسیر: فراخوانی updateInputs مجدد با همان پارامترها
-              window.updateInputs(count, 'equal');
+            const count = Number(cntStr)||0;
+
+            if(type==='equal' && count>0) {
+              const total = Number(widthInput.value) || 0;
+              const partEls = qAll('.width-input', inputContainer);
+              if(partEls.length === count && total > 0) {
+                const base = Math.floor(total / count);
+                const remainder = total - (base * count);
+                partEls.forEach((inp, i) => {
+                  const extra = (i < remainder) ? 1 : 0;
+                  inp.value = String(base + extra);
+                });
+              } else {
+                window.updateInputs(count, 'equal');
+              }
             } else {
               validateForm();
             }
           });
 
-          // event delegation: وقتی هر یک از ورودی‌های بخش تغییر کنند validate کن
+          // جلوگیری از صفر و نامعتبر در همه input ها
           inputContainer.addEventListener('input', function(e){
             if(e.target && e.target.classList.contains('width-input')){
-              // hide individual invalid
-              if(e.target.classList.contains('is-invalid')) e.target.classList.remove('is-invalid');
+              const val = Number(e.target.value);
+              if(isNaN(val) || val <= 0){
+                e.target.value = '';
+                e.target.classList.add('is-invalid');
+              } else {
+                e.target.classList.remove('is-invalid');
+              }
               validateForm();
             }
           });
 
-          // وقتی مودال باز میشه: فقط فیلدهای موقتی ریست میشن، دسته (Category) نگه داشته میشه و در صورت وجود زیر دسته لود میشه
+          // ریست فرم هنگام باز شدن مودال
           const modalEl = document.getElementById('customSizeModal');
           if(modalEl){
             modalEl.addEventListener('shown.bs.modal', function(){
-              // reset only inputs we want to clear (حفظ دسته در صورت پر بودن)
-              form.querySelectorAll('input').forEach(inp => {
-                const name = inp.getAttribute('name') || inp.getAttribute('id') || '';
-                if(name === 'CategoryId' || name === 'SubCategoryId') return;
-                if(inp.type === 'hidden') {
-                  // reset hidden parted fields
-                  inp.value = '';
-                } else {
-                  inp.value = '';
-                }
-                inp.classList.remove('is-invalid');
-              });
-
-              // clear selects except Category
-              if(subSelect) {
-                subSelect.innerHTML = '<option value="">ابتدا دسته را انتخاب کنید</option>';
-                subSelect.disabled = true;
-              }
-
+              form.reset();
+              form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
               inputContainer.innerHTML = '';
               widthInputsWrapper.style.display = 'none';
               widthErrorEl.style.display = 'none';
-              countErrorEl.style.display = 'none';
               divisionErrorEl.classList.add('d-none');
+              countErrorEl.style.display = 'none';
               submitBtn.disabled = true;
-
-              // اگر دسته پیش‌پر شده بود، زیر دسته‌ها را بارگذاری کن
-              if(categoryEl && categoryEl.value){
-                categoryEl.dispatchEvent(new Event('change'));
-              }
             });
           }
 
-          // جلوگیری از ارسال فرم اگر نامعتبر است
           form.addEventListener('submit', function(e){
-            if(!validateForm()){
-              e.preventDefault();
-              e.stopPropagation();
-              // نشان دادن پیام‌های خطا به کاربر (به صورت فارسی)
-            }
-            // در صورت درست بودن، ارسال به سرور ادامه پیدا می‌کند.
+            if(!validateForm()){ e.preventDefault(); e.stopPropagation(); }
           });
 
-          // هر تغییر در فرم -> اعتبارسنجی
-          form.addEventListener('input', function(e){
-            // اگر المان دارای کلاس is-invalid هست، پاکش کن
-            if(e.target && e.target.classList && e.target.classList.contains('is-invalid')){
-              e.target.classList.remove('is-invalid');
-            }
+          form.addEventListener('input', function(){
             validateForm();
           });
 
         })();
     </script>
 }
+

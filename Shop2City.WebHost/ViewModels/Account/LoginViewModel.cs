@@ -8,7 +8,7 @@ namespace Shop2City.WebHost.ViewModels.Account
     {
         [Display(Name = "شماره همراه", Prompt = "شماره همراه")]
         [Required(ErrorMessage = ErrorMessage.Required)]
-        [MaxLength(11, ErrorMessage = ErrorMessage.MinLength)]
+        [MaxLength(11)]
         public string userName { get; set; }
 
         [Display(Name = "کلمه عبور", Prompt = "کلمه عبور")]

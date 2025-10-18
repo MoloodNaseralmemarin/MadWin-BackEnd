@@ -17,7 +17,7 @@ namespace MadWin.Application.Services
             _factorDetailRepository = factorDetailRepository;
             _factorRepository = factorRepository;
         }
-        public async Task<FactorSummaryForAdminDto> GetOpenFactorAsync(int userId, int factorId)
+        public async Task<FactorSummaryForAdminDto> GetOpenFactorAsync(int userId, int? factorId)
         {
             return await _factorDetailRepository.GetOpenFactorAsync(userId,factorId);
         }
@@ -81,7 +81,7 @@ namespace MadWin.Application.Services
             return await _factorDetailRepository.GetByFactorIdAsync(factorId);
         }
 
-        public async Task MarkItemsAsSeenAsync(int factorId)
+        public async Task MarkItemsAsSeenAsync(int? factorId)
         {
             var newItems = await _factorDetailRepository.GetQuery()
                 .Where(d => d.FactorId == factorId && d.IsNew)

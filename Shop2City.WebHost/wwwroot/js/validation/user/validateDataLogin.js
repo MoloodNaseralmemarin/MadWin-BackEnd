@@ -8,6 +8,6 @@ window.validateData = () => {
         toastr.error("لطفاً کلمه عبور را وارد کنید");
         return false;
     }
-
     return true;
 };
+

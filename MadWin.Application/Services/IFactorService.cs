@@ -19,10 +19,14 @@ namespace MadWin.Application.Services
 
         Task<int> CountFactors();
 
+        
+
         Task<FactorSummaryForSendSMS> GetFactorDetailForSendSMSAsync(int factorId);
 
 
         Task<FactorSummaryForAdminItemDto?> GetFactorSummaryByUserIdAsync(int userId);
+
+        Task<int> GetLastFactorId(int userId);
 
 
     }

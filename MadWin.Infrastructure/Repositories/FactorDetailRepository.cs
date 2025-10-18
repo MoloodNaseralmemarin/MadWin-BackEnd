@@ -12,11 +12,13 @@ namespace MadWin.Infrastructure.Repositories
     {
         private readonly MadWinDBContext _context;
         private readonly IProductRepository _productRepository;
+       
 
         public FactorDetailRepository(MadWinDBContext context, IProductRepository productRepository) : base(context)
         {
             _context = context;
             _productRepository = productRepository;
+           
         }
 
         public async Task<FactorDetail> AddFactorDetailAsync(int factorId, int count, int productId)
@@ -54,8 +56,9 @@ namespace MadWin.Infrastructure.Repositories
         }
 
 
-        public async Task<FactorSummaryForAdminDto> GetOpenFactorAsync(int userId, int factorId)
+        public async Task<FactorSummaryForAdminDto> GetOpenFactorAsync(int userId, int? factorId = null)
         {
+  
             var query = GetQuery()
                 .Include(f => f.Factor)
                     .ThenInclude(f => f.FactorDetails)
@@ -85,7 +88,7 @@ namespace MadWin.Infrastructure.Repositories
                                 Count = fd.Count,
                                 Price = fd.Price,
                                 TotalPrice = fd.Price * fd.Count,
-                                IsNew=fd.IsNew
+                                IsNew = fd.IsNew
                             }).ToList()
                     }).ToListAsync(),
 
@@ -291,8 +294,8 @@ namespace MadWin.Infrastructure.Repositories
 
         }
 
-       
 
+   
 
     }
 }

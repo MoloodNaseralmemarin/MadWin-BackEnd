@@ -20,11 +20,14 @@
         </ol>
     </nav>
 
-    @if (!Model.Any())
+    @if ((Model == null || !Model.Any()) && TempData["EmptyCartMessage"] != null)
+
     {
-        <div class="alert alert-info text-center">
-            سبد خرید شما خالی می‌باشد.
-        </div>
+        <input type="hidden" id="toastrError" value="@TempData["ToastrError"]" />
+        <div class="alert alert-warning text-center mt-3">
+        @TempData["EmptyCartMessage"]
+    </div>
+
     }
     else
     {
@@ -53,11 +56,9 @@
                         <tr>
                             <td>@row</td>
                             <td>
-                                <a href="@Url.Action("ShowProduct", "Product", new { id = item.ProductId })">
                                     <img src="https://MadWin.ir/images/products/thumb/@item.ImageName"
                                          alt="@item.Title"
                                          class="img-fluid w-25" />
-                                </a>
                             </td>
                             <td>
                                 @item.Title
@@ -90,10 +91,10 @@
                 <div class="card mb-3 shadow-sm hover-shadow" id="cartCard_@item.ProductId">
                     <div class="row g-0 align-items-center">
                         <div class="col-4">
-                            <a href="/ShowProduct/@item.ProductId">
-                                <img src="http://panahplast.ir/images/products/thumb/@item.ImageName"
+                            
+                                <img src="https://MadWin.ir/images/products/thumb/@item.ImageName"
                                      alt="@item.Title" class="img-fluid rounded-start">
-                            </a>
+                   
                         </div>
                         <div class="col-8">
                             <div class="card-body p-2">
@@ -122,7 +123,7 @@
 
         <!-- Buttons -->
         <div class="d-flex justify-content-between mt-3 flex-wrap gap-2" id="cartButtons">
-            <a asp-controller="Products" asp-action="BuyProduct" class="btn btn-primary btn-sm">تایید فاکتور</a>
+            <a asp-controller="Products" asp-action="BuyProduct" class="btn btn-primary btn-sm">تسویه حساب</a>
             <a asp-controller="Home" asp-action="Index" class="btn btn-secondary btn-sm">بازگشت</a>
         </div>
     }

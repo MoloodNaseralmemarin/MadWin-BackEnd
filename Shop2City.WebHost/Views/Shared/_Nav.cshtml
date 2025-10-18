@@ -51,7 +51,20 @@
                     else
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-white fs-5 hover-shadow" asp-area="" asp-controller="Orders" asp-action="CreateOrder">
+                            <a class="nav-link text-white fs-5 hover-shadow" asp-area="" asp-controller="Orders" asp-action="CreateOrder"> سفارش پرده با اندازه دلخواه</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white fs-5 hover-shadow"
+                               asp-area="UserPanel"
+                               asp-controller="Factors"
+                               asp-action="FactorSummary"
+                               asp-route-factorId="">
+                                مشاهده سبد خرید
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-white fs-5 hover-shadow">
                                 @User.Identity.Name خوش آمدید.
                             </a>
                         </li>
@@ -77,7 +90,7 @@
                     </li>
 
                 }
-                <li class="nav-item mt-2 mt-lg-0">
+                <li class="nav-item mx-3 mt-lg-0">
                     @await Component.InvokeAsync("CartBadgeComponent")
                 </li>
             </ul>

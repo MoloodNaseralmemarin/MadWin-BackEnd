@@ -9,7 +9,7 @@
             @{
                 string titleText = string.IsNullOrEmpty(Model.Title) ? "" : Model.Title.Replace("سایز", "<br/>" + "سایز");
             }
-            <a href="/ShowProduct/@Model.Id"><h4 id="title">@Html.Raw(titleText)</h4></a>
+            <h4 id="title">@Html.Raw(titleText)</h4>
         </div>
         @if (Model.IsStatus)
         {

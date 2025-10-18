@@ -14,9 +14,10 @@ namespace Shop2City.WebHost.ViewModels.Account
 
         [Display(Name = "شماره همراه")]
         [Required(ErrorMessage = "شماره همراه الزامی است")]
-        [Phone]
+        [MaxLength(11)]
         public string CellPhone { get; set; }
 
+        [MaxLength(11)]
         [Display(Name = "شماره ثابت")]
         public string? TelPhone { get; set; }
 

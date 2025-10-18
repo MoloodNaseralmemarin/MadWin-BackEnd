@@ -200,8 +200,6 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
         }
         #endregion
 
-
-
         #region پرده طلقی ایرانی
         private async Task<decimal> CalculateIraniAsync(CreateDto order)
         {

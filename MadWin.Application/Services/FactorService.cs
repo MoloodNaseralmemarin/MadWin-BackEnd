@@ -1,5 +1,6 @@
 ﻿using MadWin.Core.DTOs.Fators;
 using MadWin.Core.Entities.Factors;
+using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -134,6 +135,7 @@ namespace MadWin.Application.Services
         }
 
 
+
  public async Task<FactorSummaryForAdminItemDto?> GetFactorSummaryByUserIdAsync(int userId)
 {
     var factor = await _factorRepository.GetQuery()
@@ -184,5 +186,10 @@ namespace MadWin.Application.Services
 
     return dto;
 }
+
+        public async Task<int> GetLastFactorId(int userId)
+        {
+            return await _factorRepository.GetLastFactorId(userId);  
+        }
     }
 }

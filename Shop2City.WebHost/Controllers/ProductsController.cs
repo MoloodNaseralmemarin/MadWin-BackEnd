@@ -1,5 +1,6 @@
 ﻿using MadWin.Application.DTOs.Cart;
 using MadWin.Application.Services;
+using MadWin.Core.Entities.Factors;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -31,7 +32,9 @@ namespace Shop2City.WebHost.Controllers
             // اگر سبد خرید خالی باشد
             if (!cart.Any())
             {
-                return RedirectToAction("Index", "Home"); // کاربر را به صفحه اصلی هدایت کن
+                @TempData["ToastrError"] = "سبد خرید شما خالی است. لطفاً ابتدا محصولی انتخاب کنید.";
+                TempData["EmptyCartMessage"] = "سبد خرید شما خالی است. لطفاً ابتدا محصولی انتخاب کنید.";
+                return RedirectToAction("ShowCart", "Cart");
             }
 
             using (var scope = _serviceProvider.CreateScope())

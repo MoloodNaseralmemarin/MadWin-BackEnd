@@ -134,5 +134,16 @@ namespace MadWin.Infrastructure.Repositories
                 .Where(o => o.IsFinaly)
                 .CountAsync();
         }
+
+        public async Task<int> GetLastFactorId(int userId)
+        {
+            var factorId = await GetQuery()
+                     .Where(f => f.UserId == userId && !f.IsFinaly && !f.IsDelete)
+                     .OrderByDescending(f => f.Id) // آخرین فاکتور
+                     .Select(f => f.Id)
+                     .FirstOrDefaultAsync();
+            return factorId;
+        }
+
     }
 }

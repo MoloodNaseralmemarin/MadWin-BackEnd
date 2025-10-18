@@ -15,11 +15,14 @@ namespace Shop2City.WebHost.Areas.UserPanel.Controllers
         private readonly IFactorDetailService _factorDetailService;
         private readonly IDeliveryMethodService _deliveryMethodService;
         private readonly IUserService _userService;
+        private readonly IFactorService _factorService;
 
-        public FactorsController(IFactorDetailService factorDetailService, IDeliveryMethodService deliveryMethodService)
+        public FactorsController(IFactorDetailService factorDetailService, IDeliveryMethodService deliveryMethodService, IFactorService factorService)
         {
             _factorDetailService = factorDetailService;
             _deliveryMethodService = deliveryMethodService;
+            _factorService = factorService;
+
         }
         [HttpGet]
         public async Task<IActionResult> Index(FilterParameter filter, int pageId = 1)
@@ -52,11 +55,17 @@ namespace Shop2City.WebHost.Areas.UserPanel.Controllers
 
         }
 
-        public async Task<IActionResult> FactorSummary(int factorId)
+        public async Task<IActionResult> FactorSummary(int? factorId)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(userIdString, out int userId))
                 return Unauthorized();
+
+            if(!factorId.HasValue)
+            {
+                factorId=await _factorService.GetLastFactorId(userId);
+            }
+             
             var factorSummary = await _factorDetailService.GetOpenFactorAsync(userId,factorId);  // از پارامتر استفاده شد
             var deliveryMethods = await _deliveryMethodService.GetDeliveryMethodInfoAsync();
             if (factorSummary == null)

@@ -3,9 +3,7 @@
 
 <div class="card shadow-lg border-0 rounded-3">
     <div class="image">
-        <a href="/ShowProduct/@Model.Id">
             <img src="~/images/products/thumb/@Model.FileName" alt="@Model.Title" title="@Model.Title" class="card-img-top img-fluid rounded-3" />
-        </a>
     </div>
 
     <div class="card-body">
@@ -13,9 +11,9 @@
         @{
             string titleText = string.IsNullOrEmpty(Model.Title) ? "" : Model.Title.Replace("سایز", "<br/>سایز");
         }
-        <a href="/ShowProduct/@Model.Id">
+        
             <h5 class="card-title text-truncate">@Html.Raw(titleText)</h5>
-        </a>
+       
         <p class="card-text">
             @if (Model.IsStatus)
             {
