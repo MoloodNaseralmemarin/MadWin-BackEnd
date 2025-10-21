@@ -1,11 +1,11 @@
-﻿@using MadWin.Core.DTOs.Fators
+﻿@using MadWin.Core.DTOs.Factors
 @using MadWin.Core.DTOs.Orders
 @using Shop2City.Core.Convertors
 @using Shop2City.WebHost.ViewModels.Orders
-@model FactorForAdminViewModel
+@model FactorForUserViewModel
 
 @{
-     var factor = Model.FactorSummary?.FirstOrDefault();
+     var factor = Model.FactorSummaryForUser?.FirstOrDefault();
     var factorId = factor?.FactorId ?? 0;
     ViewBag.Title = "لیست فاکتورها";
     var currentFromDate = Context.Request.Query["FromDate"].ToString() ?? "";
@@ -68,12 +68,12 @@
 
 
             <!-- کارت‌های فاکتور -->
-            @if (Model.FactorSummary != null && Model.FactorSummary.Any())
+            @if (Model.FactorSummaryForUser != null && Model.FactorSummaryForUser.Any())
             {
                 <div class="container mt-4">
                     <h4 class="mb-3">لیست فاکتورها</h4>
                     <div class="row g-3">
-                        @foreach (var item in Model.FactorSummary)
+                        @foreach (var item in Model.FactorSummaryForUser)
                         {
                             <div class="col-12 col-sm-6 col-lg-4 col-xl-4">
                                 <div class="card factor-card h-100 shadow-sm @(item.IsFinaly ? "border-success" : "border-secondary")">
@@ -82,7 +82,7 @@
                                         <p class="card-text mb-1"><i class="fas fa-calendar-alt"></i> @item.CreateDate.ToShamsi() - @item.CreateDate.ToString("HH:mm:ss")</p>
                                         <p class="card-text mb-1"><i class="fas fa-box"></i> @item.FactorDetailItemCount آیتم</p>
                                         <p class="card-text mb-1"><i class="fas fa-tag"></i> @item.DisTotal.ToString("N0") ریال (@item.DisPercent%)</p>
-                                        <p class="card-text mb-1"><i class="fas fa-coins"></i> @item.FinalTotal.ToString("N0") تومان</p>
+                                        <p class="card-text mb-1"><i class="fas fa-coins"></i> @item.TotalAmount.ToString("N0") ریال</p>
                                         <p class="card-text mb-2">
                                             <strong>وضعیت:</strong>
                                             <span class="@(item.IsFinaly ? "status-paid" : "status-unpaid")">

@@ -49,6 +49,7 @@ namespace MadWin.Infrastructure.Repositories
                         ProductId = u.Id,
                         Title = u.Title,
                         Price = u.Price,
+                        LastUpdateDate=u.LastUpdateDate,
                         FactorCount=u.FactorDetails.Where(fd=>fd.ProductId==u.Id).Count()
                     })
                     .ToListAsync()

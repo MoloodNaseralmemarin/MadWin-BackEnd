@@ -78,7 +78,7 @@
                                                     <span class="badge bg-success">جدید</span>
                                                 }
                                             </td>
-                                            <td><span class="badge bg-info">@item.Count</span></td>
+                                            <td><span class="badge bg-info">@item.Count</span> عدد</td>
                                             <td>@item.Price.ToString("N0") ریال</td>
                                             <td><span class="item-price">@item.TotalPrice.ToString("N0") ریال</span></td>
                                             <td class="text-center">
@@ -137,7 +137,7 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="row mb-2">
-                                            <div class="col-6"><strong>تعداد انتخاب‌شده:</strong> <span class="badge bg-info">@item.Count</span></div>
+                                            <div class="col"><strong>تعداد انتخاب‌شده:</strong> <span class="badge bg-info">@item.Count</span> عدد</div>
                                         </div>
                                         <div class="row mb-2">
                                             <div class="col-6"><strong>قیمت واحد:</strong> <span class="badge bg-secondary">@item.Price.ToString("N0") ریال</span></div>
@@ -198,8 +198,11 @@
                                         <td><strong>هزینه ارسال :</strong></td>
                                         <td><span id="deliveryPrice">0</span> ریال</td>
                                     </tr>
-                                    <tr class="h4 text-primary">
-                                        <td colspan="2"><strong>مبلغ قابل پرداخت :</strong> <span id="sumPrice">0</span> ریال</td>
+                                    <tr>
+                                        <td colspan="2" class="fs-4 text-primary">
+                                            <span class="fs-4 text-primary">مبلغ قابل پرداخت : </span>
+                                            <span id="sumPrice" class="fs-4 text-primary">0</span> ریال
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td colspan="2">

@@ -1,4 +1,5 @@
-﻿using MadWin.Core.DTOs.Fators;
+﻿using MadWin.Core.DTOs.Factors;
+using MadWin.Core.DTOs.Fators;
 using MadWin.Core.Entities.Factors;
 
 namespace MadWin.Application.Services
@@ -24,7 +25,7 @@ namespace MadWin.Application.Services
         Task<FactorSummaryForSendSMS> GetFactorDetailForSendSMSAsync(int factorId);
 
 
-        Task<FactorSummaryForAdminItemDto?> GetFactorSummaryByUserIdAsync(int userId);
+        Task<FactorSummaryForUserItemDto> GetFactorSummaryByUserIdAsync(int userId);
 
         Task<int> GetLastFactorId(int userId);
 

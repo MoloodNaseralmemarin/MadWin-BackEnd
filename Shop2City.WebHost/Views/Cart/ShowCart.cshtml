@@ -19,15 +19,15 @@
             <li class="breadcrumb-item active" aria-current="page">سبد خرید</li>
         </ol>
     </nav>
-
-    @if ((Model == null || !Model.Any()) && TempData["EmptyCartMessage"] != null)
-
+    @if ((Model == null || !Model.Any()))
     {
         <input type="hidden" id="toastrError" value="@TempData["ToastrError"]" />
-        <div class="alert alert-warning text-center mt-3">
-        @TempData["EmptyCartMessage"]
-    </div>
-
+        <div class="alert alert-warning text-center mt-4 shadow-sm p-4">
+            <h5 class="mb-3"><i class="fas fa-shopping-cart"></i>@TempData["EmptyCartMessage"]</h5>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                افزودن محصول جدید
+            </a>
+        </div>
     }
     else
     {
@@ -99,8 +99,9 @@
                         <div class="col-8">
                             <div class="card-body p-2">
                                 <h5 class="card-title mb-1">@item.Title</h5>
-                                <p class="mb-1">قیمت واحد: <span class="fw-bold">@item.Price.ToString("#,0 ریال")</span></p>
-                                <p class="mb-1">مجموع: <span class="fw-bold">@item.Sum.ToString("#,0 ریال")</span></p>
+                                <p class="mb-2">تعداد: <span class="fw-bold">@item.Count عدد</span></p>
+                                <p class="mb-2">قیمت واحد: <span class="fw-bold">@item.Price.ToString("#,0 ریال")</span></p>
+                                <p class="mb-2">مجموع: <span class="fw-bold">@item.Sum.ToString("#,0 ریال")</span></p>
                                 <div class="d-flex justify-content-start flex-wrap gap-1">
                                     <button class="btn btn-sm btn-success me-1" onclick="increaseCart(@item.ProductId)"><i class="fa fa-plus"></i></button>
                                     <button class="btn btn-sm btn-info me-1" onclick="decreaseCart(@item.ProductId)">  <i class="fas fa-minus"></i></button>
@@ -123,7 +124,7 @@
 
         <!-- Buttons -->
         <div class="d-flex justify-content-between mt-3 flex-wrap gap-2" id="cartButtons">
-            <a asp-controller="Products" asp-action="BuyProduct" class="btn btn-primary btn-sm">تسویه حساب</a>
+            <a asp-controller="Products" asp-action="BuyProduct" class="btn btn-primary btn-sm">افزودن به فاکتور</a>
             <a asp-controller="Home" asp-action="Index" class="btn btn-secondary btn-sm">بازگشت</a>
         </div>
     }

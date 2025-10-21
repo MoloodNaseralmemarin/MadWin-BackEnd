@@ -1,4 +1,5 @@
 ﻿@using MadWin.Core.DTOs.Products
+@using Shop2City.Core.Convertors
 @model ProductForAdminViewModel
 @{
     ViewBag.Title = "لیست محصولات";
@@ -18,6 +19,7 @@
                 <table class="table table-striped table-hover align-middle">
                     <thead class="table-light">
                         <tr>
+                            <th>تاریخ ویرایش</th>
                             <th>عنوان</th>
                             <th>قیمت</th>
                             <td>تعداد محصول فروخته شده</td>
@@ -28,11 +30,12 @@
                         @foreach (var item in Model.Products)
                         {
                             <tr>
+                                <td>@item.LastUpdateDate.ToShamsi()</td>
                                 <td>@item.Title</td>
                                 <td>@item.Price.ToString("N0") ریال</td>
                                 <td>@item.FactorCount</td>
                                 <td class="text-center">
-                                    <a asp-controller="CommissionRates" asp-action="Edit" asp-route-id="@item.ProductId">
+                                    <a asp-controller="Products" asp-action="Edit" asp-route-id="@item.ProductId">
                                         <i class="fas fa-edit text-danger"></i>
                                     </a>
                                 </td>

@@ -27,5 +27,7 @@ namespace MadWin.Core.Interfaces
         Task<OrderForAdminViewModel> GetAllOrdersAsync(OrderFilterParameters filter, int pageId = 1);
 
         Task<OrderForAdminViewModel> GetAllOrdersByUserIdAsync(int userId, OrderFilterParameters filter, int pageId = 1);
+
+        Task<OrderSummaryForAdminItemDto> GetOrdersByOrderIdAsync(int orderId);
     }
 }

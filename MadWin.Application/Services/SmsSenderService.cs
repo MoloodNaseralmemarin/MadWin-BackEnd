@@ -5,6 +5,7 @@ using MadWin.Core.Interfaces;
 using MadWin.Core.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Globalization;
 
 namespace MadWin.Application.Services
 {
@@ -80,159 +81,66 @@ namespace MadWin.Application.Services
         }
 
 
-        // متدی برای ارسال پیامک برای مشتری
+
+        #region ارسال سفارش برای مشتری
         public async Task<bool> SendSMSOrderForCustomerAsync(string cellPhone, int orderId)
         {
-            //string equalParts;
-            //var order = await _orderRepository.GetOrderSummaryByOrderIdAsync(orderId);
-            //var s = _orderWidthPartRepository.GetStringAsync(orderId);
-            //var message = $"{order.Count} عدد پرده آهنربایی {order.CategoryGroup} به ابعاد {order.SizeSMS} به صورت {order.PartCount} قسمت {order.IsEqualParts} از چپ به راست{order.WidthParts} با کد پیگیری {order.OrderId} برای شما ثبت گردید.";
+            try
+            {
+                var order = await _orderRepository.GetOrdersByOrderIdAsync(orderId);
+                if (order == null)
+                {
+                    _logger.LogWarning($"سفارشی با شناسه {orderId} یافت نشد.");
+                    return false;
+                }
 
-            //if (order.IsEqualParts)
-            //{
-            //    equalParts = "مساوی";
-            //}
-            //else
-            //{
-            //    equalParts = "نامساوی";
-            //}
-            //try
-            //{
-            //    var otpsms = new Api(_smsSettings.ApiKey);
-            //    var result = await otpsms.VerifyAsync(1, "MadWinGetOrderForCustomer",
-            //        new string[]
-            //        { cellPhone },
-            //        order.Count.ToString(),
-            //        order.CategoryGroup,
-            //        order.SizeSMS,
-            //        order.PartCount + " قسمت " + equalParts + " از راست به چپ " + s, order.OrderId.ToString());
+                var widthPart =  _orderWidthPartRepository.GetStringAsync(orderId);
+                if (string.IsNullOrWhiteSpace(widthPart))
+                {
+                    _logger.LogWarning($"قسمت‌های عرض برای سفارش {orderId} یافت نشد.");
+                    widthPart = "-";
+                }
 
-            //    if (result != null)
-            //    {
-            //        await SaveSmsAsync(cellPhone, "MadWinGetOrderForCustomer", message, "سفارش دهنده", 4, "200", orderId, null);
-            //        _logger.LogInformation("پیامک ثبت سفارش توسط مشتری با موفقیت ارسال شد.");
-            //        return true;
-            //    }
-            //    else
-            //    {
-            //        _logger.LogWarning("ارسال پیامک ثبت سفارش توسط مشتری با خطا مواجه شد. نتیجه خالی بود.");
-            //        return false;
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    _logger.LogError(ex, "خطا در ارسال پیامک سفارش مشتری‌.");
-            //    return false;
-            //}
-            return true;
+                string equalParts = order.IsEqualParts ? "مساوی" : "نامساوی";
+
+                string message =
+                    $"{order.Count} عدد پرده آهنربایی {order.CategoryGroup} به ابعاد {order.SizeSMS} " +
+                    $"به صورت {order.PartCount} قسمت {equalParts} از راست به چپ {widthPart} " +
+                    $"با کد پیگیری {order.OrderId} برای شما ثبت گردید.";
+
+                var otpsms = new Api(_smsSettings.ApiKey);
+
+                var result = await otpsms.VerifyAsync(
+                    1,
+                    "MadWinGetOrderForCustomer",
+                    new[] { cellPhone },
+                    order.Count.ToString(),
+                    order.CategoryGroup,
+                    order.SizeSMS,
+                    $"{order.PartCount} قسمت {equalParts} از راست به چپ {widthPart}",
+                    order.OrderId.ToString()
+                );
+
+                if (result != null)
+                {
+                    await SaveSmsAsync(cellPhone, "MadWinGetOrderForCustomer", message, "سفارش دهنده", 4, "200", orderId, null);
+                    _logger.LogInformation("پیامک ثبت سفارش توسط مشتری با موفقیت ارسال شد.");
+                    return true;
+                }
+
+                _logger.LogWarning("ارسال پیامک ثبت سفارش توسط مشتری با خطا مواجه شد. نتیجه خالی بود.");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "خطا در ارسال پیامک سفارش مشتری.");
+                return false;
+            }
         }
 
-        // متدی برای ارسال پیامک برای تولید
-        public async Task<bool> SendSMSOrderForProductionAsync(string cellPhone, int orderId)
-        {
-            ////2 عدد پرده آهنربایی طلقی توری به ابعاد 230 * 120 به صورت 2 قسمت نامساوی از چپ به راست(10 - 10) با کد پیگیری 1252 .
-            ////با تشکر وین ماد
-            //// لغو 11
-            //string equalParts;
-            //var order = await _orderRepository.GetOrderSummaryByOrderIdAsync(orderId);
-            //var s = _orderWidthPartRepository.GetStringAsync(orderId);
-            //var message = $"{order.Count} عدد پرده آهنربایی {order.CategoryGroup} به ابعاد {order.SizeSMS} به صورت {order.PartCount} قسمت {order.IsEqualParts} از چپ به راست{order.WidthParts} با کد پیگیری {order.OrderId} برای شما ثبت گردید.";
-
-            //if (order.IsEqualParts)
-            //{
-            //    equalParts = "مساوی";
-            //}
-            //else
-            //{
-            //    equalParts = "نامساوی";
-            //}
-
-            //try
-            //{
-            //    var otpsms = new Api(_smsSettings.ApiKey);
-            //    var result = await otpsms.VerifyAsync(1, "MadWinGetOrderForProduction",
-            //        new string[]
-            //        { cellPhone },
-            //        order.Count.ToString(),
-            //        order.CategoryGroup,
-            //        order.SizeSMS,
-            //        order.PartCount + " قسمت " + equalParts + " از راست به چپ " + s, order.OrderId.ToString());
-
-
-            //    if (result != null)
-            //    {
-            //        await SaveSmsAsync(cellPhone, "MadWinGetOrderForProduction", message, "تولید کننده", 4, "200", orderId, null);
-            //        _logger.LogInformation("پیامک ثبت سفارش برای تولید کننده با موفقیت ارسال شد.");
-            //        return true;
-            //    }
-            //    else
-            //    {
-            //        _logger.LogWarning("ارسال پیامک ثبت سفارش برای مدیر با خطا مواجه شد. نتیجه خالی بود.");
-            //        return false;
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    _logger.LogError(ex, "خطا در ارسال پیامک سفارش مشتری‌.");
-            //    return false;
-            //}
-            return true;
-        }
-
-        //
-        public async Task<bool> SendSMSOrderForManagerAsync(string cellPhone, int orderId)
-        {
-            ////2 عدد پرده آهنربایی طلقی توری به ابعاد 230 * 120 به صورت 2 قسمت نامساوی از چپ به راست(10 - 10) با کد پیگیری 1252 .
-            ////با تشکر وین ماد
-            //// لغو 11
-            //string equalParts;
-            //var order = await _orderRepository.GetOrderSummaryByOrderIdAsync(orderId);
-            //var s = _orderWidthPartRepository.GetStringAsync(orderId);
-            //var message = $"{order.Count} عدد پرده آهنربایی {order.CategoryGroup} به ابعاد {order.SizeSMS} به صورت {order.PartCount} قسمت {order.IsEqualParts} از چپ به راست{order.WidthParts} با کد پیگیری {order.OrderId} برای شما ثبت گردید.";
-
-
-            //if (order.IsEqualParts)
-            //{
-            //    equalParts = "مساوی";
-            //}
-            //else
-            //{
-            //    equalParts = "نامساوی";
-            //}
-
-            //try
-            //{
-            //    var otpsms = new Api(_smsSettings.ApiKey);
-            //    var result = await otpsms.VerifyAsync(1, "MadWinGetOrderForManager",
-            //        new string[]
-            //        { cellPhone },
-            //        order.Count.ToString(),
-            //        order.CategoryGroup,
-            //        order.SizeSMS,
-            //        order.PartCount + " قسمت " + equalParts + " از راست به چپ " + s, order.OrderId.ToString(), order.FullName);
-
-
-            //    if (result != null)
-            //    {
-            //        await SaveSmsAsync(cellPhone, "MadWinGetOrderForManager", message, "مدیریت", 4, "200", orderId, null);
-            //        _logger.LogInformation("پیامک ثبت سفارش برای تولید کننده با موفقیت ارسال شد.");
-            //        return true;
-            //    }
-            //    else
-            //    {
-            //        _logger.LogWarning("ارسال پیامک ثبت سفارش برای تولید کننده با خطا مواجه شد. نتیجه خالی بود.");
-            //        return false;
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    _logger.LogError(ex, "خطا در ارسال پیامک سفارش مشتری‌.");
-            //    return false;
-            //}
-            return false;
-        }
-
-
+        #endregion
+    
+        #region ارسال فاکتور برا مشتری
         public async Task<bool> SendSMSFactorForCustomerAsync(string cellPhone, int factorId)
         {
             var message = $"با موفقیت ثبت شد." + factorId + "فاکتور شما با کد پیگیری.\r\nبا تشکر از خرید شما مادوین(نادری)\r\n لغو 11";
@@ -245,7 +153,7 @@ namespace MadWin.Application.Services
 
                 if (result != null)
                 {
-                    await SaveSmsAsync(cellPhone, "MadWinGetFactorForCustomer", message, "سفارش دهنده", 2, "200",null,factorId);
+                    await SaveSmsAsync(cellPhone, "MadWinGetFactorForCustomer", message, "سفارش دهنده", 2, "200", null, factorId);
                     _logger.LogInformation("پیامک ثبت فاکتور توسط مشتری با موفقیت ارسال شد.");
                     return true;
                 }
@@ -261,11 +169,10 @@ namespace MadWin.Application.Services
                 return false;
             }
         }
-
+        #endregion
+        #region ارسال فاکتور برای اقای نادری
         public async Task<bool> SendSMSFactorForManagerAsync(int factorId)
         {
-
-            //var message = $"Message = \"فاکتور\" + item.FactorId + \"-\" + listFactorDetails.Count + \"-\" + i + \" \" + \"نوع\" + item.Product.Title + \" \" + \"تعداد :\" + item.Quantity + \" \" + \"با تشکر پناه پلاست لغو 11\",";
             var factorDetails = await _factorService.GetFactorDetailForSendSMSAsync(factorId);
 
             if (factorDetails == null)
@@ -286,7 +193,7 @@ namespace MadWin.Application.Services
 
                     var result = await otpsms.VerifyAsync(1, "MadWinGetFactorForManager",
                                       new string[] { "09180580270" }, // شماره مقصد
-                                      message,
+                                      factorDetails.FullName,
                                       $"{factorDetails.FactorId}-{item.Count}-{i}", // شناسه پیامک یا کد دلخواه
                                       item.ProductName,
                                       item.Count.ToString(),
@@ -294,7 +201,7 @@ namespace MadWin.Application.Services
 
                     if (result != null)
                     {
-                        await SaveSmsAsync("09180580270", "MadWinGetFactorForCustomer", message, "سفارش دهنده", 2, "200", null, factorId);
+                        await SaveSmsAsync("09180580270", "MadWinGetFactorForManager", message, "مدیریت", 2, "200", null, factorId);
                         _logger.LogInformation($"پیامک محصول {item.ProductName} با موفقیت ارسال شد.");
                     }
                     else
@@ -313,11 +220,61 @@ namespace MadWin.Application.Services
                 _logger.LogError(ex, "خطا در ارسال پیامک فاکتور");
                 return false;
             }
-
-
-
         }
-       
+
+        #endregion
+        #region ارسال فاکتور برای خانم حیدری
+        public async Task<bool> SendSMSFactorForProductionAsync(int factorId)
+        {
+            var factorDetails = await _factorService.GetFactorDetailForSendSMSAsync(factorId);
+
+            if (factorDetails == null)
+            {
+                _logger.LogWarning("فاکتور یافت نشد.");
+                return false;
+            }
+
+            try
+            {
+                var i = 1;
+                foreach (var item in factorDetails.Details)
+                {
+                    var otpsms = new Api(_smsSettings.ApiKey);
+
+                    // ساخت پیامک (مثلا می‌تونی هر متنی می‌خوای بسازی)
+                    string message = $"محصول: {item.ProductName}, تعداد: {item.Count}, فاکتور: {factorDetails.FactorId}-{i}";
+
+                    var result = await otpsms.VerifyAsync(1, "MadWinGetFactorForProduction",
+                                      new string[] { "09182185223" }, // شماره مقصد
+                                      $"{factorDetails.FactorId}-{item.Count}-{i}",
+                                      item.ProductName,
+                                      item.Count.ToString(),
+                                      "ماد وین");
+
+                    if (result != null)
+                    {
+                        await SaveSmsAsync("09182185223", "MadWinGetFactorForProduction", message, "تولید کننده", 2, "200", null, factorId);
+                        _logger.LogInformation($"پیامک محصول {item.ProductName} با موفقیت ارسال شد.");
+                    }
+                    else
+                    {
+                        _logger.LogWarning($"ارسال پیامک محصول {item.ProductName} با خطا مواجه شد. نتیجه خالی بود.");
+                        return false;
+                    }
+
+                    i++;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "خطا در ارسال پیامک فاکتور");
+                return false;
+            }
+        }
+
+        #endregion
         public async Task<bool> SendSMSForgotPasswordForCustomer(string cellPhone, string password)
         {
             var message = $"کلمه عبور جدید {password}اگر شما این درخواست را انجام نداده‌اید، لطفاً فوراً با پشتیبانی تماس بگیرید.با تشکر مادوین(نادری)لغو 11";
@@ -359,6 +316,16 @@ namespace MadWin.Application.Services
         public async Task<UserForAdminViewModel> GetAllUsers(int pageId = 1, string filterFirstName = "")
         {
             return null;// await _userRepository.GetAllUsers(pageId, filterFirstName);
+        }
+
+        public Task<bool> SendSMSOrderForProductionAsync(string cellPhone, int orderId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> SendSMSOrderForManagerAsync(string cellPhone, int orderId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

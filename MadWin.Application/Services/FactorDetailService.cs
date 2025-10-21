@@ -1,4 +1,5 @@
 ﻿
+using MadWin.Core.DTOs.Factors;
 using MadWin.Core.DTOs.Fators;
 using MadWin.Core.DTOs.FilterParameters;
 using MadWin.Core.DTOs.Orders;
@@ -72,7 +73,7 @@ namespace MadWin.Application.Services
         {
             return  await _factorDetailRepository.GetAllFactorAsync(filter, pageId);
         }
-        public async Task<FactorForAdminViewModel> GetAllFactorByUserIdAsync(int userId, FilterParameter filter, int pageId = 1)
+        public async Task<FactorForUserViewModel> GetAllFactorByUserIdAsync(int userId, FilterParameter filter, int pageId = 1)
         {
             return await _factorDetailRepository.GetAllFactorByUserIdAsync(userId,filter, pageId);
         }

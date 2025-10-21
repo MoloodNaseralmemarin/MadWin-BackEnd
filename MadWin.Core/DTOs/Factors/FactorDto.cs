@@ -43,6 +43,8 @@ public class FactorSummaryForAdminItemDto
     public bool IsFinaly { get; set; }
     public int FactorDetailItemCount { get; set; }
 
+   public decimal TotalAmount { get; set; }
+
 
 }
 

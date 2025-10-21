@@ -1,4 +1,5 @@
-﻿using MadWin.Core.DTOs.Fators;
+﻿using MadWin.Core.DTOs.Factors;
+using MadWin.Core.DTOs.Fators;
 using MadWin.Core.Entities.Factors;
 using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
@@ -190,6 +191,11 @@ namespace MadWin.Application.Services
         public async Task<int> GetLastFactorId(int userId)
         {
             return await _factorRepository.GetLastFactorId(userId);  
+        }
+
+        Task<FactorSummaryForUserItemDto> IFactorService.GetFactorSummaryByUserIdAsync(int userId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

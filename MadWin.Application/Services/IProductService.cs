@@ -1,9 +1,6 @@
-﻿using MadWin.Core.DTOs.Products;
-using MadWin.Core.DTOs.Users;
-using MadWin.Core.Entities.Products;
-using MadWin.Core.Entities.Properties;
-using MadWin.Core.Interfaces;
-using Microsoft.AspNetCore.Http;
+﻿using MadWin.Application.DTOs.Products;
+using MadWin.Core.DTOs.Products;
+using MadWin.Core.Entities.CommissionRates;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Shop2City.Core.Services.Products
@@ -16,6 +13,11 @@ namespace Shop2City.Core.Services.Products
 
         Task<List<SelectListItem>> GetCategoryForManageProduct(int groupId);
         Task<List<SelectListItem>> GetSubCategoryForManageProduct(int categoryId);
+
+
+       Task<EditProductDto> GetProductByIdAsync(int id);
+
+        Task<bool> EditProductAsync(EditProductDto editProduct);
 
     }
 }

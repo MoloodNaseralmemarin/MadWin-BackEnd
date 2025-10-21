@@ -25,12 +25,18 @@ namespace Shop2City.WebHost.Controllers
 
         public IActionResult ShowCart()
         {
-
             var cart = HttpContext.Session.GetJson<List<ShopCartitemDto>>("Cart")
                        ?? new List<ShopCartitemDto>();
 
+            if (cart == null || !cart.Any())
+            {
+                TempData["EmptyCartMessage"] = "سبد خرید خالی است، لطفاً محصولی اضافه کنید.";
+                TempData["ToastrError"] = "سبد خرید شما خالی است.";
+            }
+
             return View(cart);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Increase(int productId)
@@ -50,6 +56,7 @@ namespace Shop2City.WebHost.Controllers
         public async Task<IActionResult> Remove(int productId)
         {
             var result = await _cartService.Remove(productId, HttpContext.Session);
+
             return Json(result);
         }
 

@@ -19,7 +19,7 @@
             <p>هیچ سفارشی برای امروز ثبت نشده است.</p>
         </div>
         <div class="card shadow border-0 rounded-3">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="fa fa-shopping-basket"></i> خلاصه سفارش</h5>
                 <span class="badge bg-light text-dark">شماره سفارش: @orderId</span>
             </div>
@@ -220,9 +220,14 @@
                         <td><strong>هزینه ارسال :</strong></td>
                         <td><span id="deliveryPrice">0</span> ریال</td>
                     </tr>
-                    <tr class="h4 text-primary">
-                        <td colspan="2"><strong>مبلغ قابل پرداخت :</strong> <span id="sumPrice">0</span> ریال</td>
-                    </tr>
+                        <tr>
+                            <td colspan="2" class="fs-4 text-primary">
+                                <span class="fs-4 text-primary">مبلغ قابل پرداخت : </span>
+                                <span id="sumPrice" class="fs-4 text-primary">0</span> ریال
+                            </td>
+                        </tr>
+
+
                     <tr>
                         <td colspan="2">
                             <button id="postButton" class="btn btn-success w-100 py-2">پرداخت آنلاین</button>

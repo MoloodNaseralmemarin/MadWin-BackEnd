@@ -201,7 +201,8 @@ namespace MadWin.Infrastructure.Repositories
                 .Where(o => !o.IsDelete
                             && o.CreateDate >= today
                             && o.CreateDate < tomorrow
-                            && o.UserId == userId); // 🔹 فیلتر بر اساس کاربر
+                            && o.UserId == userId
+                            && !o.IsFinaly); 
 
             // ساخت DTO
             var list = new OrderSummaryForAdminDto
@@ -494,6 +495,62 @@ namespace MadWin.Infrastructure.Repositories
             }
             return list;
         }
+
+        public async Task<OrderSummaryForAdminItemDto> GetOrdersByOrderIdAsync(int orderId)
+        {
+            var orderDto = await GetQuery()
+                .Include(o => o.User)
+                .Include(o => o.OrderCategory)
+                .Include(o => o.OrderSubCategory)
+                .Where(o => o.Id == orderId && !o.IsDelete)
+                .Select(o => new OrderSummaryForAdminItemDto
+                {
+                    OrderId = o.Id,
+                    CreateDate = o.CreateDate,
+                    FullName = (o.User != null
+                        ? (o.User.FirstName ?? "") + " " + (o.User.LastName ?? "")
+                        : "نامشخص"),
+                    CategoryGroup =
+                        (o.OrderCategory != null ? o.OrderCategory.Title : "") +
+                        (o.OrderSubCategory != null && !string.IsNullOrEmpty(o.OrderSubCategory.Title)
+                            ? " / " + o.OrderSubCategory.Title
+                            : ""),
+                    CellPhone = o.User != null ? o.User.CellPhone : "نامشخص",
+                    Address = (o.User != null
+                        ? o.User.Address ?? ""
+                        : "نامشخص"),
+                    Size = $"ارتفاع: {o.Height} - عرض: {o.Width}",
+                    SizeSMS = $"w: {o.Width} * h: {o.Height}",
+                    Count = o.Count,
+                    PriceWithFee = o.PriceWithFee,
+                    IsEqualParts = o.IsEqualParts,
+                    PartCount = o.PartCount,
+                    IsFinaly = o.IsFinaly,
+                    BasePrice = o.BasePrice,
+                    DisPercent = o.DisPercent,
+                    DisTotal = o.DisTotal,
+                    TotalPrice = o.TotalCost,
+                    WidthParts = new List<OrderWidthPartDto>()
+                })
+                .FirstOrDefaultAsync();
+
+            if (orderDto == null)
+                throw new Exception("سفارش مورد نظر یافت نشد.");
+
+            // گرفتن عرض‌های تکه‌ها
+            var widthParts = await _context.Set<OrderWidthPart>()
+                .Where(w => w.OrderId == orderId)
+                .Select(w => new OrderWidthPartDto
+                {
+                    WidthValue = w.WidthValue
+                })
+                .ToListAsync();
+
+            orderDto.WidthParts = widthParts ?? new List<OrderWidthPartDto>();
+
+            return orderDto;
+        }
+
     }
 }
 

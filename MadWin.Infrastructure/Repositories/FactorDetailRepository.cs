@@ -1,4 +1,5 @@
-﻿using MadWin.Core.DTOs.Fators;
+﻿using MadWin.Core.DTOs.Factors;
+using MadWin.Core.DTOs.Fators;
 using MadWin.Core.DTOs.FilterParameters;
 using MadWin.Core.Entities.Factors;
 using MadWin.Core.Interfaces;
@@ -209,13 +210,15 @@ namespace MadWin.Infrastructure.Repositories
 
 
 
-        public async Task<FactorForAdminViewModel> GetAllFactorByUserIdAsync(int userId,FilterParameter filter, int pageId = 1)
+        public async Task<FactorForUserViewModel> GetAllFactorByUserIdAsync(int userId,FilterParameter filter, int pageId = 1)
         {
             IQueryable<Factor> query = _context.Factors
                  .Include(f => f.User)
                  .Include(f => f.FactorDetails)
                      .ThenInclude(fd => fd.Product)
-                 .Where(f => !f.IsDelete && f.User.Id==userId);
+                 .Where(f => !f.IsDelete &&
+                        f.User.Id==userId &&
+                        f.IsFinaly);
 
 
             if (filter.OrderId.HasValue)
@@ -244,25 +247,23 @@ namespace MadWin.Infrastructure.Repositories
                 .OrderByDescending(f => f.Id)
                 .Skip(skip)
                 .Take(take)
-                .Select(f => new FactorSummaryForAdminItemDto
+                .Select(f => new FactorSummaryForUserItemDto
                 {
                     FactorId = f.Id,
                     IsFinaly = f.IsFinaly,
-                    FullName = f.User != null
-                        ? $"{f.User.FirstName ?? ""} {f.User.LastName ?? ""}"
-                        : "نامشخص",
                     CellPhone = f.User.CellPhone ?? "",
                     Address = f.User.Address ?? "",
                     CreateDate = f.CreateDate,
                     DeliveryPrice = f.DeliveryMethodAmount,
                     DisTotal = f.DisTotal,
                     Discount = f.DisTotal,
+                    TotalAmount=f.TotalAmount,
                     FactorDetailItemCount = f.FactorDetails.Count(fd => !fd.IsDelete),
                     FactorDetails = f.FactorDetails
                         .Where(fd => !fd.IsDelete)
-                        .Select(fd => new FactorDetailDto
+                        .Select(fd => new FactorDetailForUserDto
                         {
-                            Id = fd.Id,
+                            FactorDetailId = fd.Id,
                             ProductTitle = fd.Product != null ? fd.Product.Title : "",
                             Count = fd.Count,
                             Price = fd.Price
@@ -270,11 +271,11 @@ namespace MadWin.Infrastructure.Repositories
                 })
                 .ToListAsync();
 
-            var result = new FactorForAdminViewModel
+            var result = new FactorForUserViewModel
             {
                 CurrentPage = pageId,
                 CountPage = (int)Math.Ceiling(totalCount / (double)take),
-                FactorSummary = factorList
+                FactorSummaryForUser = factorList
             };
 
             return result;

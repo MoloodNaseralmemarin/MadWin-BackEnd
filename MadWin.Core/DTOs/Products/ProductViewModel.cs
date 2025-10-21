@@ -10,6 +10,9 @@ namespace MadWin.Core.DTOs.Products
     public class ProductForAdminItemViewModel
     {
         public int ProductId { get; set; }
+
+        public DateTime LastUpdateDate { get; set; }
+
         public string Title { get; set; }
         public decimal Price { get; set; }
         public string ImageName { get; set; }
@@ -42,4 +45,6 @@ namespace MadWin.Core.DTOs.Products
         public bool IsStatus { get; set; }
 
     }
+
+
 }

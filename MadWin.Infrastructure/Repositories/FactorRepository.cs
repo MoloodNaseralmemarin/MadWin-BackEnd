@@ -122,7 +122,8 @@ namespace MadWin.Infrastructure.Repositories
                     .Select(fd => new FactorDetailItemForSendSMS
                     {
                         ProductName = fd.Product.Title,
-                        Count = fd.Count
+                        Count = fd.Count,
+
                     }).ToList()
             };
             return result;

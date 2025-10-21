@@ -7,9 +7,12 @@
         Task<bool> SendSMSOrderForProductionAsync(string cellPhone, int orderId);
         Task<bool> SendSMSOrderForManagerAsync(string cellPhone, int orderId);
 
+
         Task<bool> SendSMSFactorForCustomerAsync(string cellPhone, int factorId);
 
         Task<bool> SendSMSFactorForManagerAsync(int factorId);
+
+        Task<bool> SendSMSFactorForProductionAsync(int factorId);
 
         Task<bool> SendSMSForgotPasswordForCustomer(string cellPhone,string password);
 

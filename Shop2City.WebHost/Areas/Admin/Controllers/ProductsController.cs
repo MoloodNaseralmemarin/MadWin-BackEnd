@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MadWin.Application.DTOs.Products;
+using MadWin.Core.Entities.CommissionRates;
+using MadWin.Core.Entities.Products;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shop2City.Core.Services.Products;
+using Shop2City.WebHost.ViewModels.CommissionRates;
 
 namespace Shop2City.WebHost.Areas.Admin.Controllers
 {
@@ -18,5 +22,54 @@ namespace Shop2City.WebHost.Areas.Admin.Controllers
             var products = await _productService.GetAllProducts(pageId,filterTitleProduct);
             return View(products);
         }
+
+
+        #region Edit
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var product = await _productService.GetProductByIdAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            var vm = new EditProductDto
+            {
+                ProductId = product.ProductId,
+                Price = product.Price,
+                Title = product.Title,
+            };
+
+            return View(product);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(EditProductDto editproduct)
+        {
+            if (!ModelState.IsValid)
+                return View(editproduct);
+            var productEntity = new Product
+            {
+                Title = editproduct.Title,
+                Price = editproduct.Price
+            };
+
+            var success = await _productService.EditProductAsync(editproduct);
+
+            if (!success)
+            {
+                ModelState.AddModelError("", "خطایی در بروزرسانی اطلاعات محصول رخ داد.");
+                return View(editproduct
+                    
+                    );
+            }
+
+            TempData["Success"] = "اطلاعات محصول با موفقیت بروزرسانی شد.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        #endregion
     }
 }
