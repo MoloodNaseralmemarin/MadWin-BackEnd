@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Shop2City.Core.Services.Transactions;
+using System.Numerics;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
@@ -129,8 +130,8 @@ namespace Shop2City.WebHost.Controllers
 
                 var source = Request.Query["source"].ToString();
                 var deliveryIdQuery = Request.Query["deliveryId"].ToString();
-
-                // parse invoiceId safely
+                
+                //parse invoiceId safely
                 if (!int.TryParse(Request.Form["InvoiceId"], out int invoiceId))
                 {
                     _logger.LogWarning("InvoiceId در پاسخ درگاه معتبر نیست.");
@@ -197,7 +198,7 @@ namespace Shop2City.WebHost.Controllers
                     return RedirectToAction("PaymentFailed", "Payment");
                 }
 
-                // ثبت تراکنش در جدول تراکنش‌ها
+               // ثبت تراکنش در جدول تراکنش‌ها
                 var transactionModel = new TransactionModel
                 {
                     DigitalReceipt = digitalReceipt,
@@ -250,7 +251,7 @@ namespace Shop2City.WebHost.Controllers
                             _logger.LogWarning(ex, "دریافت شماره موبایل کاربر با خطا مواجه شد. OrderId: {OrderId}", order.Id);
                         }
 
-                        // ارسال پیامک‌ها (اگر ارسال موفق/ناموفق، صرفاً لاگ شود)
+                        //ارسال پیامک به مشتری
                         var smsCustomerSent = false;
                         if (!string.IsNullOrEmpty(cellPhone))
                         {
@@ -259,19 +260,19 @@ namespace Shop2City.WebHost.Controllers
                         }
                         else
                         {
-                            _logger.LogWarning("شماره مشتری برای ارسال پیامک موجود نیست. OrderId: {OrderId}", order.Id);
+                            _logger.LogWarning("شماره مشتری برای ارسال پیامک سفاش موجود نیست. OrderId: {OrderId}", order.Id);
                         }
+                        ////ارسال پیامک به مدیریت
+                        //var smsManagerSent = await _smsSenderService.SendSMSFactorForManagerAsync(order.Id);
+                        //_logger.LogInformation("ارسال پیامک به مدیر پس از پرداخت (factor). FactorId: {FactorId}, Sent: {Sent}", order.Id, smsManagerSent);
 
-                        var smsAdminSent = await _smsSenderService.SendSMSOrderForManagerAsync("09180580270", order.Id);
-                        _logger.LogInformation("ارسال پیامک به مدیر پس از پرداخت (order). OrderId: {OrderId}, Sent: {Sent}", order.Id, smsAdminSent);
-
-                        var smsProductionSent = await _smsSenderService.SendSMSOrderForProductionAsync("09182185223", order.Id);
-                        _logger.LogInformation("ارسال پیامک به تولید پس از پرداخت (order). OrderId: {OrderId}, Sent: {Sent}", order.Id, smsProductionSent);
+                        ////ارسال پیامک به تولیدی
+                        //var smsProductionSent = await _smsSenderService.SendSMSFactorForProductionAsync(order.Id);
+                        //_logger.LogInformation("ارسال پیامک به تولیدی پس از پرداخت (factor). FactorId: {FactorId}, Sent: {Sent}", order.Id, smsManagerSent);
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "خطا در نهایی‌سازی سفارش پس از پرداخت. InvoiceId: {InvoiceId}", invoiceId);
-                        // حتی اگر ارسال پیامک یا آپدیت نهایی با خطا مواجه شد، بهتر است کاربر را به صفحه سفارش هدایت کنیم و خطا را لاگ کنیم
+                        _logger.LogError(ex, "خطا در نهایی‌سازی فاکتور پس از پرداخت. InvoiceId: {InvoiceId}", invoiceId);
                     }
 
                     return RedirectToAction("Index", "Orders", new { area = "UserPanel", orderId = invoiceId });
@@ -313,9 +314,13 @@ namespace Shop2City.WebHost.Controllers
                         {
                             _logger.LogWarning("شماره مشتری برای ارسال پیامک فاکتور موجود نیست. FactorId: {FactorId}", factor.Id);
                         }
-
+                        //ارسال پیامک به مدیریت
                         var smsManagerSent = await _smsSenderService.SendSMSFactorForManagerAsync(factor.Id);
                         _logger.LogInformation("ارسال پیامک به مدیر پس از پرداخت (factor). FactorId: {FactorId}, Sent: {Sent}", factor.Id, smsManagerSent);
+
+                        //ارسال پیامک به تولیدی
+                        var smsProductionSent = await _smsSenderService.SendSMSFactorForProductionAsync(factor.Id);
+                        _logger.LogInformation("ارسال پیامک به تولیدی پس از پرداخت (factor). FactorId: {FactorId}, Sent: {Sent}", factor.Id, smsManagerSent);
                     }
                     catch (Exception ex)
                     {
