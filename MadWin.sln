@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MadWin.Core", "MadWin.Core\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MadWin.Infrastructure", "MadWin.Infrastructure\MadWin.Infrastructure.csproj", "{59348AC7-7169-4C94-936B-1F04D2FF6DCB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MadWin.E2ETests", "MadWin.E2ETests\MadWin.E2ETests.csproj", "{4D8E80F6-2FFB-4B05-A4EA-B537C269B5DC}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,10 +33,6 @@ Global
 		{59348AC7-7169-4C94-936B-1F04D2FF6DCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59348AC7-7169-4C94-936B-1F04D2FF6DCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59348AC7-7169-4C94-936B-1F04D2FF6DCB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4D8E80F6-2FFB-4B05-A4EA-B537C269B5DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4D8E80F6-2FFB-4B05-A4EA-B537C269B5DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4D8E80F6-2FFB-4B05-A4EA-B537C269B5DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4D8E80F6-2FFB-4B05-A4EA-B537C269B5DC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

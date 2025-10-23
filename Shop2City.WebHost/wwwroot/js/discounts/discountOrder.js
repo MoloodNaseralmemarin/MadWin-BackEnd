@@ -1,4 +1,7 @@
-﻿import { formatCurrency, updateTotal } from '../utils.js';
+﻿
+
+
+import { formatCurrency, updateTotal } from '../utils.js';
 
 // discountOrder.js
 

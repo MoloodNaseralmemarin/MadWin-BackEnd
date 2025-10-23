@@ -193,9 +193,5 @@ namespace MadWin.Application.Services
             return await _factorRepository.GetLastFactorId(userId);  
         }
 
-        Task<FactorSummaryForUserItemDto> IFactorService.GetFactorSummaryByUserIdAsync(int userId)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

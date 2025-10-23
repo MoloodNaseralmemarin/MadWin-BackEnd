@@ -22,17 +22,17 @@ namespace Shop2City.WebHost.ViewModels.Orders
         [Display(Name = "ارتفاع")]
         [Required(ErrorMessage = "ارتفاع را وارد کنید.")]
         //[Range(1, int.MaxValue, ErrorMessage = "مقدار ارتفاع باید بیشتر از صفر باشد.")]
-        public int Height { get; set; }
+        public int? Height { get; set; }
 
         [Display(Name = "عرض")]
         [Required(ErrorMessage = "عرض را وارد کنید.")]
         //[Range(1, int.MaxValue, ErrorMessage = "مقدار عرض باید بیشتر از صفر باشد.")]
-        public int Width { get; set; }
+        public int? Width { get; set; }
 
         [Display(Name = "تعداد")]
         [Required(ErrorMessage = "تعداد را وارد کنید.")]
         [Range(1, int.MaxValue, ErrorMessage = "مقدار تعداد باید بیشتر از صفر باشد.")]
-        public int Count { get; set; }
+        public int? Count { get; set; }
 
         // برای تقسیم‌بندی
         public int PartCount { get; set; }

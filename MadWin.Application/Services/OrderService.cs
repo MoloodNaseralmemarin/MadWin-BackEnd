@@ -83,11 +83,12 @@ namespace MadWin.Application.Services
         }
         public async Task UpdateIsFinalyOrderAsync(int orderId)
         {
-            var order = await _orderRepository.GetByIdAsync(orderId); // یا FindAsync
+            var order = await _orderRepository.GetByIdAsync(orderId);
             if (order == null) return;
 
             order.IsFinaly = true;
-            order.TotalAmount = order.TotalAmount + order.DeliveryMethodAmount - order.DisTotal;
+            order.TotalAmount = order.PriceWithFee + order.DeliveryMethodAmount - order.DisTotal;
+            order.TotalCost = order.TotalAmount; //بعدااکش کن به درد نمیخوره
 
             await _orderRepository.SaveChangesAsync();
         }

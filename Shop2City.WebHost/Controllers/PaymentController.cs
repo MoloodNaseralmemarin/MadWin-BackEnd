@@ -227,7 +227,7 @@ namespace Shop2City.WebHost.Controllers
                     // به‌روز‌رسانی سفارش و نهایی‌سازی
                     try
                     {
-                        // آپدیت قیمت و تحویل (اگر deliveryId صفر بود، سرویس باید آن را هندل کند یا شما تصمیم بگیرید)
+                        // آپدیت قیمت روش ارسال
                         await _orderService.UpdatePriceAndDeliveryAsync(deliveryId, invoiceId);
 
                         var order = await _orderService.GetOrderByOrderIdAsync(invoiceId);

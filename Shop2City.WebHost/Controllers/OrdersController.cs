@@ -107,8 +107,8 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
                     return Unauthorized();
 
                 // حداقل مقدارها
-                orderView.Height = Math.Max(orderView.Height, 200);
-                orderView.Width = Math.Max(orderView.Width, 80);
+                var height = Math.Max(orderView.Height, 200);
+                var width = Math.Max(orderView.Width, 80);
 
                 decimal basePrice = 0m;
 
@@ -137,13 +137,13 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
                         2 => await CalculateKharejiAsync(orderView),
                         3 => await CalculateTooriOneLayerAsync(orderView),
                         4 => await CalculateTooriTwoLayerAsync(orderView, orderView.PartCount),
-                        5 => await CalculateZipper5CostAsync(orderView.Width),
-                        6 => await CalculateZipper2CostAsync(orderView.Height),
-                        7 => await CalculateChodonCostAsync(orderView.Width),
-                        8 => await CalculateGanCostAsync(orderView.Height, orderView.PartCount),
-                        9 => await CalculateMagnetCostAsync(orderView.Height, orderView.PartCount),
-                        10 => await CalculateGlue4CostAsync(orderView.Width),
-                        11 => await CalculateGlue2CostAsync(orderView.Height),
+                        5 => await CalculateZipper5CostAsync(width),
+                        6 => await CalculateZipper2CostAsync(height),
+                        7 => await CalculateChodonCostAsync(width),
+                        8 => await CalculateGanCostAsync(height, orderView.PartCount),
+                        9 => await CalculateMagnetCostAsync(height, orderView.PartCount),
+                        10 => await CalculateGlue4CostAsync(width),
+                        11 => await CalculateGlue2CostAsync(height),
                         12 => await GetWageCostAsync(),
                         13 => await GetPackagingCostAsync(),
                         _ => 0m

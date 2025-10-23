@@ -25,7 +25,7 @@ namespace MadWin.Application.Services
         Task<FactorSummaryForSendSMS> GetFactorDetailForSendSMSAsync(int factorId);
 
 
-        Task<FactorSummaryForUserItemDto> GetFactorSummaryByUserIdAsync(int userId);
+        Task<FactorSummaryForAdminItemDto> GetFactorSummaryByUserIdAsync(int userId);
 
         Task<int> GetLastFactorId(int userId);
 
