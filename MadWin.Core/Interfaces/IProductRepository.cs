@@ -16,9 +16,5 @@ namespace MadWin.Core.Interfaces
         Task<List<SelectListItem>> GetCategoryForManageProduct(int groupId);
 
         Task<List<SelectListItem>> GetSubCategoryForManageProduct(int categoryId);
-
-
-
-
     }
 }

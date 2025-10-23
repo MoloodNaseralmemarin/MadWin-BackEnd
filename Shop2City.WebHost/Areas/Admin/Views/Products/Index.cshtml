@@ -23,6 +23,7 @@
                             <th>عنوان</th>
                             <th>قیمت</th>
                             <td>تعداد محصول فروخته شده</td>
+                            <td>موجود/ناموجود</td>
                             <th>ویرایش</th>
                         </tr>
                     </thead>
@@ -34,6 +35,16 @@
                                 <td>@item.Title</td>
                                 <td>@item.Price.ToString("N0") ریال</td>
                                 <td>@item.FactorCount</td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               @(item.IsStatus ? "checked" : "")
+                                               onchange="editIsStatusProduct(this, @item.ProductId)">
+                                    </div>
+                                </td>
+
+
                                 <td class="text-center">
                                     <a asp-controller="Products" asp-action="Edit" asp-route-id="@item.ProductId">
                                         <i class="fas fa-edit text-danger"></i>
@@ -90,3 +101,8 @@
         </nav>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/products/editStatusProduct.js"></script>
+}
+

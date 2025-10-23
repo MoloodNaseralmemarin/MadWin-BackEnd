@@ -16,7 +16,6 @@ namespace MadWin.Application.Services
         private readonly SmsSettings _smsSettings;
         private readonly IOrderRepository _orderRepository;
         private readonly IOrderWidthPartRepository _orderWidthPartRepository;
-        private readonly IFactorDetailService _factorDetailService;
         private readonly IFactorService _factorService;
 
         public SmsSenderService(
@@ -25,7 +24,6 @@ namespace MadWin.Application.Services
             IOptions<SmsSettings> smsSettings,
             IOrderRepository orderRepository,
             IOrderWidthPartRepository orderWidthPartRepository,
-            IFactorDetailService factorDetailService,
             IFactorService factorService)
         {
             _smsRepository = smsRepository;
@@ -33,7 +31,6 @@ namespace MadWin.Application.Services
             _smsSettings = smsSettings.Value;
             _orderRepository = orderRepository;
             _orderWidthPartRepository = orderWidthPartRepository;
-            _factorDetailService = factorDetailService;
             _factorService = factorService;
         }
         public async Task<bool> SendWelcomeSmsAsync(string cellPhone, string fullName, int smsCount)

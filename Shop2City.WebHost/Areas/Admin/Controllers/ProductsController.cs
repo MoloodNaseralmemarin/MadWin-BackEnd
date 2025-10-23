@@ -70,6 +70,21 @@ namespace Shop2City.WebHost.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        public async Task<JsonResult> EditIsStatusProduct(bool isStatus, int productId)
+        {
+            var success = await _productService.EditIsStatusProdct(isStatus, productId);
+
+            if (success)
+            {
+                return Json(new { success = true, message = "وضعیت محصول با موفقیت ویرایش شد." });
+            }
+            else
+            {
+                return Json(new { success = false, message = "خطا در ویرایش وضعیت محصول." });
+            }
+        }
+
         #endregion
     }
 }

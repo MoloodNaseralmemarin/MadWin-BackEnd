@@ -16,7 +16,18 @@ namespace Shop2City.Core.Services.Products
             _productRepository = productRepository;
         }
 
-     
+        public async Task<bool> EditIsStatusProdct(bool isStatus,int productId)
+        {
+            var existing = await _productRepository.GetByIdAsync(productId);
+            if (existing == null) return false;
+
+            existing.IsStatus = isStatus;
+            existing.LastUpdateDate = DateTime.Now;
+            existing.Description = "وضعیت محصول تغییر کرد.";
+            await _productRepository.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<bool> EditProductAsync(EditProductDto editProduct)
         {
             var existing = await _productRepository.GetByIdAsync(editProduct.ProductId);

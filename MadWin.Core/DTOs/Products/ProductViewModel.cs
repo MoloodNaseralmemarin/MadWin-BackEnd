@@ -18,6 +18,9 @@ namespace MadWin.Core.DTOs.Products
         public string ImageName { get; set; }
 
         public int FactorCount {  get; set; }
+
+        [Display(Name = "موجود / ناموجود")]
+        public bool IsStatus { get; set; }
     }
     public class ProductForAdminViewModel
     {

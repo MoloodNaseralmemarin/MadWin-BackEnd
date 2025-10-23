@@ -19,6 +19,8 @@ namespace Shop2City.Core.Services.Products
 
         Task<bool> EditProductAsync(EditProductDto editProduct);
 
+        Task<bool> EditIsStatusProdct(bool isStatus,int productId);
+
     }
 }
 

@@ -50,6 +50,7 @@ namespace MadWin.Infrastructure.Repositories
                         Title = u.Title,
                         Price = u.Price,
                         LastUpdateDate=u.LastUpdateDate,
+                        IsStatus=u.IsStatus,
                         FactorCount=u.FactorDetails.Where(fd=>fd.ProductId==u.Id).Count()
                     })
                     .ToListAsync()
@@ -126,6 +127,5 @@ namespace MadWin.Infrastructure.Repositories
                 Value = pg.Id.ToString()
     }).ToList();
 }
-
     }
 }
