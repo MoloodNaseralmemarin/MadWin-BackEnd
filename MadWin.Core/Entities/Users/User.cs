@@ -40,7 +40,6 @@ namespace MadWin.Core.Entities.Users
         #region Relationship
 
         public virtual List<UserRole> UserRoles { get; set; }
-        public virtual List<Product> Products { get; set; }
         public virtual List<Factor> Factors { get; set; }
 
         public virtual List<Order> Orders { get; set; }

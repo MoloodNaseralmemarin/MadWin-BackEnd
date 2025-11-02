@@ -39,21 +39,16 @@
 
                 <!-- تاریخ شروع و پایان -->
                 <!-- تاریخ شروع -->
-
+                <div class="col-md-6">
+                    <label asp-for="StartDate" class="form-label"></label>
+                    <input class="form-control" type="text" asp-for="StartDate" id="startDate" name="startDate" />
+                </div>
 
                 <!-- تاریخ پایان -->
                 <div class="col-md-6">
                     <label asp-for="ExpiryDate" class="form-label"></label>
-                    <!-- نمایش تاریخ شمسی -->
-                    <input type="text" id="expiryDateView" class="form-control" />
-
-                    <!-- مقدار اصلی برای ارسال به مدل -->
-                    <input type="hidden" asp-for="ExpiryDate" id="ExpiryDate" />
-                    <span class="text-danger" asp-validation-for="ExpiryDate"></span>
+                    <input class="form-control" type="text" asp-for="ExpiryDate" id="expiryDate" name="expiryDate"/>
                 </div>
-
-
-
 
                 <!-- دکمه‌ها -->
                 <div class="col-12 d-flex gap-2 justify-content-start">
@@ -66,27 +61,58 @@
     </div>
 </div>
 
-<div class="form-group">
-    <label>تاریخ شروع</label>
-    <input type="text" id="startDate" name="StartDate" class="form-control" autocomplete="off" />
-</div>
-
-
- @section Scripts {
-
-
-<script>
-                $(function () {
+@section Scripts {
+    <script>
+        $(function () {
             $('#startDate').persianDatepicker({
                 format: 'YYYY/MM/DD',
                 autoClose: true,
-                initialValueType: 'gregorian',
+                initialValueType: 'persian',
                 calendar: {
                     persian: { locale: 'fa', leapYearMode: 'algorithmic' }
+                },
+                onSelect: function (unixDate) {
+                    // تبدیل به تاریخ شمسی
+                    const pDate = new persianDate(unixDate);
+
+                    // استخراج سال/ماه/روز به صورت دستی (بدون درنظر گرفتن زمان)
+                    const g = pDate.toGregorian();
+
+                    // ایجاد تاریخ میلادی بدون timezone
+                    const fixedDate = new Date(Date.UTC(g.year, g.month - 1, g.day));
+
+                    // خروجی نهایی yyyy-MM-dd
+                    const isoDate = fixedDate.toISOString().split('T')[0];
+
+                    // ثبت در فیلد hidden برای ارسال به سرور
+                    $('#StartDate').val(isoDate);
                 }
             });
         });
 
+          $(function () {
+            $('#expiryDate').persianDatepicker({
+                format: 'YYYY/MM/DD',
+                autoClose: true,
+                initialValueType: 'persian',
+                minDate: new persianDate().unix(), // 👈 جلوگیری از انتخاب روزهای قبل از امروز
+                calendar: {
+                    persian: { locale: 'fa', leapYearMode: 'algorithmic' }
+                },
+                onSelect: function (unixDate) {
+                    const pDate = new persianDate(unixDate);
+                    const g = pDate.toGregorian();
 
-</script>
+                    // ایجاد تاریخ میلادی بدون timezone برای جلوگیری از اختلاف روز
+                    const fixedDate = new Date(Date.UTC(g.year, g.month - 1, g.day));
+
+                    // خروجی نهایی yyyy-MM-dd
+                    const isoDate = fixedDate.toISOString().split('T')[0];
+
+                    // ثبت در فیلد hidden برای ارسال به سرور
+                    $('#ExpiryDate').val(isoDate);
+                }
+            });
+        });
+    </script>
 }

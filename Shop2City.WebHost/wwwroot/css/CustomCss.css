@@ -124,6 +124,20 @@ body {
     max-width: 250px; /* حداکثر عرض کارت */
 }
 
+/* طراحی برای تبلت و موبایل */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 0.75rem;
+    }
+}
+
+/* برای نمایش در اندازه‌های بزرگتر */
+@media (min-width: 768px) {
+    .image img {
+        display: block;
+    }
+}
+
 /* واکنش‌گرایی */
 @media (min-width: 576px) {
     .product-card {

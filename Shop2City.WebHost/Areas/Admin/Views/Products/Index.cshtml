@@ -66,7 +66,7 @@
                             <p class="card-text"><strong>قیمت:</strong>@item.Price.ToString("N0") ریال</p>
                             <p class="card-text"><strong>تعداد فروخته شده:</strong> @item.FactorCount</p>
                             <div class="d-flex flex-wrap gap-2 mt-2">
-                                <a asp-controller="CommissionRates" asp-action="Edit" asp-route-id="@item.ProductId">
+                                <a asp-controller="Products" asp-action="Edit" asp-route-id="@item.ProductId">
                                     <i class="fas fa-edit"></i>
                                 </a>
                             </div>

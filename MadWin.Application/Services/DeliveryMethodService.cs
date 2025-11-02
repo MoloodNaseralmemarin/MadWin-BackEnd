@@ -1,4 +1,6 @@
-﻿using MadWin.Application.Services;
+﻿using MadWin.Application.DTOs.DeliveryMethods;
+using MadWin.Application.Services;
+using MadWin.Core.Entities.DeliveryMethods;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Lookups.DeliveryMethods;
 using System;
@@ -16,6 +18,11 @@ namespace MadWin.Application.Repositories
         public DeliveryMethodService(IDeliveryMethodRepository deliveryMethodRepository)
         {
             _deliveryMethodRepository = deliveryMethodRepository;
+        }
+
+        public async Task<DeliveryMethod> GetAllDeliveryMethodsAsync()
+        {
+            return await _deliveryMethodRepository.GetAllDeliveryMethodAsync();
         }
 
         public async Task<decimal> GetDeliveryMethodCostByIdAsync(int deliveryId)

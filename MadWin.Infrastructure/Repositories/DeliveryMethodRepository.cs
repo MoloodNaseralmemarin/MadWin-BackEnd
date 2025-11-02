@@ -62,6 +62,5 @@ namespace MadWin.Infrastructure.Repositories
 
 
         }
-
     }
 }

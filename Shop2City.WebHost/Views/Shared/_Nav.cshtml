@@ -28,9 +28,36 @@
         <!-- آیتم‌های منو -->
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
-                <li class="nav-item">
+              
+                @if(User.Identity.IsAuthenticated)
+                {
+                    if (await PermissionService.CheckPermissionAsync(1, userId))
+                    {
+                          <li class="nav-item">
                     <a class="nav-link text-white fs-5 active hover-shadow" asp-area="" asp-controller="Home" asp-action="Index">صفحه اصلی</a>
-                </li>
+                        </li>
+                    }
+                    else
+                    {
+
+                        <li class="nav-item">
+                            <a class="nav-link text-white fs-5 active hover-shadow" asp-area="" asp-controller="Home" asp-action="Index">صفحه اصلی</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-warning fs-5 hover-shadow" asp-area="" asp-controller="Orders" asp-action="CreateOrder"> سفارش پرده با اندازه دلخواه</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white fs-5 hover-shadow"
+                               asp-area="UserPanel"
+                               asp-controller="Factors"
+                               asp-action="FactorSummary"
+                               asp-route-factorId="">
+                                مشاهده سبد خرید
+                            </a>
+                        </li>
+                    }
+
+                }
             </ul>
 
             <!-- بخش سمت راست -->
@@ -47,18 +74,6 @@
                     }
                     else
                     {
-                        <li class="nav-item">
-                            <a class="nav-link text-warning fs-5 hover-shadow" asp-area="" asp-controller="Orders" asp-action="CreateOrder"> سفارش پرده با اندازه دلخواه</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white fs-5 hover-shadow"
-                               asp-area="UserPanel"
-                               asp-controller="Factors"
-                               asp-action="FactorSummary"
-                               asp-route-factorId="">
-                                مشاهده سبد خرید
-                            </a>
-                        </li>
 
                         <li class="nav-item">
                             <a class="nav-link text-white fs-5 hover-shadow">

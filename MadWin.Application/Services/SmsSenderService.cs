@@ -185,15 +185,19 @@ namespace MadWin.Application.Services
                 {
                     var otpsms = new Api(_smsSettings.ApiKey);
 
+
+                    //تغییر دادم توی مجل کار
+                    //1404-08-11
+                    //تعداد کل زیر فاکتور
                     // ساخت پیامک (مثلا می‌تونی هر متنی می‌خوای بسازی)
-                    string message = $"محصول: {item.ProductName}, تعداد: {item.Count}, سفارش‌دهنده: {factorDetails.FullName}, فاکتور: {factorDetails.FactorId}-{i}";
+                    string message = $"محصول: {item.ProductName}, تعداد: {factorDetails.Details.Count}, سفارش‌دهنده: {factorDetails.FullName}, فاکتور: {factorDetails.FactorId}-{i}";
 
                     var result = await otpsms.VerifyAsync(1, "MadWinGetFactorForManager",
                                       new string[] { "09180580270" }, // شماره مقصد
                                       factorDetails.FullName,
-                                      $"{factorDetails.FactorId}-{item.Count}-{i}", // شناسه پیامک یا کد دلخواه
+                                      $"{factorDetails.FactorId}-{factorDetails.Details.Count}-{i}", //شماره فاکتور + تعداد زیر فاکتور + ردیف فاکتور
                                       item.ProductName,
-                                      item.Count.ToString(),
+                                      item.Count.ToString(),// تعدااد سفارشی مشتری
                                       "ماد وین");
 
                     if (result != null)

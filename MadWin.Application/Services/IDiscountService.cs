@@ -9,11 +9,6 @@ namespace MadWin.Application.Services
 {
     public interface IDiscountService
     {
-
-
-
-      
-
         Task<DiscountResultDto> ApplyDiscountForOrderAsync(int orderId, string discountCode);
 
         Task<DiscountResultDto> ApplyDiscountForFactorAsync(int factorId, string discountCode);
@@ -27,6 +22,7 @@ namespace MadWin.Application.Services
         Task AddDiscount(Discount discount);
 
         Task<bool> IsExistDisCountCode(string discountCode);
+
     }
 }
         

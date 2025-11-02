@@ -39,18 +39,11 @@ namespace MadWin.Core.DTOs.DisCounts
             get
             {
                 var now = DateTime.Now;
-
-                // اگر تاریخ‌ها یکی هستند، کل روز فعال باشد
-                if (StartDate.Date == ExpiryDate.Date)
-                {
-                    var startOfDay = StartDate.Date; // ساعت 00:00
-                    var endOfDay = StartDate.Date.AddDays(1).AddTicks(-1); // ساعت 23:59:59.9999999
-                    return now >= startOfDay && now <= endOfDay;
-                }
-
-                return now >= StartDate && now <= ExpiryDate;
+                return now < StartDate || now > ExpiryDate;
             }
         }
+
+
         public string Description {  get; set; }
     }
 

@@ -7,5 +7,7 @@ namespace MadWin.Application.Services
     {
         Task<IEnumerable<ProductGroup>> AllProductGroupsAsync();
         Task<ProductGroupForAdminDto> GetAllProductGroupsAsync(int pageId = 1, string filterTitle = "");
+        Task<ProductGroup> GetByIdAsync(int id);
+        Task<bool> EditProductGroupsAsync(ProductGroup productGroup);
     }
 }

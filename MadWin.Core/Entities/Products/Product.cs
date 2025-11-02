@@ -21,9 +21,6 @@ namespace MadWin.Core.Entities.Products
         #endregion
         #region Field
 
-        [Display(Name = "کاربر ثبت کننده")]
-        public int UserId { get; set; }
-
         [Required]
         [Display(Name = "دسته اصلی")]
         public int ProductGroupId { get; set; }
@@ -65,7 +62,6 @@ namespace MadWin.Core.Entities.Products
         public ProductGroup? Category { get; set; }
         [ForeignKey("SubCategoryId")]
         public ProductGroup? SubCategory { get; set; }
-        public User User { get; set; }
         public List<ProductGallery> ProductGalleries { get; set; }
         public List<ProductProperty>? ProductProperties { get; set; }
 

@@ -93,6 +93,7 @@ namespace MadWin.Infrastructure.Repositories
                         Item = d.Item,
                         Percentage = d.Percentage,
                         StartDate = d.StartDate,
+                        InitialCount=d.InitialCount,
                         UseableCount = d.UseableCount,
                         Description = d.Description
 
