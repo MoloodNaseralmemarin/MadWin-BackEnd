@@ -7,12 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="DTOs\DeliveryMethods\**" />
-    <EmbeddedResource Remove="DTOs\DeliveryMethods\**" />
-    <None Remove="DTOs\DeliveryMethods\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="DTOs\Discounts\DiscountViewModel.cs~RF181415d.TMP" />
   </ItemGroup>
 

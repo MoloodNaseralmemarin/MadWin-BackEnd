@@ -4,8 +4,7 @@
     ViewData["Title"] = "ویرایش موارد مصرفی";
 }
 
-<div class="container py-4" dir="rtl">
-    <div class="row justify-content-center">
+<div class="row justify-content-center">
         <div class="col-12 col-md-10 col-lg-8">
             <div class="card shadow-sm border-0 rounded-4">
                 <div class="card-body p-4">
@@ -19,7 +18,7 @@
                         <div class="row g-3">
                             <!-- Name -->
                             <div class="col-12">
-                                <label asp-for="Name" class="form-label fw-semibold">نام مؤلفه</label>
+                                <label asp-for="Name" class="form-label fw-semibold">نام</label>
                                 <input asp-for="Name" class="form-control form-control-lg" type="text" required placeholder="نام مؤلفه را وارد کنید..." />
                                 <div class="invalid-feedback">
                                     <span asp-validation-for="Name"></span>
@@ -68,11 +67,7 @@
             </div>
         </div>
     </div>
-</div>
-
 @section Scripts {
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
-
     <script>
         // نمایش زنده مبلغ به ریال و تومان
         const input = document.getElementById("Cost");
@@ -84,7 +79,7 @@
                 const toman = Math.floor(value / 10); // هر 10 ریال = 1 تومان
                 const formattedRial = value.toLocaleString('fa-IR');
                 const formattedToman = toman.toLocaleString('fa-IR');
-                preview.innerHTML = `💰 ${formattedRial} ریال معادل ${formattedToman} تومان`;
+                preview.innerHTML = `${formattedRial} ریال معادل ${formattedToman} تومان`;
             } else {
                 preview.innerHTML = "";
             }

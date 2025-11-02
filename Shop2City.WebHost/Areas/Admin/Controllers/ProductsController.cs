@@ -22,8 +22,6 @@ namespace Shop2City.WebHost.Areas.Admin.Controllers
             var products = await _productService.GetAllProducts(pageId,filterTitleProduct);
             return View(products);
         }
-
-
         #region Edit
 
         [HttpGet]

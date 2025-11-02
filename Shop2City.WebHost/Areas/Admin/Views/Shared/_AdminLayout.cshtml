@@ -6,6 +6,7 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.rtl.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2/theme-bootstrap-5@5/bootstrap-5.min.css" rel="stylesheet">
@@ -75,6 +76,7 @@
                             <li><a asp-area="Admin" asp-controller="Discounts" asp-action="Index" class="d-block py-1">کد تخفیف</a></li>
                             <li><a asp-area="Admin" asp-controller="Products" asp-action="Index" class="d-block py-1">محصولات</a></li>
                             <li><a asp-area="Admin" asp-controller="ProductGroups" asp-action="Index" class="d-block py-1">دسته بندی محصولات</a></li>
+                            <li><a asp-area="Admin" asp-controller="DeliveryMethods" asp-action="Index" class="d-block py-1">شیوه ارسال</a></li>
                         </ul>
                     </div>
                 </div>
@@ -177,11 +179,12 @@
                     <div id="collapseTwoMobile" class="accordion-collapse collapse">
                         <div class="accordion-body p-0">
                             <ul class="list-unstyled ps-3">
-                                <li><a asp-controller="CurtainComponents" asp-action="Index" class="d-block py-1">مواد مصرفی</a></li>
-                                <li><a asp-controller="CommissionRates" asp-action="Index" class="d-block py-1">کارمزد</a></li>
-                                <li><a href="#" class="d-block py-1">کد تخفیف</a></li>
+                                <li><a asp-area="Admin" asp-controller="CurtainComponents" asp-action="Index" class="d-block py-1">مواد مصرفی</a></li>
+                                <li><a asp-area="Admin" asp-controller="CommissionRates" asp-action="Index" class="d-block py-1">کارمزد</a></li>
+                                <li><a asp-area="Admin" asp-controller="Discounts" asp-action="Index" class="d-block py-1">کد تخفیف</a></li>
                                 <li><a asp-area="Admin" asp-controller="Products" asp-action="Index" class="d-block py-1">محصولات</a></li>
-                                <li><a href="#" class="d-block py-1">دسته بندی محصولات</a></li>
+                                <li><a asp-area="Admin" asp-controller="ProductGroups" asp-action="Index" class="d-block py-1">دسته بندی محصولات</a></li>
+                                <li><a asp-area="Admin" asp-controller="DeliveryMethods" asp-action="Index" class="d-block py-1">شیوه ارسال</a></li>
                             </ul>
                         </div>
                     </div>

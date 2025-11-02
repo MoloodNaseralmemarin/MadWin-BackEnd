@@ -56,8 +56,8 @@
                                 <td>@discount.UseableCount</td>
                                 <td>@discount.StartDate.ToShamsi() - @discount.ExpiryDate.ToShamsi()</td>
                                 <td>
-                                    <span class="btn @(discount.IsInactive ? "btn-success" : "btn-danger")">
-                                        @(discount.IsInactive ? "فعال" : "غیرفعال")
+                                    <span class="btn @(discount.IsInactive ? "btn-danger" : "btn-success")">
+                                        @(discount.IsInactive ? "غیرفعال" : "فعال")
                                     </span>
                                 </td>
 
