@@ -28,14 +28,15 @@ namespace Shop2City.Core.Services.Products
             return true;
         }
 
-        public async Task<bool> EditProductAsync(EditProductDto editProduct)
+        public async Task<bool> EditProductAsync(Product editProduct)
         {
-            var existing = await _productRepository.GetByIdAsync(editProduct.ProductId);
+            var existing = await _productRepository.GetByIdAsync(editProduct.Id);
             if (existing == null) return false;
 
             existing.Title = editProduct.Title;
             existing.Price = editProduct.Price;
-            existing.LastUpdateDate = DateTime.UtcNow;
+            existing.LastUpdateDate = DateTime.Now;
+            existing.ShortDescription = editProduct.ShortDescription;
 
             await _productRepository.SaveChangesAsync();
             return true;
@@ -63,9 +64,10 @@ namespace Shop2City.Core.Services.Products
                 var product = await _productRepository.GetByIdAsync(id);
                 var productDto = new EditProductDto
                 {
-                    ProductId = product.Id,
+                    Id = product.Id,
                     Title = product.Title,
-                    Price = product.Price
+                    Price = product.Price,
+                    ShortDescription=product.ShortDescription,
                 };
 
                 return productDto;

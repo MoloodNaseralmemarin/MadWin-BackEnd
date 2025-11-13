@@ -1,9 +1,7 @@
 ﻿using MadWin.Core.DTOs.Calculations;
+using MadWin.Core.DTOs.Factors;
 using MadWin.Core.DTOs.Orders;
-using MadWin.Core.Entities.CurtainComponents;
 using MadWin.Core.Entities.Orders;
-using MadWin.Core.Interfaces;
-using System.Threading.Tasks;
 
 
 namespace MadWin.Application.Services
@@ -22,15 +20,21 @@ namespace MadWin.Application.Services
 
         Task<int> CountOrders();
 
+        Task<decimal> GetTotalOrdersPriceAsync();
+
+        Task<decimal> GetTodayTotalOrdersPriceAsync();
+
         Task<OrderSummaryForAdminDto> GetTodayOrdersAsync(int userId);
 
-        Task<OrderForAdminViewModel> GetAllOrdersAsync(OrderFilterParameters filter, int pageId = 1);
+        Task<OrderForAdminViewModel> GetAllOrdersAsync(OrderFilterParameter filter, int pageId = 1);
 
-        Task<OrderForAdminViewModel> GetAllOrdersByUserIdAsync(int userId, OrderFilterParameters filter, int pageId = 1);
+        Task<OrderForAdminViewModel> GetAllOrdersByUserIdAsync(int userId, OrderFilterParameter filter, int pageId = 1);
 
        
         Task SoftDeleteFromOrderAsync(int[] orderId);
 
         Task<decimal> GetSumPriceWithFeeByOrder(int[] orderIds, int userId);
+
+        Task AddDescriptionForOrder(int orderId, string description);
     }
 }

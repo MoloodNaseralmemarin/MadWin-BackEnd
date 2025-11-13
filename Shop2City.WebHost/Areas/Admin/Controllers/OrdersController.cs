@@ -1,5 +1,5 @@
 ﻿using MadWin.Application.Services;
-using MadWin.Core.DTOs.Orders;
+using MadWin.Core.DTOs.Factors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Shop2City.Web.Areas.Admin.Controllers
@@ -17,7 +17,7 @@ namespace Shop2City.Web.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(OrderFilterParameters filter,int pageId=1)
+        public async Task<IActionResult> Index(OrderFilterParameter filter,int pageId=1)
         {
             var result = await _orderService.GetAllOrdersAsync(filter,pageId);
             return View(result);

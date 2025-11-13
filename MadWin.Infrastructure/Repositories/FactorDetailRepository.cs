@@ -1,10 +1,10 @@
 ﻿using MadWin.Core.DTOs.Factors;
-using MadWin.Core.DTOs.Fators;
-using MadWin.Core.DTOs.FilterParameters;
 using MadWin.Core.Entities.Factors;
 using MadWin.Core.Interfaces;
 using MadWin.Infrastructure.Context;
+using MadWin.Infrastructure.Convertors;
 using Microsoft.EntityFrameworkCore;
+using Shop2City.Core.Convertors;
 
 
 namespace MadWin.Infrastructure.Repositories
@@ -131,8 +131,17 @@ namespace MadWin.Infrastructure.Repositories
         }
 
 
-        public async Task<FactorForAdminViewModel> GetAllFactorAsync(FilterParameter filter, int pageId = 1)
+        public async Task<FactorForAdminViewModel> GetAllFactorAsync(FactorFilterParameter filter, int pageId = 1)
         {
+            DateTime? FromDate = string.IsNullOrWhiteSpace(filter.FromDate)
+    ? null
+    : DateConvertor.ConvertPersianToGregorian(filter.FromDate);
+
+            DateTime? ToDate = string.IsNullOrWhiteSpace(filter.ToDate)
+                ? null
+                : DateConvertor.ConvertPersianToGregorian(filter.ToDate);
+
+
             IQueryable<Factor> query = _context.Factors
                 .Include(f => f.User)
                 .Include(f => f.FactorDetails)
@@ -146,14 +155,14 @@ namespace MadWin.Infrastructure.Repositories
                     (f.User.FirstName + " " + f.User.LastName).Contains(filter.FullName));
             }
 
-            if (filter.OrderId.HasValue)
-                query = query.Where(f => f.Id == filter.OrderId.Value);
+            if (filter.FactorId.HasValue)
+                query = query.Where(f => f.Id == filter.FactorId.Value);
 
-            if (filter.FromDate.HasValue)
-                query = query.Where(f => f.CreateDate >= filter.FromDate.Value);
+            if (FromDate.HasValue)
+                query = query.Where(f => f.CreateDate >= FromDate);
 
-            if (filter.ToDate.HasValue)
-                query = query.Where(f => f.CreateDate <= filter.ToDate.Value);
+            if (ToDate.HasValue)
+                query = query.Where(f => f.CreateDate <= ToDate);
 
             if (filter.FromPrice.HasValue)
                 query = query.Where(f => f.TotalAmount >= filter.FromPrice.Value);
@@ -185,6 +194,8 @@ namespace MadWin.Infrastructure.Repositories
                     DeliveryPrice = f.DeliveryMethodAmount,
                     DisTotal = f.DisTotal,
                     Discount = f.DisTotal,
+                    TotalAmount=f.TotalAmount,
+                    Description=f.Description,
                     FactorDetailItemCount = f.FactorDetails.Count(fd => !fd.IsDelete),
                     FactorDetails = f.FactorDetails
                         .Where(fd => !fd.IsDelete)
@@ -208,10 +219,17 @@ namespace MadWin.Infrastructure.Repositories
             return result;
         }
 
-
-
-        public async Task<FactorForUserViewModel> GetAllFactorByUserIdAsync(int userId,FilterParameter filter, int pageId = 1)
+        public async Task<FactorForUserViewModel> GetAllFactorByUserIdAsync(int userId,FactorFilterParameter filter, int pageId = 1)
         {
+            DateTime? FromDate = string.IsNullOrWhiteSpace(filter.FromDate)
+     ? null
+     : DateConvertor.ConvertPersianToGregorian(filter.FromDate);
+
+            DateTime? ToDate = string.IsNullOrWhiteSpace(filter.ToDate)
+                ? null
+                : DateConvertor.ConvertPersianToGregorian(filter.ToDate);
+
+
             IQueryable<Factor> query = _context.Factors
                  .Include(f => f.User)
                  .Include(f => f.FactorDetails)
@@ -221,14 +239,14 @@ namespace MadWin.Infrastructure.Repositories
                         f.IsFinaly);
 
 
-            if (filter.OrderId.HasValue)
-                query = query.Where(f => f.Id == filter.OrderId.Value);
+            if (filter.FactorId.HasValue)
+                query = query.Where(f => f.Id == filter.FactorId.Value);
 
-            if (filter.FromDate.HasValue)
-                query = query.Where(f => f.CreateDate >= filter.FromDate.Value);
+            if (FromDate.HasValue)
+                query = query.Where(f => f.CreateDate >= FromDate);
 
-            if (filter.ToDate.HasValue)
-                query = query.Where(f => f.CreateDate <= filter.ToDate.Value);
+            if (ToDate.HasValue)
+                query = query.Where(f => f.CreateDate <= ToDate);
 
             if (filter.FromPrice.HasValue)
                 query = query.Where(f => f.TotalAmount >= filter.FromPrice.Value);

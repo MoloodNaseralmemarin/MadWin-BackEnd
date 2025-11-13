@@ -1,10 +1,8 @@
 ﻿using MadWin.Core.DTOs.Calculations;
+using MadWin.Core.DTOs.Factors;
 using MadWin.Core.DTOs.Orders;
 using MadWin.Core.Entities.Common;
-using MadWin.Core.Entities.CurtainComponents;
-using MadWin.Core.Entities.Factors;
 using MadWin.Core.Entities.Orders;
-using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -112,6 +110,16 @@ namespace MadWin.Application.Services
         {
             return await _orderRepository.CountOrders();
         }
+
+        public async Task<decimal> GetTotalOrdersPriceAsync()
+        {
+            return await _orderRepository.GetTotalOrdersPriceAsync();
+        }
+
+        public async Task<decimal> GetTodayTotalOrdersPriceAsync()
+        {
+            return await _orderRepository.GetTodayTotalOrdersPriceAsync();
+        }
         public async Task<OrderSummaryForAdminDto> GetTodayOrdersAsync(int userId)
         {
             return await _orderRepository.GetTodayOrdersAsync(userId);
@@ -171,7 +179,7 @@ namespace MadWin.Application.Services
             return orders.Sum(o => o.PriceWithFee);
         }
 
-        public async Task<OrderForAdminViewModel> GetAllOrdersAsync(OrderFilterParameters filter, int pageId = 1)
+        public async Task<OrderForAdminViewModel> GetAllOrdersAsync(OrderFilterParameter filter, int pageId = 1)
         {
             var order = await _orderRepository.GetAllOrdersAsync(filter,pageId);
 
@@ -185,7 +193,7 @@ namespace MadWin.Application.Services
             return order; 
         }
 
-        public async Task<OrderForAdminViewModel> GetAllOrdersByUserIdAsync(int userId, OrderFilterParameters filter, int pageId = 1)
+        public async Task<OrderForAdminViewModel> GetAllOrdersByUserIdAsync(int userId, OrderFilterParameter filter, int pageId = 1)
         {
             var order = await _orderRepository.GetAllOrdersByUserIdAsync(userId,filter, pageId);
 
@@ -197,6 +205,16 @@ namespace MadWin.Application.Services
 
             _logger.LogInformation("سفارش  با موفقیت بارگذاری شد.");
             return order;
+        }
+
+        public async Task AddDescriptionForOrder(int orderId, string description)
+        {
+            var order = new Order
+            {
+                Description = description,
+            };
+            await _orderRepository.AddAsync(order);
+            await _orderRepository.SaveChangesAsync();
         }
     }
 

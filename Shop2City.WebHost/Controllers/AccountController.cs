@@ -165,11 +165,11 @@ namespace Shop2City.WebHost.Controllers
             if (!ModelState.IsValid)
                 return View(forgot);
 
-            await _userService.ExtractAndSaveLast4DigitsAsync(forgot.UserName);
+            //await _userService.ExtractAndSaveLast4DigitsAsync(forgot.UserName);
 
-            TempData["SuccessMessage"] = "کلمه عبور جدید به شماره موبایل ثبت‌شده شما پیامک شد.";
+            TempData["SuccessMessage"] = "کلمه عبور جدید به شماره موبایل ثبت ‌شده شما پیامک شد.";
 
-            return View();
+            return RedirectToAction("Login");
         }
         #endregion
         

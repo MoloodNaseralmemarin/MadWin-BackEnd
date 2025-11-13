@@ -1,4 +1,4 @@
-﻿using MadWin.Core.DTOs.Fators;
+﻿using MadWin.Core.DTOs.Factors;
 using MadWin.Core.Entities.Factors;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Lookups.Factors;
@@ -135,7 +135,19 @@ namespace MadWin.Infrastructure.Repositories
                 .Where(o => o.IsFinaly)
                 .CountAsync();
         }
+        public async Task<decimal> GetTotalFactorsPriceAsync()
+        {
+            return await _context.Factors
+              .Where(o => o.IsFinaly && !o.IsDelete)
+              .SumAsync(o => o.TotalAmount);
+        }
 
+        public async Task<decimal> GetTodayTotalFactorsPriceAsync()
+        {
+            return await _context.Factors
+              .Where(o => o.IsFinaly && !o.IsDelete && o.CreateDate.Date == DateTime.Now.Date)
+              .SumAsync(o => o.TotalAmount);
+        }
         public async Task<int> GetLastFactorId(int userId)
         {
             var factorId = await GetQuery()

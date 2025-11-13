@@ -49,7 +49,7 @@
                             <th>شناسه</th>
                             <th>نام کامل</th>
                             <th>شماره همراه</th>
-                            <th>تاریخ ثبت‌نام</th>
+                            <th>تاریخ و ساعت ثبت نام</th>
                             <td>تعداد سفارش</td>
                             <td>تعداد فاکتور</td>
                             <th>دستورات</th>
@@ -62,7 +62,7 @@
                                 <td>@user.Id</td>
                                 <td>@user.FirstName @user.LastName</td>
                                 <td>@user.CellPhone</td>
-                                <td>@user.CreateDate.ToShamsi()</td>
+                                <td>@user.CreateDate.ToShamsi()- @user.CreateDate.ToString("HH:mm:ss")</td>
                                 <td>@user.OrderCount</td>
                                 <td>@user.FactorCount</td>
                                 <td>
@@ -143,9 +143,8 @@
         </div>
     </div>
 </div>
-<script>
 
-    
+<script>
        document.querySelectorAll(".btn-danger").forEach(function(btn){
            
         btn.addEventListener("click", function () {

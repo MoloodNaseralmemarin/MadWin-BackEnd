@@ -1,9 +1,5 @@
 ﻿
 using MadWin.Core.DTOs.Factors;
-using MadWin.Core.DTOs.Fators;
-using MadWin.Core.DTOs.FilterParameters;
-using MadWin.Core.DTOs.Orders;
-using MadWin.Core.Entities.Orders;
 using MadWin.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -69,11 +65,11 @@ namespace MadWin.Application.Services
             await _factorRepository.SaveChangesAsync();
         }
 
-        public async Task<FactorForAdminViewModel> GetAllFactorAsync(FilterParameter filter, int pageId = 1)
+        public async Task<FactorForAdminViewModel> GetAllFactorAsync(FactorFilterParameter filter, int pageId = 1)
         {
             return  await _factorDetailRepository.GetAllFactorAsync(filter, pageId);
         }
-        public async Task<FactorForUserViewModel> GetAllFactorByUserIdAsync(int userId, FilterParameter filter, int pageId = 1)
+        public async Task<FactorForUserViewModel> GetAllFactorByUserIdAsync(int userId, FactorFilterParameter filter, int pageId = 1)
         {
             return await _factorDetailRepository.GetAllFactorByUserIdAsync(userId,filter, pageId);
         }

@@ -1,10 +1,12 @@
 ﻿using MadWin.Application.DTOs.Products;
 using MadWin.Core.Entities.CommissionRates;
+using MadWin.Core.Entities.CurtainComponents;
 using MadWin.Core.Entities.Products;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shop2City.Core.Services.Products;
 using Shop2City.WebHost.ViewModels.CommissionRates;
+using Shop2City.WebHost.ViewModels.CurtainComponents;
 
 namespace Shop2City.WebHost.Areas.Admin.Controllers
 {
@@ -35,39 +37,44 @@ namespace Shop2City.WebHost.Areas.Admin.Controllers
 
             var vm = new EditProductDto
             {
-                ProductId = product.ProductId,
+                Id = product.Id,
                 Price = product.Price,
                 Title = product.Title,
+                ShortDescription=product.ShortDescription,
             };
 
             return View(product);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(EditProductDto editproduct)
+        public async Task<IActionResult> Edit(EditProductDto vm)
         {
+            // اعتبارسنجی سمت سرور
             if (!ModelState.IsValid)
-                return View(editproduct);
-            var productEntity = new Product
+                return View(vm);
+
+            // نگاشت ViewModel -> Entity
+            var product = new Product
             {
-                Title = editproduct.Title,
-                Price = editproduct.Price
+                Id = vm.Id,
+                Price = vm.Price,
+                Title = vm.Title,
+                ShortDescription=vm.ShortDescription,
             };
 
-            var success = await _productService.EditProductAsync(editproduct);
+            // فراخوانی سرویس برای بروزرسانی
+            var success = await _productService.EditProductAsync(product);
 
             if (!success)
             {
-                ModelState.AddModelError("", "خطایی در بروزرسانی اطلاعات محصول رخ داد.");
-                return View(editproduct
-                    
-                    );
+                // اگر مشتری پیدا نشد یا خطایی رخ داد
+                ModelState.AddModelError("", "خطایی در بروزرسانی اطلاعات مشتری رخ داد.");
+                return View(vm);
             }
 
-            TempData["Success"] = "اطلاعات محصول با موفقیت بروزرسانی شد.";
-            return RedirectToAction(nameof(Index));
+            TempData["Success"] = "اطلاعات مشتری با موفقیت بروزرسانی شد.";
+            return RedirectToAction(nameof(Index)); // برگرد به لیست مشتری‌ها
         }
-
         [HttpPost]
         public async Task<JsonResult> EditIsStatusProduct(bool isStatus, int productId)
         {

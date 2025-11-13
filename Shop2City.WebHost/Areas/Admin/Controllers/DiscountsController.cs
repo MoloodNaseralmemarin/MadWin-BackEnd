@@ -41,7 +41,7 @@ namespace Shop2City.WebHost.Areas.Admin.Controllers
                 Item = model.Item,
                 Percentage = model.Percentage,
                 InitialCount=model.InitialCount,
-                UseableCount = model.InitialCount,
+                UseableCount = 0,
             };
             await _discountService.AddDiscount(discount);
             return RedirectToAction("Index");

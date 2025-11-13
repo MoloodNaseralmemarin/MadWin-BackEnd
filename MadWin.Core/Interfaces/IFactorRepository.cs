@@ -1,4 +1,4 @@
-﻿using MadWin.Core.DTOs.Fators;
+﻿using MadWin.Core.DTOs.Factors;
 using MadWin.Core.Entities.Factors;
 using MadWin.Core.Lookups.Factors;
 
@@ -19,6 +19,11 @@ namespace MadWin.Core.Interfaces
         Task<Factor?> GetOpenFactorByUserIdAsync(int userId);
         Task<FactorSummaryForSendSMS> GetFactorDteailForSendSMSAsync(int factorId);
         Task<int> CountFactors();
+
+        Task<decimal> GetTotalFactorsPriceAsync();
+
+        Task<decimal> GetTodayTotalFactorsPriceAsync();
+
         Task<int> GetLastFactorId(int userId);
 
     }

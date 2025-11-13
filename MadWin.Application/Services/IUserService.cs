@@ -35,5 +35,7 @@ namespace MadWin.Application.Services
 
         Task DeleteUserFromAdmin(int id);
 
+        Task<UserNameDto?> GetNameByUserNameAsync(string userId);
+
     }
 }

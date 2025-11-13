@@ -2,6 +2,7 @@
 using MadWin.Core.DTOs.Users;
 using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shop2City.Core.Generator;
 using System.Reflection;
@@ -145,6 +146,18 @@ namespace MadWin.Application.Services
             user.Description = "توسط آقای نادری حذف شده است.";
             _userRepository.Remove(user);
             await _userRepository.SaveChangesAsync();
+        }
+        public async Task<UserNameDto?> GetNameByUserNameAsync(string userId)
+        {
+            return await _userRepository
+                .GetQuery()
+                .Where(u => u.Id.ToString() == userId)
+                .Select(u => new UserNameDto
+                {
+                    FirstName = u.FirstName,
+                    LastName = u.LastName
+                })
+                .SingleOrDefaultAsync();
         }
     }
 }

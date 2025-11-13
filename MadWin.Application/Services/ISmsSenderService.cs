@@ -1,4 +1,8 @@
-﻿namespace MadWin.Application.Services
+﻿using MadWin.Core.DTOs.SendSms;
+using MadWin.Core.DTOs.Users;
+using Shop2City.Core.Senders;
+
+namespace MadWin.Application.Services
 {
     public interface ISmsSenderService
     {
@@ -19,6 +23,8 @@
         Task SaveSmsAsync(string phoneNumber, string template, string message, string contact, int smsCount, string status, int? orderId = null, int? factorId = null);
 
         Task<int> CountSendSms();
+
+        Task<SendSmsForAdminViewModel> GetAllSendSms(int pageId);
     }
-    }
+}
 

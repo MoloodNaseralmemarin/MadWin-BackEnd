@@ -1,4 +1,4 @@
-﻿@using MadWin.Core.DTOs.Fators
+﻿@using MadWin.Core.DTOs.Factors
 @using Shop2City.Core.Convertors
 @model FactorSummaryViewModel
 
@@ -123,6 +123,14 @@
                                             </div>
                                         </td>
                                     </tr>
+                                    <!--توضیحات-->
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="input-group">
+                                                <textarea type="text" id="description" name="description" class="form-control" placeholder="درج توضیحات اختیاری" rows="3"></textarea>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -177,6 +185,15 @@
                                     <div class="input-group mb-3">
                                         <input type="text" id="discountCodeMobile" class="form-control" placeholder="مثلاً OFF10" />
                                         <button id="applyDiscountBtnMobile" class="btn btn-primary">اعمال</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- درج توضیحات موبایل -->
+                            <div class="card mt-4 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <div class="input-group mb-3">
+                                        <textarea type="text" id="description" name="description" class="form-control" placeholder="درج توضیحات اختیاری" rows="3"></textarea>
                                     </div>
                                 </div>
                             </div>

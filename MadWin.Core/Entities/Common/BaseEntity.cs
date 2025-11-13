@@ -1,4 +1,4 @@
-﻿using MadWin.Core.Helpers;
+﻿
 using System.ComponentModel.DataAnnotations;
 namespace MadWin.Core.Entities.Common
 {

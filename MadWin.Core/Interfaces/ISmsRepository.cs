@@ -1,4 +1,6 @@
-﻿using MadWin.Core.Entities.SentMessages;
+﻿using MadWin.Core.DTOs.SendSms;
+using MadWin.Core.Entities.SentMessages;
+using System.Threading.Tasks;
 
 
 namespace MadWin.Core.Interfaces
@@ -11,5 +13,7 @@ namespace MadWin.Core.Interfaces
         Task<bool> SendSMSOrderForManagerAsync(string cellPhone, int orderId);
 
         Task SaveSmsAsync(string phoneNumber, string template, string message, string contact, int smsCount, string status, int? orderId = null, int? factorId = null);
+
+        Task<SendSmsForAdminViewModel> GetAllSendSms(int pageId);
     }
 }

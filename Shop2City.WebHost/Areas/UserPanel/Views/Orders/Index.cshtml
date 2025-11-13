@@ -8,6 +8,7 @@
     var currentFromDate = (Context.Request.Query["FromDate"].ToString() ?? "");
     var currentToDate = (Context.Request.Query["ToDate"].ToString() ?? "");
     var currentOrderId = (Context.Request.Query["OrderId"].ToString() ?? "");
+    var currentFullName = Context.Request.Query["FullName"].ToString();
     var currentFromPrice = (Context.Request.Query["FromPrice"].ToString() ?? "");
     var currentToPrice = (Context.Request.Query["ToPrice"].ToString() ?? "");
     
@@ -21,38 +22,42 @@
     <!-- محتوای اصلی -->
     <main class="col-12 col-lg-9">
       <!-- فیلتر -->
-      <div class="card border-info shadow-sm mb-3">
+      <div class="container mt-3">
+    <div class="card border-info shadow-sm">
         <div class="card-header bg-info text-white fs-5">فیلتر جستجو</div>
         <div class="card-body">
-          <form method="get">
-            <div class="row g-3">
-              <div class="col-12 col-md-3">
-                <label for="FromDate" class="form-label">از تاریخ:</label>
-                <input id="FromDate" name="FromDate" value="@currentFromDate" class="form-control" type="date" />
-              </div>
-              <div class="col-12 col-md-3">
-                <label for="ToDate" class="form-label">تا تاریخ:</label>
-                <input id="ToDate" name="ToDate" value="@currentToDate" class="form-control" type="date" />
-              </div>
-              <div class="col-12 col-md-3">
-                <label for="OrderId" class="form-label">کد سفارش:</label>
-                <input id="OrderId" name="OrderId" value="@currentOrderId" class="form-control" type="number" placeholder="کد سفارش" />
-              </div>
-              <div class="col-12 col-md-3">
-                <label for="FromPrice" class="form-label">از مبلغ:</label>
-                <input id="FromPrice" name="FromPrice" value="@currentFromPrice" class="form-control" type="number" placeholder="حداقل مبلغ" />
-              </div>
-              <div class="col-12 col-md-3">
-                <label for="ToPrice" class="form-label">تا مبلغ:</label>
-                <input id="ToPrice" name="ToPrice" value="@currentToPrice" class="form-control" type="number" placeholder="حداکثر مبلغ" />
-              </div>
-            </div>
-            <div class="mt-3 text-end">
-              <button type="submit" class="btn btn-primary w-100 w-md-auto">جستجو</button>
-            </div>
-          </form>
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="FromDate" class="form-label">از تاریخ:</label>
+                    <input type="text" id="FromDate" name="FromDate" value="@currentFromDate" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label for="ToDate" class="form-label">تا تاریخ:</label>
+                    <input type="text" id="ToDate" name="ToDate" value="@currentToDate" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label for="OrderId" class="form-label">کد سفارش:</label>
+                    <input type="number" id="OrderId" name="OrderId" value="@currentOrderId" class="form-control" placeholder="کد سفارش" />
+                </div>
+                <div class="col-md-3">
+                    <label for="FullName" class="form-label">نام مشتری:</label>
+                    <input type="text" id="FullName" name="FullName" value="@currentFullName" class="form-control" placeholder="نام کامل" />
+                </div>
+                <div class="col-md-3">
+                    <label for="FromPrice" class="form-label">از مبلغ:</label>
+                    <input type="number" id="FromPrice" name="FromPrice" value="@currentFromPrice" class="form-control" placeholder="حداقل مبلغ" />
+                </div>
+                <div class="col-md-3">
+                    <label for="ToPrice" class="form-label">تا مبلغ:</label>
+                    <input type="number" id="ToPrice" name="ToPrice" value="@currentToPrice" class="form-control" placeholder="حداکثر مبلغ" />
+                </div>
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary">جستجو</button>
+                </div>
+            </form>
         </div>
-      </div>
+    </div>
+</div>
 
       <!-- بخش لیست سفارش‌ها -->
       @if (Model.OrderSummary != null && Model.OrderSummary.Any())
@@ -159,3 +164,27 @@
     </main>
   </div>
 </div>
+
+@section Scripts {
+<script>
+    $(document).ready(function () {
+    $("#FromDate").persianDatepicker({
+        format: 'YYYY/MM/DD',
+        initialValueType: 'gregorian',
+        altField: '#FromDateHidden',
+        altFormat: 'YYYY/MM/DD',
+        autoClose: true,
+        calendarType: 'persian'
+    });
+
+    $("#ToDate").persianDatepicker({
+        format: 'YYYY/MM/DD',
+        initialValueType: 'gregorian',
+        altField: '#ToDateHidden',
+        altFormat: 'YYYY/MM/DD',
+        autoClose: true,
+        calendarType: 'persian'
+    });
+});
+</script>
+}

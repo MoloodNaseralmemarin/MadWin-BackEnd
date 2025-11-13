@@ -1,7 +1,5 @@
 ﻿using MadWin.Core.DTOs.Factors;
-using MadWin.Core.DTOs.Fators;
 using MadWin.Core.Entities.Factors;
-using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -130,6 +128,15 @@ namespace MadWin.Application.Services
             return await _factorRepository.CountFactors();
         }
 
+        public async Task<decimal> GetTotalFactorsPriceAsync()
+        {
+            return await _factorRepository.GetTotalFactorsPriceAsync();
+        }
+
+        public async Task<decimal> GetTodayTotalFactorsPriceAsync()
+        {
+            return await _factorRepository.GetTodayTotalFactorsPriceAsync();
+        }
         public async Task<FactorSummaryForSendSMS> GetFactorDetailForSendSMSAsync(int factorId)
         {
             return await _factorRepository.GetFactorDteailForSendSMSAsync(factorId);
@@ -191,6 +198,16 @@ namespace MadWin.Application.Services
         public async Task<int> GetLastFactorId(int userId)
         {
             return await _factorRepository.GetLastFactorId(userId);  
+        }
+
+        public async Task AddDescriptionForFactor(int factorId, string description)
+        {
+            var factor = new Factor
+            {
+                Description = description,
+            };
+            await _factorRepository.AddAsync(factor);
+            await _factorRepository.SaveChangesAsync();
         }
 
     }

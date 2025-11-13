@@ -1,11 +1,12 @@
 ﻿using Ghasedak.Core;
+using MadWin.Core.DTOs.SendSms;
 using MadWin.Core.DTOs.Users;
 using MadWin.Core.Entities.SentMessages;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Globalization;
+using Shop2City.Core.Senders;
 
 namespace MadWin.Application.Services
 {
@@ -59,7 +60,7 @@ namespace MadWin.Application.Services
                 return false;
            }
         }
-        public async Task SaveSmsAsync(string phoneNumber, string template, string message, string contact, int smsCount, string status, int? orderId = null, int? factorId = null)
+        public async Task SaveSmsAsync(string phoneNumber, string template, string message, string contact, int smsCount, string status, int? orderId , int? factorId)
         {
             var sms = new Sms
             {
@@ -67,8 +68,8 @@ namespace MadWin.Application.Services
                 Template = template,
                 Message = message,
                 Contact = contact,
-                OrderId = null,
-                FactorId = null,
+                OrderId = orderId,
+                FactorId = factorId,
                 SmsCount = smsCount,
                 Status = status
             };
@@ -328,6 +329,11 @@ namespace MadWin.Application.Services
         public Task<bool> SendSMSOrderForManagerAsync(string cellPhone, int orderId)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<SendSmsForAdminViewModel> GetAllSendSms(int pageId)
+        {
+            return await _smsRepository.GetAllSendSms(pageId);
         }
     }
 }

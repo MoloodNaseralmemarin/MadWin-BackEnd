@@ -1,18 +1,15 @@
 ﻿using MadWin.Application.Services;
+using MadWin.Core.DTOs.Factors;
 using MadWin.Core.DTOs.Orders;
-using MadWin.Core.DTOs.Users;
 using MadWin.Core.Entities.Common;
 using MadWin.Core.Entities.CurtainComponents;
 using MadWin.Core.Entities.Orders;
-using MadWin.Core.Entities.Products;
-using MadWin.Core.Entities.Users;
-using MadWin.Core.Helpers;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Lookups.Orders;
 using MadWin.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
+using Shop2City.Core.Convertors;
 
 namespace MadWin.Infrastructure.Repositories
 {
@@ -128,6 +125,20 @@ namespace MadWin.Infrastructure.Repositories
             return await _context.Orders
                 .Where(o => o.IsFinaly)
                 .CountAsync();
+        }
+
+        public async Task<decimal> GetTotalOrdersPriceAsync()
+        {
+            return await _context.Orders
+              .Where(o => o.IsFinaly && !o.IsDelete)
+              .SumAsync(o=>o.TotalAmount);
+        }
+
+        public async Task<decimal> GetTodayTotalOrdersPriceAsync()
+        {
+            return await _context.Orders
+              .Where(o => o.IsFinaly && !o.IsDelete && o.CreateDate.Date==DateTime.Now.Date)
+              .SumAsync(o => o.TotalAmount);
         }
 
         public async Task SoftDeleteFromOrderAsync(IEnumerable<int> orderIds)
@@ -269,8 +280,16 @@ namespace MadWin.Infrastructure.Repositories
             return list;
         }
 
-        public async Task<OrderForAdminViewModel> GetAllOrdersAsync(OrderFilterParameters filter, int pageId = 1)
+        public async Task<OrderForAdminViewModel> GetAllOrdersAsync(OrderFilterParameter filter, int pageId = 1)
         {
+
+            DateTime? FromDate = string.IsNullOrWhiteSpace(filter.FromDate)
+? null
+: DateConvertor.ConvertPersianToGregorian(filter.FromDate);
+
+            DateTime? ToDate = string.IsNullOrWhiteSpace(filter.ToDate)
+                ? null
+                : DateConvertor.ConvertPersianToGregorian(filter.ToDate);
             IQueryable<Order> query = GetQuery()
                 .Include(o => o.User)
                 .Include(o => o.OrderCategory)
@@ -289,14 +308,14 @@ namespace MadWin.Infrastructure.Repositories
                 query = query.Where(o => o.Id == filter.OrderId.Value);
             }
 
-            if (filter.FromDate.HasValue)
+            if (FromDate.HasValue)
             {
-                query = query.Where(o => o.CreateDate >= filter.FromDate.Value);
+                query = query.Where(o => o.CreateDate >= FromDate);
             }
 
-            if (filter.ToDate.HasValue)
+            if (ToDate.HasValue)
             {
-                query = query.Where(o => o.CreateDate <= filter.ToDate.Value);
+                query = query.Where(o => o.CreateDate <= ToDate);
             }
 
             if (filter.FromPrice.HasValue)
@@ -385,8 +404,15 @@ namespace MadWin.Infrastructure.Repositories
             }
             return list;
         }
-        public async Task<OrderForAdminViewModel> GetAllOrdersByUserIdAsync(int userId, OrderFilterParameters filter, int pageId = 1)
+        public async Task<OrderForAdminViewModel> GetAllOrdersByUserIdAsync(int userId, OrderFilterParameter filter, int pageId = 1)
         {
+            DateTime? FromDate = string.IsNullOrWhiteSpace(filter.FromDate)
+? null
+: DateConvertor.ConvertPersianToGregorian(filter.FromDate);
+
+            DateTime? ToDate = string.IsNullOrWhiteSpace(filter.ToDate)
+                ? null
+                : DateConvertor.ConvertPersianToGregorian(filter.ToDate);
             // کوئری اصلی (فقط سفارش‌های همین کاربر)
             IQueryable<Order> query = GetQuery()
                 .Include(o => o.User)
@@ -406,14 +432,14 @@ namespace MadWin.Infrastructure.Repositories
                 query = query.Where(o => o.Id == filter.OrderId.Value);
             }
 
-            if (filter.FromDate.HasValue)
+            if (FromDate.HasValue)
             {
-                query = query.Where(o => o.CreateDate >= filter.FromDate.Value);
+                query = query.Where(o => o.CreateDate >= FromDate);
             }
 
-            if (filter.ToDate.HasValue)
+            if (ToDate.HasValue)
             {
-                query = query.Where(o => o.CreateDate <= filter.ToDate.Value);
+                query = query.Where(o => o.CreateDate <= ToDate);
             }
 
             if (filter.FromPrice.HasValue)

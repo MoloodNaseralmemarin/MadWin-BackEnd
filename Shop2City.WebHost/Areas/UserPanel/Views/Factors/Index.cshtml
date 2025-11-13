@@ -83,6 +83,8 @@
                                         <p class="card-text mb-1"><i class="fas fa-box"></i> @item.FactorDetailItemCount آیتم</p>
                                         <p class="card-text mb-1"><i class="fas fa-tag"></i> @item.DisTotal.ToString("N0") ریال (@item.DisPercent%)</p>
                                         <p class="card-text mb-1"><i class="fas fa-coins"></i> @item.TotalAmount.ToString("N0") ریال</p>
+                                        <p class="card-text mb-1"><i class="fas fa-location"></i> @item.Address</p>
+                                         <p class="card-text mb-1"><i class="fas fa-description"></i> @item.Description</p>
                                         <p class="card-text mb-2">
                                             <strong>وضعیت:</strong>
                                             <span class="@(item.IsFinaly ? "status-paid" : "status-unpaid")">

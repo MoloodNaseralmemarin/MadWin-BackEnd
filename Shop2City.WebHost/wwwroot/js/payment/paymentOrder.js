@@ -8,6 +8,7 @@ $(document).ready(function () {
         const deliveryId = $("input[name=selection]:checked").val();
         const sumPrice = parseNumber($("#sumPrice").text());
         const token = $('input[name="__RequestVerificationToken"]').val();
+        const description = $("#description").val();
 
         if (!orderId || !deliveryId)
             return toastr.warning("روش ارسال هنوز انتخاب نشده است.");
@@ -15,7 +16,7 @@ $(document).ready(function () {
             url: '/Payment/ProcessPayment',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ invoiceId: orderId, deliveryId, sumPrice, source: 'order' }),
+            data: JSON.stringify({ invoiceId: orderId, deliveryId, sumPrice, source: 'order',description:description }),
             headers: { 'RequestVerificationToken': token },
             success: function (res) {
                 if (res.success) window.location.href = res.redirectUrl;

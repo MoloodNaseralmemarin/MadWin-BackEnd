@@ -1,6 +1,5 @@
 ﻿
 using MadWin.Core.Entities.Common;
-using MadWin.Core.Helpers;
 using MadWin.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -18,10 +17,9 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 
     public async Task AddAsync(T entity)
     {
-        entity.LastUpdateDate = DateTimeHelper.NowIran();
-        entity.CreateDate = DateTimeHelper.NowIran();
+        entity.LastUpdateDate = DateTime.Now;
+        entity.CreateDate = DateTime.Now;
         entity.IsDelete = false;
-        entity.Description = "تغییرات اعمال شد.";
         await _dbSet.AddAsync(entity);
     }
     public async Task<T> GetByIdAsync(int id) => await _dbSet.FindAsync(id);

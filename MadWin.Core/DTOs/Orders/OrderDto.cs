@@ -1,7 +1,6 @@
-﻿using MadWin.Core.Common;
-using MadWin.Core.DTOs.Users;
+﻿using MadWin.Core.DTOs.Factors;
 using MadWin.Core.Lookups.DeliveryMethods;
-using System.ComponentModel.DataAnnotations;
+
 
 
 namespace MadWin.Core.DTOs.Orders
@@ -61,7 +60,7 @@ namespace MadWin.Core.DTOs.Orders
     public class OrderForAdminViewModel
     {
         public List<OrderSummaryForAdminItemDto> OrderSummary { get; set; } = new();
-        public OrderFilterParameters filter { get; set; }
+        public FactorFilterParameter filter { get; set; }
 
         public int CurrentPage { get; set; }
         public int CountPage { get; set; }

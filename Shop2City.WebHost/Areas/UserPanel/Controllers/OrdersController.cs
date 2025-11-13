@@ -1,5 +1,5 @@
 ﻿using MadWin.Application.Services;
-using MadWin.Core.DTOs.Orders;
+using MadWin.Core.DTOs.Factors;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -18,7 +18,7 @@ namespace Shop2City.WebHost.Areas.UserPanel.Controllers
             }
 
             [HttpGet]
-            public async Task<IActionResult> Index(OrderFilterParameters filter, int pageId = 1)
+            public async Task<IActionResult> Index(OrderFilterParameter filter, int pageId = 1)
             {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(userIdString, out int userId))

@@ -72,6 +72,18 @@ namespace Shop2City.WebHost.Controllers
                     payload = ""
                 };
 
+
+                #region درج توضیحات
+                if (request.Source == "order")
+                {
+                    await _orderService.AddDescriptionForOrder(request.InvoiceId, request.Description);
+                }
+                else
+                {
+                    await _factorService.AddDescriptionForFactor(request.InvoiceId, request.Description);
+                }
+                #endregion
+
                 string jsonData = JsonSerializer.Serialize(paymentRequest);
                 var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
@@ -108,6 +120,7 @@ namespace Shop2City.WebHost.Controllers
                 // نکته مهم: هیچ‌گونه Update روی سفارش/فاکتور و یا ارسال پیامک در این متد انجام نمی‌دهیم.
                 // این کارها فقط پس از تایید Advice در متد Verify انجام خواهند شد.
 
+
                 return Json(new { success = true, redirectUrl = redirectUrl });
             }
             catch (Exception ex)
@@ -130,8 +143,10 @@ namespace Shop2City.WebHost.Controllers
 
                 var source = Request.Query["source"].ToString();
                 var deliveryIdQuery = Request.Query["deliveryId"].ToString();
-                
-                //parse invoiceId safely
+
+  
+
+                ////parse invoiceId safely
                 if (!int.TryParse(Request.Form["InvoiceId"], out int invoiceId))
                 {
                     _logger.LogWarning("InvoiceId در پاسخ درگاه معتبر نیست.");
@@ -198,7 +213,7 @@ namespace Shop2City.WebHost.Controllers
                     return RedirectToAction("PaymentFailed", "Payment");
                 }
 
-               // ثبت تراکنش در جدول تراکنش‌ها
+                // ثبت تراکنش در جدول تراکنش‌ها
                 var transactionModel = new TransactionModel
                 {
                     DigitalReceipt = digitalReceipt,
@@ -263,12 +278,12 @@ namespace Shop2City.WebHost.Controllers
                             _logger.LogWarning("شماره مشتری برای ارسال پیامک سفاش موجود نیست. OrderId: {OrderId}", order.Id);
                         }
                         ////ارسال پیامک به مدیریت
-                        //var smsManagerSent = await _smsSenderService.SendSMSFactorForManagerAsync(order.Id);
-                        //_logger.LogInformation("ارسال پیامک به مدیر پس از پرداخت (factor). FactorId: {FactorId}, Sent: {Sent}", order.Id, smsManagerSent);
+                        var smsManagerSent = await _smsSenderService.SendSMSFactorForManagerAsync(order.Id);
+                        _logger.LogInformation("ارسال پیامک به مدیر پس از پرداخت (factor). FactorId: {FactorId}, Sent: {Sent}", order.Id, smsManagerSent);
 
                         ////ارسال پیامک به تولیدی
-                        //var smsProductionSent = await _smsSenderService.SendSMSFactorForProductionAsync(order.Id);
-                        //_logger.LogInformation("ارسال پیامک به تولیدی پس از پرداخت (factor). FactorId: {FactorId}, Sent: {Sent}", order.Id, smsManagerSent);
+                        var smsProductionSent = await _smsSenderService.SendSMSFactorForProductionAsync(order.Id);
+                        _logger.LogInformation("ارسال پیامک به تولیدی پس از پرداخت (factor). FactorId: {FactorId}, Sent: {Sent}", order.Id, smsManagerSent);
                     }
                     catch (Exception ex)
                     {
@@ -350,6 +365,8 @@ namespace Shop2City.WebHost.Controllers
             public int InvoiceId { get; set; }
             public string Source { get; set; }
             public int deliveryId { get; set; }
+
+            public string Description { get; set; }
         }
     }
 }

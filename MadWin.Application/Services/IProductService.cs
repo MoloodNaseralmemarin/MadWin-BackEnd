@@ -1,6 +1,7 @@
 ﻿using MadWin.Application.DTOs.Products;
 using MadWin.Core.DTOs.Products;
 using MadWin.Core.Entities.CommissionRates;
+using MadWin.Core.Entities.Products;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Shop2City.Core.Services.Products
@@ -17,7 +18,7 @@ namespace Shop2City.Core.Services.Products
 
        Task<EditProductDto> GetProductByIdAsync(int id);
 
-        Task<bool> EditProductAsync(EditProductDto editProduct);
+        Task<bool> EditProductAsync(Product editProduct);
 
         Task<bool> EditIsStatusProdct(bool isStatus,int productId);
 

@@ -19,12 +19,14 @@ namespace MadWin.Application.DTOs.Products
 
     public class EditProductDto
     {
-        public int ProductId { get; set; }
+        public int Id { get; set; }
 
         [Display(Name ="محصول")]
         public string Title { get; set; }
 
         [Display(Name = "قیمت")]
         public int Price { get; set; }
+
+        public string ShortDescription { get; set; }
     }
 }

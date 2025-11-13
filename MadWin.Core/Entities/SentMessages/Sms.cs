@@ -10,7 +10,7 @@ namespace MadWin.Core.Entities.SentMessages
         public string Contact { get; set; }
         public int? OrderId { get; set; }
         public int? FactorId { get; set; }
-        public string Status { get; set; } // Sent, Failed, Error, etc.
+        public string Status { get; set; }
         public string Template { get; set; }
 
     }

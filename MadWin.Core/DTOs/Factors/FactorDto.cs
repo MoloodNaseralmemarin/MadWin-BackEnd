@@ -1,7 +1,6 @@
-﻿using MadWin.Core.DTOs.FilterParameters;
-using MadWin.Core.Lookups.DeliveryMethods;
+﻿using MadWin.Core.Lookups.DeliveryMethods;
 
-namespace MadWin.Core.DTOs.Fators
+namespace MadWin.Core.DTOs.Factors
 
 {
 public class FactorSummaryForAdminItemDto
@@ -44,9 +43,11 @@ public class FactorSummaryForAdminItemDto
     public int FactorDetailItemCount { get; set; }
 
    public decimal TotalAmount { get; set; }
+   
+   public string Description { get; set; }
 
 
-}
+  }
 
 public class FactorDetailDto
 {
@@ -62,7 +63,7 @@ public class FactorDetailDto
 public class FactorForAdminViewModel
 {
     public List<FactorSummaryForAdminItemDto> FactorSummary { get; set; } = new();
-    public FilterParameter filter { get; set; }
+    public FactorFilterParameter filter { get; set; }
 
     public int CurrentPage { get; set; }
     public int CountPage { get; set; }

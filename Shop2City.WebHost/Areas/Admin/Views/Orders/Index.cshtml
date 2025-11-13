@@ -2,7 +2,6 @@
 @using Shop2City.Core.Convertors
 @using Shop2City.WebHost.ViewModels.Orders
 @model OrderForAdminViewModel
-
 @{
     ViewBag.Title = "لیست سفارش‌ها";
 
@@ -26,11 +25,11 @@
             <form method="get" class="row g-3">
                 <div class="col-md-3">
                     <label for="FromDate" class="form-label">از تاریخ:</label>
-                    <input type="date" id="FromDate" name="FromDate" value="@currentFromDate" class="form-control" />
+                    <input type="text" id="FromDate" name="FromDate" value="@currentFromDate" class="form-control" />
                 </div>
                 <div class="col-md-3">
                     <label for="ToDate" class="form-label">تا تاریخ:</label>
-                    <input type="date" id="ToDate" name="ToDate" value="@currentToDate" class="form-control" />
+                    <input type="text" id="ToDate" name="ToDate" value="@currentToDate" class="form-control" />
                 </div>
                 <div class="col-md-3">
                     <label for="OrderId" class="form-label">کد سفارش:</label>
@@ -175,4 +174,6 @@ else
                 });
         }
     </script>
+
+    <script src="~/js/datepicker/datepicker-config.js"></script>
 }

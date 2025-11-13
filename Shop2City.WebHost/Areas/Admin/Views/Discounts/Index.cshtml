@@ -32,7 +32,7 @@
                             <th>تعداد استفاده شده</th>
                             <th>تاریخ شروع - تاریخ پایان</th>
                             <th>فعال / غیرفعال</th>
-                            <th>دستورات</th>
+                           @*  <th>دستورات</th> *@
                         </tr>
                     </thead>
                     <tbody>
@@ -55,13 +55,13 @@
                                 <td>@discount.InitialCount</td>
                                 <td>@discount.UseableCount</td>
                                 <td>@discount.StartDate.ToShamsi() - @discount.ExpiryDate.ToShamsi()</td>
-                                <td>
+                               <td>
                                     <span class="btn @(discount.IsInactive ? "btn-danger" : "btn-success")">
                                         @(discount.IsInactive ? "غیرفعال" : "فعال")
                                     </span>
-                                </td>
+                                </td> 
 
-                                <td>
+                               @*  <td>
                                     <div class="btn-group">
                                         <a href="@Url.Action("Edit", "Discounts", new { area = "Admin", id = discount.Id })"
                                            class="btn btn-warning btn-sm">
@@ -75,7 +75,7 @@
                                             <i class="fa fa-remove"></i>
                                         </button>
                                     </div>
-                                </td>
+                                </td> *@
                             </tr>
                         }
                     </tbody>

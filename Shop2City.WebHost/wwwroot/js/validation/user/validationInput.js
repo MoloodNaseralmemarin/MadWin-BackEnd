@@ -1,5 +1,5 @@
 ﻿// گرفتن همه input های مورد نظر (با id های مختلف)
-const inputs = document.querySelectorAll('#userName, #telPhone, #cellPhone');
+const inputs = document.querySelectorAll('#userName, #telPhone, #cellPhone,#ToPrice,#FromPrice');
 
 inputs.forEach(input => {
     input.addEventListener('keydown', function (event) {

@@ -1,8 +1,6 @@
 
-using MadWin.Application.DTOs.Cart;
 using MadWin.Application.Services;
 using MadWin.Core.DTOs.Orders;
-using MadWin.Core.Entities.Orders;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
