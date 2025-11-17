@@ -271,7 +271,9 @@ namespace Shop2City.WebHost.Controllers
                         if (!string.IsNullOrEmpty(cellPhone))
                         {
                             smsCustomerSent = await _smsSenderService.SendSMSOrderForCustomerAsync(cellPhone, order.Id);
-                            _logger.LogInformation("ارسال پیامک به مشتری پس از پرداخت (order). OrderId: {OrderId}, Sent: {Sent}", order.Id, smsCustomerSent);
+                            _logger.LogInformation(
+                                $"ارسال پیامک به مشتری برای ثبت سفارش جدید (order). OrderId: {order.Id}, Sent: {smsCustomerSent}");
+
                         }
                         else
                         {

@@ -216,6 +216,13 @@ namespace MadWin.Application.Services
             await _orderRepository.AddAsync(order);
             await _orderRepository.SaveChangesAsync();
         }
+        #region OrderDetailForPrint
+        public async Task<OrderDetailForPrint> GetOrderDetailForPrint(int orderId)
+        {
+            return await _orderRepository.GetOrderDetailForPrint(orderId);
+        }
+        #endregion
+
     }
 
 }

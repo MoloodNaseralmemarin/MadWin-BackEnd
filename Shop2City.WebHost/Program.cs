@@ -32,6 +32,7 @@ builder.Configuration
 // ────── Logging (Serilog) ──────
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
+    .WriteTo.Console()
     .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
     .WriteTo.MSSqlServer(
         connectionString: builder.Configuration.GetConnectionString("Production"),
@@ -47,12 +48,14 @@ Log.Logger = new LoggerConfiguration()
                 StandardColumn.Message,
                 StandardColumn.Level,
                 StandardColumn.TimeStamp,
-                StandardColumn.Exception
+                StandardColumn.Exception,
+                StandardColumn.Properties
             }
         }
     )
     .Enrich.FromLogContext()
     .CreateLogger();
+
 
 builder.Host.UseSerilog();
 

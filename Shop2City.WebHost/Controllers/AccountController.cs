@@ -141,9 +141,15 @@ namespace Shop2City.WebHost.Controllers
                 // بررسی نقش کاربر
                 bool isAdmin = await _permissionService.CheckPermissionAsync(1, result.Id);
                 if (isAdmin)
+                {
+                    _logger.LogInformation(
+                        $"مدیریت سایت با موفقیت وارد سایت شده است. UserId: {result.Id}");
                     return RedirectToAction("Index", "AdminPanel", new { area = "Admin" });
-
-                return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Home");
+                }
             }
             catch (Exception ex)
             {

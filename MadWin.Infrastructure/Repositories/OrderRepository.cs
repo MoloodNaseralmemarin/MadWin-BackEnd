@@ -577,6 +577,35 @@ namespace MadWin.Infrastructure.Repositories
             return orderDto;
         }
 
+        #region OrderDetailForPrint
+        public async Task<OrderDetailForPrint> GetOrderDetailForPrint(int orderId)
+        {
+            var result = await GetQuery()
+             .Include(o => o.User)
+             .Where(o => o.Id == orderId && !o.IsDelete)
+             .Select(o => new OrderDetailForPrint
+             {
+                 OrderId = o.Id,
+                 FullName = (o.User != null
+                     ? (o.User.FirstName ?? "") + " " + (o.User.LastName ?? "")
+                     : "نامشخص"),
+                 OrderName =
+                     (o.OrderCategory != null ? o.OrderCategory.Title : "") +
+                     (o.OrderSubCategory != null && !string.IsNullOrEmpty(o.OrderSubCategory.Title)
+                         ? " / " + o.OrderSubCategory.Title
+                         : ""),
+                 Address= (o.User != null
+                     ? o.User.Address ?? ""
+                     : "نامشخص"),
+                 Description = o.Description,
+             })
+             .FirstOrDefaultAsync();
+            if(result == null)
+                return null;
+            return result;
+        }
+        #endregion
+
     }
 }
 

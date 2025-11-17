@@ -110,6 +110,9 @@
                                 <button class="btn btn-outline-primary" onclick="showOrderDetails(@item.OrderId)">
                                     <i class="fas fa-eye"></i> مشاهده جزئیات
                                 </button>
+                                <a class="btn btn-outline-primary" asp-area="" asp-controller="Print" asp-action="PrintPage" asp-route-orderId="@item.OrderId">
+                                    <i class="fas fa-print"></i> چاپ
+                                </a>
                             </div>
                         </div>
                     </div>

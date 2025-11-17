@@ -146,6 +146,10 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
                         11 => await CalculateGlue2CostAsync(height),
                         12 => await GetWageCostAsync(),
                         13 => await GetPackagingCostAsync(),
+
+                        //تغییرات 1404-08-26
+                        14 => await CalculateIrani50Async(orderView),
+                        15 => await CalculateKhareji50Async(orderView),
                         _ => 0m
                     };
 
@@ -213,6 +217,24 @@ namespace Shop2City.Web.Areas.UserPanel.Controllers
         private async Task<decimal> CalculateKharejiAsync(CreateDto order)
         {
             var unitPrice = await _curtainComponentRepository.GetPriceByIdAsync(2);
+            if (unitPrice <= 0) return 0;
+            return ((order.Height + 10) * order.Width * unitPrice) / 10000;
+        }
+        #endregion
+        //تغییرات 1404-08-26
+        #region پرده طلقی رویال ایرانی  (ضخامت 0.50)
+        private async Task<decimal> CalculateIrani50Async(CreateDto order)
+        {
+            var unitPrice = await _curtainComponentRepository.GetPriceByIdAsync(14);
+            if (unitPrice <= 0) return 0;
+            return ((order.Height + 10) * order.Width * unitPrice) / 10000;
+        }
+        #endregion
+        //تغییرات 1404-08-26
+        #region پرده طلقی رویال خارجی  (ضخامت 0.50)
+        private async Task<decimal> CalculateKhareji50Async(CreateDto order)
+        {
+            var unitPrice = await _curtainComponentRepository.GetPriceByIdAsync(15);
             if (unitPrice <= 0) return 0;
             return ((order.Height + 10) * order.Width * unitPrice) / 10000;
         }

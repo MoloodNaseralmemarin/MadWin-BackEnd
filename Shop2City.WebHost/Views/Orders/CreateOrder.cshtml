@@ -93,6 +93,24 @@
                         </div>
                     </div>
 
+
+                    <!--چسب بغل پرده-->
+                    <div class="mb-2">
+                        <label class="form-label">تقسیم‌بندی</label>
+                        <ul id="divisionList" class="list-unstyled d-flex gap-2 flex-wrap">
+                            <li>
+                                <input class="btn-check" type="radio" name="division" id="div-2-equal" value="2-equal" onclick="updateInputs(2,'equal')" required>
+                                <label class="btn btn-outline-primary" for="div-2-equal">کامل (سرتاسر ارتفاع پرده)</label>
+                            </li>
+                            <li>
+                                <input class="btn-check" type="radio" name="division" id="div-2-unequal" value="2-unequal" onclick="updateInputs(2,'unequal')">
+                                <label class="btn btn-outline-primary" for="div-2-unequal">معمولی (هر 40تا 50 سانتی متر 10 سانتی متر چسب)</label>
+                            </li>
+                        </ul>
+                        <div class="invalid-feedback d-none" id="division-error">لطفا انتخاب کنید.</div>
+                    </div>
+
+
                     <!-- تقسیم‌بندی (رادیوها داخل UL برای UX بهتر روی موبایل) -->
                     <div class="mb-2">
                         <label class="form-label">تقسیم‌بندی</label>
