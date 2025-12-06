@@ -1,0 +1,30 @@
+﻿@using MadWin.Core.DTOs.ProductGroups
+@model ProductGroupItemForAdminDto
+@{
+}
+<div class="container" dir="rtl">
+    <div class="card my-3">
+        <div class="card-body">
+            <h4 class="card-title mb-3">ویرایش گروه بندی محصولات
+            </h4>
+
+            <form method="post" class="row g-3">
+                <input type="hidden" class="form-control" asp-for="Id" />
+
+                <!-- درصد، کد، تعداد قابل استفاده -->
+                <div class="col-12 col-md-6">
+                    <label asp-for="Title" class="form-label"></label>
+                    <input type="text" class="form-control" asp-for="Title" />
+                    <span class="text-danger" asp-validation-for="Title"></span>
+                </div>
+
+                <!-- دکمه‌ها -->
+                <div class="col-12 d-flex gap-2 justify-content-start">
+                    <input type="submit" class="btn btn-success" value="ذخیره اطلاعات" />
+                    <a class="btn btn-outline-info">پاک کردن</a>
+                    <a class="btn btn-primary" data-bs-toggle="tooltip" title="مشاهده لیست محصولات درج شده">بازگشت به فهرست</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

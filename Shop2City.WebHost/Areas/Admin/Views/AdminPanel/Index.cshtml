@@ -1,0 +1,141 @@
+﻿@using MadWin.Application.Services;
+@inject IFactorService _factorService;
+@inject IOrderService _orderService;
+@inject IUserService _userService;
+@inject ISmsSenderService _smsSenderService;
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
+    ViewData["Title"] = "صفحه مدیریت";
+    var countOrders = await _orderService.CountOrders();
+    var countFactors = await _factorService.CountFactors();
+    var countSmss = await _smsSenderService.CountSendSms();
+    var countUserActive = await _userService.CountUserActive();
+    var totalOrdersPrice = await _orderService.GetTotalOrdersPriceAsync();
+    var todayTotalOrdersPrice = await _orderService.GetTodayTotalOrdersPriceAsync();
+    var totalFactorsPrice = await _factorService.GetTotalFactorsPriceAsync();
+    var todayTotalFactorsPrice = await _factorService.GetTodayTotalFactorsPriceAsync();
+}
+
+
+<div class="container my-4">
+    <div class="row g-4">
+        <!-- کارت ۱ -->
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card shadow-sm bg-light border rounded-3 h-100">
+                <div class="card-body d-flex flex-column justify-content-between text-center">
+                    <div>
+                        <h6 class="mb-3 fw-bold text-secondary">تعداد کل سفارش های فعال</h6>
+                        <span class="badge bg-primary fs-6 px-3 py-2">@countOrders عدد</span>
+                    </div>
+
+                    <div class="mt-3">
+                        <a asp-area="Admin" asp-controller="Orders" asp-action="Index"
+                           class="btn btn-outline-primary btn-sm rounded-pill px-4 mt-2">
+                            <i class="bi bi-eye"></i> نمایش
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- کارت ۲ -->
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card shadow-sm bg-light border rounded-3 h-100">
+                <div class="card-body d-flex flex-column justify-content-between text-center">
+                    <div>
+                        <h6 class="mb-3 fw-bold text-secondary">تعداد کل فاکتورهای فعال</h6>
+                        <span class="badge bg-primary fs-6 px-3 py-2">@countFactors عدد</span>
+                    </div>
+
+                    <div class="mt-3">
+                        <a asp-area="Admin" asp-controller="Factors" asp-action="Index"
+                           class="btn btn-outline-primary btn-sm rounded-pill px-4 mt-2">
+                            <i class="bi bi-eye"></i> نمایش
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- کارت ۳ -->
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card shadow-sm bg-light border rounded-3 h-100">
+                <div class="card-body d-flex flex-column justify-content-between text-center">
+                    <div>
+                        <h6 class="mb-3 fw-bold text-secondary">تعداد پیامک ارسالی</h6>
+                        <span class="badge bg-primary fs-6 px-3 py-2">@countSmss عدد</span>
+                    </div>
+
+                    <div class="mt-3">
+                        <a asp-area="Admin" asp-controller="SendSms" asp-action="Index"
+                           class="btn btn-outline-primary btn-sm rounded-pill px-4 mt-2">
+                            <i class="bi bi-eye"></i> نمایش
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- کارت ۴ -->
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card shadow-sm bg-light border rounded-3 h-100">
+                <div class="card-body d-flex flex-column justify-content-between text-center">
+                    <div>
+                        <h6 class="mb-3 fw-bold text-secondary">تعداد کاربران فعال</h6>
+                        <span class="badge bg-primary fs-6 px-3 py-2">@countUserActive عدد</span>
+                    </div>
+
+                    <div class="mt-3">
+                        <a asp-area="Admin" asp-controller="Users" asp-action="Index"
+                           class="btn btn-outline-primary btn-sm rounded-pill px-4 mt-2">
+                            <i class="bi bi-eye"></i> نمایش
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4 my-4">
+        <!--سفارش-->
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card shadow-sm bg-light border rounded-3 h-100">
+                <div class="card-body d-flex flex-column justify-content-between text-center">
+                    <div>
+                        <h6 class="mb-3 fw-bold text-secondary">جمع کل هزینه سفارش ها تا امروز</h6>
+                        <span class="badge bg-primary fs-6 px-3 py-2">@totalOrdersPrice.ToString("N0") ریال</span>
+                    </div>
+
+                    <div class="mt-3">
+                         <h6 class="mb-3 text-secondary">جمع کل هزینه سفارش ها امروز</h6>
+                            @todayTotalOrdersPrice.ToString("N0") ریال
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- فاکتور-->
+            <div class="col-12 col-md-6 col-lg-3">
+            <div class="card shadow-sm bg-light border rounded-3 h-100">
+                <div class="card-body d-flex flex-column justify-content-between text-center">
+                    <div>
+                        <h6 class="mb-3 fw-bold text-secondary">جمع کل هزینه فاکتورها تا امروز</h6>
+                        <span class="badge bg-primary fs-6 px-3 py-2">@totalFactorsPrice.ToString("N0") ریال</span>
+                    </div>
+
+                    <div class="mt-3">
+                         <h6 class="mb-3 text-secondary">جمع کل هزینه فاکتورها امروز</h6>
+                            @todayTotalFactorsPrice.ToString("N0") ریال
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

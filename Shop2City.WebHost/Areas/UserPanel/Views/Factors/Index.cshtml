@@ -1,0 +1,172 @@
+﻿@using MadWin.Core.DTOs.Factors
+@using MadWin.Core.DTOs.Orders
+@using Shop2City.Core.Convertors
+@using Shop2City.WebHost.ViewModels.Orders
+@model FactorForUserViewModel
+
+@{
+
+    ViewBag.Title = "لیست سفارش پرده های آماده";
+    var currentFromDate = Context.Request.Query["FromDate"].ToString();
+    var currentToDate = Context.Request.Query["ToDate"].ToString();
+    var currentFactorId = Context.Request.Query["FactorId"].ToString();
+    var currentFromPrice = Context.Request.Query["FromPrice"].ToString();
+    var currentToPrice = Context.Request.Query["ToPrice"].ToString();
+
+    int visiblePages = 3;
+    int startPage = Math.Max(Model.CurrentPage - visiblePages, 1);
+    int endPage = Math.Min(Model.CurrentPage + visiblePages, Model.CountPage);
+}
+
+<!-- فیلتر جستجو -->
+<div class="mt-3">
+    <div class="card border-info shadow-sm">
+        <div class="card-header bg-info text-white fs-5">فیلتر جستجو</div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="FromDate" class="form-label">از تاریخ:</label>
+                    <input type="text" id="FromDate" name="FromDate" value="@currentFromDate" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label for="ToDate" class="form-label">تا تاریخ:</label>
+                    <input type="text" id="ToDate" name="ToDate" value="@currentToDate" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label for="OrderId" class="form-label">کد سفارش:</label>
+                    <input type="number" id="FactorId" name="FactorId" value="@currentFactorId" class="form-control" placeholder="کد سفارش" />
+                </div>
+                <div class="col-md-3">
+                    <label for="FromPrice" class="form-label">از مبلغ:</label>
+                    <input type="number" id="FromPrice" name="FromPrice" value="@currentFromPrice" class="form-control" placeholder="حداقل مبلغ" />
+                </div>
+                <div class="col-md-3">
+                    <label for="ToPrice" class="form-label">تا مبلغ:</label>
+                    <input type="number" id="ToPrice" name="ToPrice" value="@currentToPrice" class="form-control" placeholder="حداکثر مبلغ" />
+                </div>
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary">جستجو</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- لیست سفارش‌ها -->@if (Model.FactorSummaryForUser != null && Model.FactorSummaryForUser.Any())
+{
+    <div class="mt-4">
+        <h4 class="mb-4 fw-bold text-center">لیست سفارش‌ها</h4>
+
+        <div class="row g-4">
+            @foreach (var item in Model.FactorSummaryForUser)
+            {
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-lg border-0 rounded-3 order-card">
+
+                        <div class="card-header text-white
+                                            @(item.IsFinaly ? "bg-success" : "bg-secondary") rounded-top">
+                            <h5 class="mb-0">کد سفارش:@item.FactorId</h5>
+                        </div>
+
+                        <div class="card-body">
+
+                            <!-- دکمه‌ها در بالا سمت چپ -->
+                            <div class="d-flex justify-content-start gap-2 mb-3">
+
+                                <button class="btn btn-outline-primary btn-sm"
+                                        data-bs-toggle="tooltip" title="مشاهده جزئیات"
+                                        onclick="showFactorDetails(@item.FactorId)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <p class="text-muted small">@item.CreateDate.ToShamsi() - @item.CreateDate.ToString("HH:mm")</p>
+                            <p><strong>تعداد اقلام:</strong> @item.FactorDetailItemCount</p>
+                            <p><strong>مبلغ اقلام:</strong> @item.TotalAmount.ToString("N0") ریال</p>
+                            <p><strong>تخفیف:</strong> @item.DisTotal.ToString("N0") ریال (@item.DisPercent%)</p>
+                            <p class="fw-bold text-primary"><strong>قیمت کل:</strong> @item.TotalAmount.ToString("N0") ریال</p>
+
+                            <p><strong>آدرس:</strong> @item.Address</p>
+                            <p><strong>شیوه ارسال:</strong> @item.DeliveryMethodName (@item.DeliveryMethodCost.ToString("N0")ریال)</p>
+                            <p><strong>توضیحات:</strong> @item.Description</p>
+                            <p>
+                                <strong>وضعیت:</strong>
+                                @if (item.IsFinaly)
+                                {
+                                    <span class="text-success fw-bold">تسویه شده</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger fw-bold">تسویه نشده</span>
+                                }
+                            </p>
+
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+
+        <!-- صفحه‌بندی -->
+        <nav class="mt-5">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Index", "Factors", new { area = "Admin", pageId = Model.CurrentPage - 1 })">قبلی</a>
+                </li>
+
+                @for (var i = startPage; i <= endPage; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Index", "Factors", new { area = "Admin", pageId = i })">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(Model.CurrentPage == Model.CountPage ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Index", "Factors", new { area = "Admin", pageId = Model.CurrentPage + 1 })">بعدی</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning text-center mt-5 p-4 fs-5 rounded-3 shadow-sm">
+        هیچ سفارشی یافت نشد.
+    </div>
+}
+<!-- Modal جزئیات سفارش -->
+<div class="modal fade" id="factorDetailsModal" tabindex="-1" aria-labelledby="factorDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="factorDetailsModalLabel">جزئیات اقلام فاکتور</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="factorDetailsContent"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showFactorDetails(factorId) {
+            const loader = `<div class="text-center my-4"><div class="spinner-border" role="status"></div></div>`;
+            document.getElementById("factorDetailsContent").innerHTML = loader;
+
+            fetch(`/Admin/Factors/ShowFactorDetails?id=${factorId}`)
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById("factorDetailsContent").innerHTML = html;
+                    new bootstrap.Modal(document.getElementById('factorDetailsModal')).show();
+                })
+                .catch(() => {
+                    document.getElementById("factorDetailsContent").innerHTML = "<div class='text-danger text-center'>خطا در بارگذاری اطلاعات</div>";
+                });
+        }
+    </script>
+
+    <script src="~/js/datepicker/datepicker-config.js"></script>
+}

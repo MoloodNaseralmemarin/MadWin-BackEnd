@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Services\IOrderService.cs~RF4c2a69.TMP" />
+    <None Remove="Services\IProductService.cs~RF77cd9d.TMP" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
+  </ItemGroup>
+  
+    <ItemGroup>
+    <ProjectReference Include="..\MadWin.Core\MadWin.Core.csproj" />
+  </ItemGroup>
+
+</Project>

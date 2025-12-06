@@ -1,0 +1,98 @@
+﻿@using MadWin.Core.DTOs.Calculations
+@model IEnumerable<CurtainComponentDetailDto>
+
+@{
+    var first = Model.FirstOrDefault();
+    var total = Model.Sum(x => x.FinalCost);
+}
+@if (first != null)
+{
+    <div class="container mt-3" dir="rtl">
+
+        <!-- اطلاعات کلی سفارش -->
+        <div class="alert alert-info shadow-sm mb-4 rounded-3">
+            <div class="row text-center small fw-semibold">
+                <div class="col-md-6 mb-2 mb-md-0">
+                    نوع پرده:
+                    <span class="fw-bold text-primary">@first.CategoryName</span>
+                </div>
+                <div class="col-md-3 mb-2 mb-md-0">
+                    عرض:
+                    <span class="fw-bold text-primary">@first.Width</span> سانتی‌متر
+                </div>
+                <div class="col-md-3">
+                    ارتفاع:
+                    <span class="fw-bold text-primary">@first.Height</span> سانتی‌متر
+                </div>
+            </div>
+        </div>
+
+        <!-- جدول مخصوص دسکتاپ -->
+        <div class="table-responsive d-none d-md-block">
+            <table class="table table-bordered table-hover table-sm align-middle shadow-sm">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th>نام قطعه</th>
+                        <th>تعداد</th>
+                        <th>قیمت واحد (ریال)</th>
+                        <th>قیمت کل (ریال)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="text-wrap">@item.ComponentName</td>
+                            <td class="text-center">@item.Count عدد</td>
+                            <td class="text-end">@item.UnitCost.ToString("N0") ریال</td>
+                            <td class="text-end fw-bold">@item.FinalCost.ToString("N0")ریال</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="table-secondary fw-bold">
+                        <td colspan="3" class="text-end">جمع کل بدون احتساب کارمزد</td>
+                        <td class="text-end text-primary">@total.ToString("N0")ریال</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- نسخه مخصوص موبایل -->
+        <div class="d-md-none">
+            @foreach (var item in Model)
+            {
+                <div class="card mb-2 shadow-sm border-0 rounded-3">
+                    <div class="card-body p-3">
+                        <div class="fw-semibold text-primary mb-2">@item.ComponentName</div>
+
+                        <div class="d-flex justify-content-between small">
+                            <span class="text-muted">تعداد:</span>
+                            <span>@item.Count عدد</span>
+                        </div>
+                        <div class="d-flex justify-content-between small">
+                            <span class="text-muted">قیمت واحد:</span>
+                            <span>@item.UnitCost.ToString("N0") ریال</span>
+                        </div>
+                        <div class="d-flex justify-content-between small">
+                            <span class="text-muted">قیمت کل:</span>
+                            <span class="fw-bold text-success">@item.FinalCost.ToString("N0") ریال</span>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="card mt-3 border-0 shadow-sm">
+                <div class="card-body py-2 text-end fw-bold">
+                   جمع کل بدون احتساب کارمزد: <span class="text-primary">@total.ToString("N0") ریال</span>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning text-center mt-3">
+        اطلاعاتی برای نمایش وجود ندارد.
+    </div>
+}

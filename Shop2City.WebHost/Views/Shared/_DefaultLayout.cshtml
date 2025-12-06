@@ -1,0 +1,18 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>فروشگاه اینترنتی مادوین - @ViewData["Title"]</title>
+    <partial name="_CSS" />
+</head>
+<body class="bg-light">
+    <header>
+        <partial name="_Nav" />
+    </header>
+    @RenderBody()
+    <partial name="_Footer" />
+    <partial name="_JS" />
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

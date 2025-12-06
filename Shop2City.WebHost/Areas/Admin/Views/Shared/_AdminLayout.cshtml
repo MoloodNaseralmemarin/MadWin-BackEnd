@@ -1,0 +1,337 @@
+﻿@using MadWin.Application.Services
+@inject IUserService _userService;
+@inject IOrderService _orderService;
+@inject IFactorService _factorService;
+@{
+    // گرفتن Claim برای NameIdentifier
+    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var user = await _userService.GetNameByUserNameAsync(userId);
+    var settledOrdersCount = await _orderService.GetTodaySettledOrdersCount();
+    var unSettledOrdersCount = await _orderService.GetTodayUnSettledOrdersCount();
+    var settledFactorsCount = await _factorService.GetTodaySettledFactorsCount();
+    var unSettledFactorsCount = await _factorService.GetTodayUnSettledFactorsCount();
+
+}
+
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.rtl.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+   <!-- Persian Datepicker CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css"/>
+
+<!-- jQuery -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+
+<!-- Persian Date libraries -->
+<script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+
+
+
+
+    <!-- استایل سفارشی -->
+    <link rel="stylesheet" type="text/css" href="~/AdminPanel/Style.css" />
+    <title>پنل مدیریت فروشگاه ماد وین</title>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top">
+<div class="container-fluid d-flex justify-content-between align-items-center">
+    <!-- دکمه همبرگر برای موبایل -->
+    <button class="btn btn-outline-dark d-md-none" type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvasSidebar"
+            aria-controls="offcanvasSidebar">
+        <i class="fa fa-bars"></i>
+    </button>
+
+    <!-- عنوان سایت -->
+    <a class="navbar-brand me-auto ms-2" href="#">پنل مدیریتی ماد وین</a>
+
+    <!-- نام کاربر و آیکون خروج -->
+    <div class="d-flex align-items-center">
+        <span class="fw-bold me-2">@user.FullName</span>
+        <a asp-controller="Account" asp-action="Logout" title="خروج">
+            <i class="bi bi-box-arrow-right fs-5 text-danger"  me-2></i>
+        </a>
+    </div>
+</div>
+
+        </nav>
+    </header>
+
+    <!-- سایدبار دسکتاپ -->
+    <div class="d-none d-md-block bg-light position-fixed vh-100 border-start"
+         style="width: 280px; top: 56px; right: 0; overflow-y: auto;">
+        <div class="accordion" id="accordionDesktop">
+
+
+            <!-- داشبورد -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOneDesktop">
+                    <button class="accordion-button collapsed" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseOneDesktop">
+                            داشبورد
+                    </button>
+                </h2>
+                <div id="collapseOneDesktop" class="accordion-collapse collapse">
+                    <div class="accordion-body p-0">
+                        <ul class="list-unstyled ps-3">
+                            <li><a asp-area="Admin" asp-controller="AdminPanel" asp-action="Index" class="d-block py-1">داشبورد</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- مدیریت کاربران -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwoDesktop">
+                    <button class="accordion-button collapsed" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseTwoDesktop">
+                        مدیریت کاربران
+                    </button>
+                </h2>
+                <div id="collapseTwoDesktop" class="accordion-collapse collapse">
+                    <div class="accordion-body p-0">
+                        <ul class="list-unstyled ps-3">
+                            <li><a asp-area="Admin" asp-controller="Users" asp-action="Index" class="d-block py-1">کاربران</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- مدیریت سایت -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThreeDesktop">
+                    <button class="accordion-button collapsed" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseThreeDesktop">
+                        مدیریت سایت
+                    </button>
+                </h2>
+                <div id="collapseThreeDesktop" class="accordion-collapse collapse">
+                    <div class="accordion-body p-0">
+                        <ul class="list-unstyled ps-3">
+                            <li><a asp-area="Admin" asp-controller="CurtainComponents" asp-action="Index" class="d-block py-1">مواد مصرفی</a></li>
+                            <li><a asp-area="Admin" asp-controller="CommissionRates" asp-action="Index" class="d-block py-1">کارمزد</a></li>
+                            <li><a asp-area="Admin" asp-controller="Discounts" asp-action="Index" class="d-block py-1">کد تخفیف</a></li>
+                            <li><a asp-area="Admin" asp-controller="Products" asp-action="Index" class="d-block py-1">محصولات</a></li>
+                            <li><a asp-area="Admin" asp-controller="ProductGroups" asp-action="Index" class="d-block py-1">دسته بندی محصولات</a></li>
+                            <li><a asp-area="Admin" asp-controller="DeliveryMethods" asp-action="Index" class="d-block py-1">شیوه ارسال</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- مدیریت فروش ها -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFourDesktop">
+                    <button class="accordion-button collapsed" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseFourDesktop">
+                        مدیریت فروش ها
+                    </button>
+                </h2>
+                <div id="collapseFourDesktop" class="accordion-collapse collapse">
+                    <div class="accordion-body p-0">
+                        <ul class="list-unstyled ps-3">
+                            <li>
+                                <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="d-block py-1 text-decoration-none">
+                                    پرده های سفارشی
+                                    <span class="badge bg-success ms-2">@settledOrdersCount</span>
+                                    <span class="badge bg-danger ms-2">@unSettledOrdersCount</span>
+                                </a>
+                                </li>
+                            <li><a asp-area="Admin" asp-controller="Factors" asp-action="Index" class="d-block py-1 text-decoration-none">
+                                پرده های آماده
+                                    <span class="badge bg-success ms-2">@settledFactorsCount</span>
+                                    <span class="badge bg-danger ms-2">@unSettledFactorsCount</span>
+                                </a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- دسترسی آسان -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFiveDesktop">
+                    <button class="accordion-button collapsed" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseFiveDesktop">
+                        دسترسی آسان
+                    </button>
+                </h2>
+                <div id="collapseFiveDesktop" class="accordion-collapse collapse">
+                    <div class="accordion-body p-0">
+                        <ul class="list-unstyled ps-3">
+                            <li><a asp-area="" asp-controller="Home" asp-action="Index" class="d-block py-1">صفحه اصلی سایت</a></li>
+                            <li><a asp-area="" asp-controller="Orders" asp-action="CreateOrder" class="d-block py-1">محاسبه پرده با اندازه دلخواه</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- خروج -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingSixDesktop">
+                    <button class="accordion-button collapsed text-danger" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseSixDesktop">
+                        خروج از سایت
+                    </button>
+                </h2>
+                <div id="collapseSixDesktop" class="accordion-collapse collapse">
+                    <div class="accordion-body p-0">
+                        <ul class="list-unstyled ps-3">
+                            <li><a asp-controller="Account" asp-action="Logout" class="d-block py-1">خروج از سایت</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Offcanvas sidebar موبایل -->
+    <div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">منو</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="بستن"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="accordion" id="accordionMobile">
+
+                <!--داشبورد-->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOneMobile">
+                        <button class="accordion-button collapsed" type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#collapseOneMobile">
+                           داشبورد
+                        </button>
+                    </h2>
+                    <div id="collapseOneMobile" class="accordion-collapse collapse">
+                        <div class="accordion-body p-0">
+                            <ul class="list-unstyled ps-3">
+                                <li><a asp-area="Admin" asp-controller="AdminPanel" asp-action="Index" class="d-block py-1">داشبورد</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- مدیریت کاربران -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwoMobile">
+                        <button class="accordion-button collapsed" type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#collapseTwoMobile">
+                            مدیریت کاربران
+                        </button>
+                    </h2>
+                    <div id="collapseTwoMobile" class="accordion-collapse collapse">
+                        <div class="accordion-body p-0">
+                            <ul class="list-unstyled ps-3">
+                                <li><a asp-area="Admin" asp-controller="Users" asp-action="Index" class="d-block py-1">کاربران</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- مدیریت سایت -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThreeMobile">
+                        <button class="accordion-button collapsed" type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#collapseThreeMobile">
+                            مدیریت سایت
+                        </button>
+                    </h2>
+                    <div id="collapseThreeMobile" class="accordion-collapse collapse">
+                        <div class="accordion-body p-0">
+                            <ul class="list-unstyled ps-3">
+                                <li><a asp-area="Admin" asp-controller="CurtainComponents" asp-action="Index" class="d-block py-1">مواد مصرفی</a></li>
+                                <li><a asp-area="Admin" asp-controller="CommissionRates" asp-action="Index" class="d-block py-1">کارمزد</a></li>
+                                <li><a asp-area="Admin" asp-controller="Discounts" asp-action="Index" class="d-block py-1">کد تخفیف</a></li>
+                                <li><a asp-area="Admin" asp-controller="Products" asp-action="Index" class="d-block py-1">محصولات</a></li>
+                                <li><a asp-area="Admin" asp-controller="ProductGroups" asp-action="Index" class="d-block py-1">دسته بندی محصولات</a></li>
+                                <li><a asp-area="Admin" asp-controller="DeliveryMethods" asp-action="Index" class="d-block py-1">شیوه ارسال</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- مدیریت فروش ها -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFourMobile">
+                        <button class="accordion-button collapsed" type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#collapseFourMobile">
+                            مدیریت فروش ها
+                        </button>
+                    </h2>
+                    <div id="collapseFourMobile" class="accordion-collapse collapse">
+                        <div class="accordion-body p-0">
+                            <ul class="list-unstyled ps-3">
+                                <li><a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="d-block py-1">پرده های سفارشی</a></li>
+                                <li><a asp-area="Admin" asp-controller="Factors" asp-action="Index" class="d-block py-1">پرده آماده</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- دسترسی آسان -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFiveDesktop">
+                        <button class="accordion-button collapsed" type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#collapseFiveDesktop">
+                            دسترسی آسان
+                        </button>
+                    </h2>
+                    <div id="collapseFiveDesktop" class="accordion-collapse collapse">
+                        <div class="accordion-body p-0">
+                            <ul class="list-unstyled ps-3">
+                                <li><a asp-area="" asp-controller="Home" asp-action="Index" class="d-block py-1">صفحه اصلی سایت</a></li>
+                                <li><a asp-area="" asp-controller="Orders" asp-action="CreateOrder" class="d-block py-1">محاسبه پرده با اندازه دلخواه</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- خروج -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingSixDesktop">
+                        <button class="accordion-button collapsed text-danger" type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#collapseSixDesktop">
+                            خروج از سایت
+                        </button>
+                    </h2>
+                    <div id="collapseSixDesktop" class="accordion-collapse collapse">
+                        <div class="accordion-body p-0">
+                            <ul class="list-unstyled ps-3">
+                                <li><a asp-controller="Account" asp-action="Logout" class="d-block py-1">خروج از سایت</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <h1 class="mt-5 mb-3 text-start">میز کار</h1>
+        @RenderBody()
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-date/dist/persian-date.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+
+    <script src="~/js/validation/user/validationInput.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+

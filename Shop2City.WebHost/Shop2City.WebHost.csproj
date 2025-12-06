@@ -1,0 +1,58 @@
+﻿
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="wwwroot\assets\**" />
+    <Compile Remove="wwwroot\images\slider\**" />
+    <Compile Remove="wwwroot\lib\**" />
+    <Content Remove="wwwroot\assets\**" />
+    <Content Remove="wwwroot\images\slider\**" />
+    <Content Remove="wwwroot\lib\**" />
+    <EmbeddedResource Remove="wwwroot\assets\**" />
+    <EmbeddedResource Remove="wwwroot\images\slider\**" />
+    <EmbeddedResource Remove="wwwroot\lib\**" />
+    <None Remove="wwwroot\assets\**" />
+    <None Remove="wwwroot\images\slider\**" />
+    <None Remove="wwwroot\lib\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Areas\Admin\Views\CurtainComponents\Index.cshtml~RF582baf9.TMP" />
+    <None Remove="Areas\Admin\Views\Shared\_AdminLayout.cshtml~RF3b1d5c.TMP" />
+    <None Remove="Areas\Admin\Views\Shared\_AdminLayout.cshtml~RF4f1c71.TMP" />
+    <None Remove="Views\Shared\_SideBar.cshtml~RF368c969.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+<FrameworkReference Include="Microsoft.AspNetCore.App" />
+<PackageReference Include="Bootstrap.Datepicker" Version="1.8.0.1" />
+<PackageReference Include="Ghasedak.Core" Version="1.1.4.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="9.0.2" />
+    <PackageReference Include="Stimulsoft.Reports.Web.NetCore" Version="2025.4.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MadWin.Application\MadWin.Application.csproj" />
+    <ProjectReference Include="..\MadWin.Core\MadWin.Core.csproj" />
+    <ProjectReference Include="..\MadWin.Infrastructure\MadWin.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

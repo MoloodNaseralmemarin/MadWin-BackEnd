@@ -1,0 +1,93 @@
+﻿@using MadWin.Core.DTOs.SendSms
+@using Shop2City.Core.Convertors
+@model SendSmsForAdminViewModel
+@{
+    ViewBag.Title = "لیست پیامکی ارسال شده";
+    int visiblePages = 3; // تعداد صفحات قبل و بعد از صفحه فعلی
+    int startPage = Math.Max(Model.CurrentPage - visiblePages, 1);
+    int endPage = Math.Min(Model.CurrentPage + visiblePages, Model.CountPage);
+}
+
+<div class="container-fluid my-3">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">لیست پیامکی ارسال شده</h5>
+        </div>
+
+        <div class="card-body">
+            <!-- نمایش به صورت جدول (فقط دسکتاپ و تبلت) -->
+            <div class="table-responsive-md d-none d-md-block">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>شناسه</th>
+                            <th>تاریخ و ساعت</th>
+                            <th>شماره همراه</th>
+                            <th>پیام ارسال شده</th>
+                            <td>شماره فاکتور</td>
+                            <td>شماره سفارش</td>
+                            <td>تعداد پیامک</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.SendSms)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.CreateDate.ToShamsi()- @item.CreateDate.ToString("HH:mm:ss")</td>
+                                <td>@item.PhoneNumber</td>
+                                <td>@item.Message</td>
+                                <td>@item.FactorId</td>
+                                <td>@item.OrderId</td>
+                                <td>@item.SmsCount</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- نمایش به صورت کارت (فقط موبایل) -->
+            <div class="d-block d-md-none">
+                <div class="row g-2">
+                    @foreach (var item in Model.SendSms)
+                    {
+                        <div class="col-12">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="card-title">@item.CreateDate.ToShamsi()- @item.CreateDate.ToString("HH:mm:ss")</h6>
+                                    <p class="card-text mb-1"><strong>شناسه:</strong> @item.Status</p>
+                                    <p class="card-text mb-1"><strong>شماره همراه:</strong> @item.OrderId</p>
+                                    <p class="card-text mb-1"><strong>تاریخ ثبت‌نام:</strong> @item.FactorId</p>
+                                    <p class="card-text mb-1"><strong>تعداد سفارش:</strong> @item.Message</p>
+                                    <p class="card-text mb-1"><strong>تعدا فاکتور</strong> @item.OrderId</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <!-- صفحه‌بندی -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm flex-wrap justify-content-center mt-3">
+                    @* دکمه صفحه قبل *@
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("Index", "SendSms", new { area = "Admin", pageId = Model.CurrentPage - 1 })">قبل</a>
+                    </li>
+
+                    @* صفحات وسطی *@
+                    @for (var i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Index", "SendSms", new { area = "Admin", pageId = i })">@i</a>
+                        </li>
+                    }
+
+                    @* دکمه صفحه بعد *@
+                    <li class="page-item @(Model.CurrentPage == Model.CountPage ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("Index", "SendSms", new { area = "Admin", pageId = Model.CurrentPage + 1 })">بعد</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>

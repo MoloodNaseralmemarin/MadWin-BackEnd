@@ -1,0 +1,30 @@
+@{
+    bool isLoggedIn = User.Identity.IsAuthenticated;
+    bool hasItems = Model.TotalCount > 0;
+
+    //  اگر لاگین نیست، همیشه بره Cart/ShowCart
+    string linkController = isLoggedIn
+        ? (hasItems ? "Cart" : "Factors")
+        : "Cart";
+
+    string linkAction = isLoggedIn
+        ? (hasItems ? "ShowCart" : "FactorSummary")
+        : "ShowCart"; //  اینجا همیشه ShowCart برای کاربر لاگین‌نشده
+
+    string badgeStyle = hasItems ? "" : "pointer-events:none; opacity:0.5;";
+}
+
+<a asp-area=""
+   asp-controller="Cart"
+   asp-action="ShowCart"
+   class="text-white badge bg-warning text-dark p-2 me-5 position-relative"
+   id="cartBadge"
+   style="@badgeStyle">
+    <i class="fa fa-shopping-cart"></i>
+
+    <span id="CartBadgeContainer"
+          class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger"
+          style="@(hasItems ? "" : "display:none;")">
+        <span id="Cart-total">@Model.TotalCount</span>
+    </span>
+</a>

@@ -1,0 +1,162 @@
+﻿@font-face {
+    font-family: 'WYekan';
+    src: url('../fonts/WYekan.eot?#') format('eot'), url('../fonts/WYekan.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'IRANSans';
+    src: url('../fonts/IRANSans.eot?#') format('eot'), url('../fonts/IRANSans.ttf') format('truetype');
+}
+
+* {
+    font-family: 'IRANSans';
+    font-size:14px;
+}
+
+body {
+    direction: rtl;
+    padding:0;
+    margin:0;
+}
+.banner-top {
+    position: relative;
+    height: 200px; /* موبایل */
+    background: url('../images/banner/01.jpg') no-repeat center center/cover;
+    overflow: hidden;
+}
+
+@media (min-width: 768px) {
+    .banner-top {
+        height: 148px; /* دسکتاپ */
+    }
+}
+.banner-middle {
+    height: 40px;
+    
+}
+.click-word {
+    font-family: "IRANSansWeb" !important;
+    display: inline-block;
+    font-weight: bold;
+    font-size: clamp(1.2rem, 2vw, 1.5rem);
+    letter-spacing: .25rem; /* فاصله بین حروف */
+    animation: blinkStretch 1.5s ease-in-out infinite;
+}
+
+/* انیمیشن: چشم‌زن + کشیدگی */
+@keyframes blinkStretch {
+    0% {
+        transform: scaleX(1);
+        color: #fff;
+    }
+
+    40% {
+        transform: scaleX(1.5);
+        color: #ffe082;
+    }
+    /* کشیده‌تر + زرد */
+    60% {
+        transform: scaleX(1.4);
+        color: #fff176;
+    }
+
+    100% {
+        transform: scaleX(1);
+        color: #fff;
+    }
+}
+
+/* دسترسی: اگه کاربر انیمیشن‌ها رو غیرفعال کرده */
+@media (prefers-reduced-motion: reduce) {
+    .click-word {
+        animation: none !important;
+        transform: none !important;
+        color: #fff !important;
+    }
+}
+
+.swiper-slide {
+    display: flex;
+    justify-content: center;
+}
+.feature-card {
+    border-radius: 15px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    color: #fff;
+}
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.card-delivery {
+    background: #0d6efd;
+}
+
+.card-quality {
+    background: #198754;
+}
+
+.card-support {
+    background: #ffc107;
+    color: #212529;
+}
+
+.highlight {
+    font-weight: bold;
+}
+
+
+.product-slider {
+    scroll-behavior: smooth; /* اسکرول نرم */
+    -webkit-overflow-scrolling: touch; /* اسکرول روان روی موبایل */
+}
+
+.product-card {
+    flex: 0 0 auto; /* کارت‌ها کوچک نشوند */
+    width: 100%; /* موبایل: یک کارت در سطر */
+    max-width: 250px; /* حداکثر عرض کارت */
+}
+
+/* طراحی برای تبلت و موبایل */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 0.75rem;
+    }
+}
+
+/* برای نمایش در اندازه‌های بزرگتر */
+@media (min-width: 768px) {
+    .image img {
+        display: block;
+    }
+}
+
+/* واکنش‌گرایی */
+@media (min-width: 576px) {
+    .product-card {
+        max-width: 45%;
+    }
+    /* 2 کارت در سطر */
+}
+
+@media (min-width: 768px) {
+    .product-card {
+        max-width: 30%;
+    }
+    /* 3 کارت در سطر */
+}
+
+@media (min-width: 992px) {
+    .product-card {
+        max-width: 18%;
+    }
+    /* 5–6 کارت در سطر */
+}
+

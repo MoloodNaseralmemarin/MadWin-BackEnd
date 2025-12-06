@@ -1,0 +1,50 @@
+﻿@{
+    ViewData["Title"] = "خانه";
+    var linkController = User.Identity.IsAuthenticated ? "Orders" : "Account";
+    var linkAction = User.Identity.IsAuthenticated ? "CreateOrder" : "Login";
+}
+
+<main>
+    <partial name="_ContactCard"/>
+
+        <section class="py-1 bg-danger text-white mb-3">
+        <div class="text-center">
+            <a asp-controller="@linkController" asp-action="@linkAction"
+               class="fs-5 fs-md-5 fw-semibold mb-0 text-white text-decoration-none">
+                برای سفارش پرده، به اندازه دلخواه کلیک کنید.
+            </a>
+        </div>
+    </section>
+
+    <section class="container">
+        <h5 class="position-relative d-inline-block pb-2 mb-3">
+            پرده طلقی ایرانی
+            <span class="position-absolute start-0 bottom-0 w-100 border-bottom border-2 border-danger"></span>
+        </h5>
+        @await Component.InvokeAsync("CategoryIraniComponent")
+    </section>
+    <section class="container">
+        <h5 class="position-relative d-inline-block pb-2 mb-3">
+            پرده طلقی خارجی
+            <span class="position-absolute start-0 bottom-0 w-100 border-bottom border-2 border-danger"></span>
+        </h5>
+        @await Component.InvokeAsync("CategoryKharejiComponent")
+    </section>
+    <section class="container">
+        <h5 class="position-relative d-inline-block pt-5 pb-2 mb-3">
+            پرده توری یک لایه
+            <span class="position-absolute start-0 bottom-0 w-100 border-bottom border-2 border-danger"></span>
+        </h5>
+        @await Component.InvokeAsync("CategoryTooriOneLayerComponent")
+        </section>
+    <section class="container">
+        <h5 class="position-relative d-inline-block pb-2 mb-3">
+            پرده توری دو لایه
+            <span class="position-absolute start-0 bottom-0 w-100 border-bottom border-2 border-danger"></span>
+        </h5>
+        @await Component.InvokeAsync("CategoryTooriTwoLayerComponent")
+    </section>
+
+
+
+</main>

@@ -1,0 +1,70 @@
+﻿@using MadWin.Core.DTOs.Users
+@model EditUserViewModel
+@{
+    ViewData["Title"] = "ویرایش کاربر";
+}
+<div class="container my-3">
+    <div class="row g-3">
+        <!-- فرم ثبت کاربر -->
+        <div class="col-12 col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">ثبت کاربر</h4>
+                    <form method="post">
+                        <input type="hidden" class="form-control" asp-for="UserId">
+                        <!-- نام و نام خانوادگی -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-6">
+                                <label asp-for="FirstName" class="form-label"></label>
+                                <input type="text" class="form-control" asp-for="FirstName">
+                                <span class="text-danger" asp-validation-for="FirstName"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label asp-for="LastName" class="form-label"></label>
+                                <input type="text" class="form-control" asp-for="LastName">
+                                <span class="text-danger" asp-validation-for="LastName"></span>
+                            </div>
+                        </div>
+
+                        <!-- شماره موبایل و تلفن -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-6">
+                                <label asp-for="CellPhone" class="form-label"></label>
+                                <input type="text" class="form-control" asp-for="CellPhone">
+                                <span class="text-danger" asp-validation-for="CellPhone"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label asp-for="TelPhone" class="form-label"></label>
+                                <input type="text" class="form-control" asp-for="TelPhone">
+                                <span class="text-danger" asp-validation-for="TelPhone"></span>
+                            </div>
+                        </div>
+
+                        <!-- آدرس -->
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label"></label>
+                            <textarea class="form-control" asp-for="Address" rows="3"></textarea>
+                            <span class="text-danger" asp-validation-for="Address"></span>
+                        </div>
+
+                        <!-- نام کاربری و رمز عبور -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-6">
+                                <label asp-for="Password" class="form-label"></label>
+                                <input type="password" class="form-control" asp-for="Password">
+                                <span class="text-danger" asp-validation-for="Password"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label asp-for="ConfirmPassword" class="form-label"></label>
+                                <input type="password" class="form-control" asp-for="ConfirmPassword">
+                                <span class="text-danger" asp-validation-for="ConfirmPassword"></span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">ویرایش اطلاعات</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

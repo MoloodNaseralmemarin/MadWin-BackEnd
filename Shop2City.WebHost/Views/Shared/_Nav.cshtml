@@ -1,0 +1,111 @@
+﻿@using System.Security.Claims
+@using MadWin.Application.Services
+@using MadWin.Core.DTOs.Account
+@using Shop2City.Core.Services.Permissions
+@inject IUserPanelService UserPanelService
+@inject IPermissionService PermissionService
+@{
+    int userId = 0;
+    SideBarUserPanelViewModel user = null;
+    if (int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out userId) && userId > 0)
+    {
+      user = await UserPanelService.GetSideBarUserPanelDataAsync(userId);
+    }
+    var linkController = User.Identity.IsAuthenticated ? "Orders" : "Account";
+    var linkAction = User.Identity.IsAuthenticated ? "CreateOrder" : "Login";
+
+}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <!-- لوگو سمت چپ -->
+        <a class="navbar-brand fs-4 text-white" asp-area="" asp-controller="Home" asp-action="Index">فروشگاه ماد وین</a>
+
+        <!-- دکمه همبرگر برای موبایل -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="باز کردن منو">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- آیتم‌های منو -->
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+              
+                @if(User.Identity.IsAuthenticated)
+                {
+                    if (await PermissionService.CheckPermissionAsync(1, userId))
+                    {
+                          <li class="nav-item">
+                    <a class="nav-link text-white fs-5 active hover-shadow" asp-area="" asp-controller="Home" asp-action="Index">صفحه اصلی</a>
+                        </li>
+                    }
+                    else
+                    {
+
+                        <li class="nav-item">
+                            <a class="nav-link text-white fs-5 active hover-shadow" asp-area="" asp-controller="Home" asp-action="Index">صفحه اصلی</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-warning fs-5 hover-shadow" asp-area="" asp-controller="Orders" asp-action="CreateOrder"> سفارش پرده با اندازه دلخواه</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white fs-5 hover-shadow"
+                               asp-area="UserPanel"
+                               asp-controller="Factors"
+                               asp-action="FactorSummary"
+                               asp-route-factorId="">
+                                مشاهده سبد خرید
+                            </a>
+                        </li>
+                    }
+
+                }
+            </ul>
+
+            <!-- بخش سمت راست -->
+            <ul class="navbar-nav mb-2 mb-lg-0 ms-lg-auto align-items-lg-center">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    if (await PermissionService.CheckPermissionAsync(1, userId)) // یعنی Admin
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-white fs-5 hover-shadow" asp-area="Admin" asp-controller="AdminPanel" asp-action="Index">
+                                @User.Identity.Name خوش آمدید.
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+
+                        <li class="nav-item">
+                            <a class="nav-link text-white fs-5 hover-shadow" asp-area="UserPanel" asp-controller="UserPanel" asp-action="Index">
+                                @User.Identity.Name خوش آمدید.
+                            </a>
+                        </li>
+                    }
+
+                    <li class="nav-item">
+                        <a class="nav-link text-danger fs-5 hover-shadow"
+                           asp-controller="Account"
+                           asp-action="Logout">خروج</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-white fs-5 hover-shadow"
+                           asp-controller="Account"
+                           asp-action="Register">ثبت نام</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fs-5 hover-shadow"
+                           asp-controller="Account"
+                           asp-action="Login">ورود</a>
+                    </li>
+
+                }
+                <li class="nav-item mx-3 mt-lg-0">
+                    @await Component.InvokeAsync("CartBadgeComponent")
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,244 @@
+﻿@using MadWin.Core.DTOs.Factors
+@using Shop2City.Core.Convertors
+@model FactorSummaryViewModel
+
+@{
+    ViewData["Title"] = "خلاصه فاکتور";
+    var factor = Model.FactorSummaryForAdmin?.FactorSummary?.FirstOrDefault();
+    var factorId = factor?.FactorId ?? 0;
+    var subTotal = factor?.SubTotal ?? 0M;
+    var sumPrice = factor?.SubTotal ?? 0M;
+    var hasItems = factor != null && factor.FactorDetails?.Any() == true;
+}
+@Html.AntiForgeryToken() <!-- توکن CSRF -->
+
+
+<div class="container my-4">
+
+    <!-- مسیر صفحات -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-controller="Home" asp-action="Index"><i class="fa fa-home"></i></a>
+            </li>
+            <li class="breadcrumb-item">
+                <a asp-area="UserPanel" asp-controller="Home" asp-action="Index">پنل کاربری</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">فاکتور</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+            <div class="container mt-3">
+
+                @if (Model == null || Model.FactorSummaryForAdmin?.FactorSummary == null || !Model.FactorSummaryForAdmin.FactorSummary.Any())
+                {
+                    <!-- ✅ پیام در صورت خالی بودن فاکتور -->
+                    <div class="text-center mt-5">
+                        <i class="fa fa-receipt fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted"></h5>
+                    </div>
+                }
+                else
+                {
+                    var factorDetails = factor?.FactorDetails ?? new List<FactorDetailDto>();
+
+                    <div class="card shadow border-0 rounded-3">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fa fa-shopping-basket"></i> خلاصه فاکتور</h5>
+                            <span class="badge bg-light text-dark">شماره فاکتور: @factorId</span>
+                        </div>
+
+                        <!-- ✅ جدول دسکتاپ -->
+                        <div class="table-responsive d-none d-md-block">
+                            <table class="table table-bordered table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th><input type="checkbox" id="selectAll" /></th>
+                                        <th>نام محصول</th>
+                                        <th>تعداد</th>
+                                        <th>قیمت واحد</th>
+                                        <th>قیمت کل</th>
+                                        <th>عملیات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in factorDetails)
+                                    {
+                                        <tr data-factorid="@item.Id">
+                                            <td class="text-center">
+                                                <input type="checkbox" class="delete-checkbox" value="@item.Id" />
+                                            </td>
+                                            <td>
+                                                @item.ProductTitle
+                                                @if (item.IsNew)
+                                                {
+                                                    <span class="badge bg-success">جدید</span>
+                                                }
+                                            </td>
+                                            <td><span class="badge bg-info">@item.Count</span> عدد</td>
+                                            <td>@item.Price.ToString("N0") ریال</td>
+                                            <td><span class="item-price">@item.TotalPrice.ToString("N0") ریال</span></td>
+                                            <td class="text-center">
+                                                <a class="remove-item-btn" data-factorid="@item.Id" style="cursor:pointer;">
+                                                    <i class="fa fa-trash text-danger"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+
+                                    <!-- حذف چندتایی -->
+                                    <tr>
+                                        <td colspan="6" class="text-end">
+                                            <button id="deleteSelectedBtn" class="btn btn-outline-danger btn-sm" disabled>
+                                                <i class="fa fa-trash"></i> حذف انتخاب‌شده‌ها
+                                            </button>
+                                        </td>
+                                    </tr>
+
+                                    <!-- انتخاب روش ارسال -->
+                                    <tr>
+                                        <td colspan="2"><strong>روش ارسال:</strong></td>
+                                        <td colspan="4">
+                                            @foreach (var delivery in Model.DeliveryMethods)
+                                            {
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="selection" value="@delivery.DeliveryId" id="delivery_@delivery.DeliveryId" />
+                                                    <label class="form-check-label" for="delivery_@delivery.DeliveryId">@delivery.Name</label>
+                                                </div>
+                                            }
+                                        </td>
+                                    </tr>
+
+                                    <!-- کد تخفیف -->
+                                    <tr>
+                                        <td colspan="2"><strong>کد تخفیف:</strong></td>
+                                        <td colspan="4">
+                                            <input type="hidden" id="factorId" name="factorId" value="@factorId" />
+                                            <div class="input-group">
+                                                <input type="text" id="discountCode" class="form-control" placeholder="مثلاً OFF10" />
+                                                <button id="applyDiscountBtn" class="btn btn-primary">اعمال</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <!--توضیحات-->
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="input-group">
+                                                <textarea type="text" id="description" name="description" class="form-control" placeholder="درج توضیحات اختیاری" rows="3"></textarea>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- ✅ نمایش موبایل -->
+                        <div class="d-block d-md-none">
+                            @foreach (var item in factorDetails)
+                            {
+                                <div class="card mb-3 shadow-sm border-0" data-factorid="@item.Id">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <span>@item.ProductTitle</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row mb-2">
+                                            <div class="col"><strong>تعداد انتخاب‌شده:</strong> <span class="badge bg-info">@item.Count</span> عدد</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-6"><strong>قیمت واحد:</strong> <span class="badge bg-secondary">@item.Price.ToString("N0") ریال</span></div>
+                                            <div class="col-6"><strong>قیمت کل:</strong> <span class="badge bg-primary item-price">@item.TotalPrice.ToString("N0") ریال</span></div>
+                                        </div>
+                                        <div class="mt-3 d-flex justify-content-end">
+                                            <button type="button" class="remove-item-btn btn btn-sm btn-outline-danger" aria-label="حذف آیتم">
+                                                <i class="fas fa-trash"></i> حذف
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            <!--بخش ارسال برای موبایل-->
+                            <div class="card mt-4 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="fw-bold mb-2">شیوه ارسال</h6>
+                                    <ul class="list-unstyled row">
+                                        @foreach (var delivery in Model.DeliveryMethods)
+                                        {
+                                            <li class="col-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="selection" value="@delivery.DeliveryId" id="delivery_mobile_@delivery.DeliveryId" />
+                                                    <label class="form-check-label" for="delivery_mobile_@delivery.DeliveryId">@delivery.Name</label>
+                                                </div>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- کد تخفیف موبایل -->
+                            <div class="card mt-4 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="fw-bold mb-2">کد تخفیف</h6>
+                                    <div class="input-group mb-3">
+                                        <input type="text" id="discountCodeMobile" class="form-control" placeholder="مثلاً OFF10" />
+                                        <button id="applyDiscountBtnMobile" class="btn btn-primary">اعمال</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- درج توضیحات موبایل -->
+                            <div class="card mt-4 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <div class="input-group mb-3">
+                                        <textarea type="text" id="description" name="description" class="form-control" placeholder="درج توضیحات اختیاری" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ✅ جدول نهایی مبلغ‌ها -->
+                        <div class="d-flex justify-content-center mt-4">
+                            <div class="w-100" style="max-width:500px;">
+                                <table class="table table-bordered text-center">
+                                    <tr>
+                                        <td><strong>جمع کل قبل از تخفیف :</strong></td>
+                                        <td id="subtotalPrice">@subTotal.ToString("N0") ریال</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>مبلغ تخفیف :</strong></td>
+                                        <td><span id="distotalPrice">0</span> ریال</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>هزینه ارسال :</strong></td>
+                                        <td><span id="deliveryPrice">0</span> ریال</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="fs-4 text-primary">
+                                            <span class="fs-4 text-primary">مبلغ قابل پرداخت : </span>
+                                            <span id="sumPrice" class="fs-4 text-primary">0</span> ریال
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <button id="postButton" class="btn btn-success w-100 py-2">پرداخت آنلاین</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/removing/removeFactor.js"></script>
+    <script type="module" src="~/js/delivery/delivery.js"></script>
+    <script type="module" src="~/js/discounts/discountFactor.js"></script>
+    <script type="module" src="~/js/payment/paymentFactor.js"></script>
+}
+
+
+

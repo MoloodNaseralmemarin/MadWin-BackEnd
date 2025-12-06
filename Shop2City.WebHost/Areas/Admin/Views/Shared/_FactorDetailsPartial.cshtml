@@ -1,0 +1,77 @@
+﻿@using MadWin.Core.DTOs.Factors
+
+@model IEnumerable<FactorDetailDto>
+
+<!-- جدول: نمایش در دسکتاپ (بیشتر از md) -->
+<div class="table-responsive-md d-none d-md-block">
+    <table class="table table-bordered table-sm align-middle">
+        <thead class="table-light">
+            <tr>
+                <th scope="col">عنوان</th>
+                <th scope="col">قیمت</th>
+                <th scope="col">تعداد</th>
+                <th scope="col">قیمت نهایی</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="text-wrap">@item.ProductTitle</td>
+
+                    <td>@item.Price.ToString("N0") ریال</td>
+                    <td>@item.Count عدد </td>
+                    <td>@((item.Count * item.Price).ToString("N0")) ریال</td>
+                </tr>
+        
+
+            }
+            <tr class="fw-bold">
+                <td colspan="2" class="text-end">مجموع:</td>
+                <td>@Model.Sum(x => x.Count) عدد</td>
+                <td>@Model.Sum(x => x.Price * x.Count).ToString("N0") ریال</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- کارت‌ها: نمایش در موبایل (کمتر از md) -->
+<!-- کارت‌ها: نمایش در موبایل (کمتر از md) -->
+<div class="d-md-none">
+    @foreach (var item in Model)
+    {
+        <div class="card mb-2 shadow-sm">
+            <div class="card-body p-3">
+                <!-- عنوان محصول -->
+                <div class="fw-semibold small mb-2" style="word-break: break-word;">
+                    @item.ProductTitle
+                </div>
+
+                <!-- تعداد -->
+                <div class="small mb-1">
+                    <span class="text-muted">تعداد: </span>
+                    <span class="fw-bold">@item.Count عدد</span>
+                </div>
+
+                <!-- قیمت -->
+                <div class="small mb-1">
+                    <span class="text-muted">قیمت: </span>
+                    <span class="fw-bold">@item.Price.ToString("N0") ریال</span>
+                </div>
+
+                <!-- قیمت نهایی -->
+                <div class="small">
+                    <span class="text-muted">قیمت نهایی: </span>
+                    <span class="fw-bold">@((item.Count * item.Price).ToString("N0")) ریال</span>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- مجموع -->
+    <div class="fw-bold text-end mt-3">
+        <div>مجموع:</div>
+        <div>@Model.Sum(x => x.Count) عدد</div>
+        <div>@Model.Sum(x => x.Price * x.Count).ToString("N0") ریال</div>
+    </div>
+</div>

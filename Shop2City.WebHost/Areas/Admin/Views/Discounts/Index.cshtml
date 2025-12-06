@@ -1,0 +1,196 @@
+﻿@using MadWin.Core.DTOs.DisCounts
+@using Shop2City.Core.Convertors
+@model DiscountForAdminViewModel
+@{
+    ViewBag.Title = "لیست تخفیفات";
+    int visiblePages = 3; // تعداد صفحات قبل و بعد از صفحه فعلی
+    int startPage = Math.Max(Model.CurrentPage - visiblePages, 1);
+    int endPage = Math.Min(Model.CurrentPage + visiblePages, Model.CountPage);
+}
+
+<div class="container-fluid my-3">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">لیست تخفیفات</h5>
+            <a asp-area="Admin" asp-controller="Discounts" asp-action="Create" class="btn btn-success btn-sm">
+                <i class="fa fa-plus"></i> ثبت کد تخفیف جدید
+            </a>
+        </div>
+
+        <div class="card-body">
+
+            <!-- نمایش به صورت جدول (فقط دسکتاپ و تبلت) -->
+            <div class="table-responsive-md d-none d-md-block">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>تاریخ ثبت</th>
+                            <th>عنوان</th>
+                            <th>کد تخفیف</th>
+                            <th>درصد تخفیف</th>
+                            <th>تعداد اولیه</th>
+                            <th>تعداد استفاده شده</th>
+                            <th>تاریخ شروع - تاریخ پایان</th>
+                            <th>فعال / غیرفعال</th>
+                           @*  <th>دستورات</th> *@
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var discount in Model.Discounts)
+                        {
+                            <tr>
+                                <td>@discount.CreateDate.ToShamsi()</td>
+                                <td>
+                                    @if (discount.Item == "O")
+                                    {
+                                        <span>سفارش با انداره دلخواه</span>
+                                    }
+                                    else if (discount.Item == "F")
+                                    {
+                                        <span>سفارش آماده</span>
+                                    }
+                                </td>
+                                <td>@discount.DiscountCode</td>
+                                <td>@discount.Percentage</td>
+                                <td>@discount.InitialCount</td>
+                                <td>@discount.UseableCount</td>
+                                <td>@discount.StartDate.ToShamsi() - @discount.ExpiryDate.ToShamsi()</td>
+                               <td>
+                                    <span class="btn @(discount.IsInactive ? "btn-danger" : "btn-success")">
+                                        @(discount.IsInactive ? "غیرفعال" : "فعال")
+                                    </span>
+                                </td> 
+
+                               @*  <td>
+                                    <div class="btn-group">
+                                        <a href="@Url.Action("Edit", "Discounts", new { area = "Admin", id = discount.Id })"
+                                           class="btn btn-warning btn-sm">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        <button class="btn btn-danger btn-sm"
+                                                data-id="@discount.Id
+
+                                                data-url="@Url.Action("Delete", "Users", new { area = "Admin" })"
+                                                data-name="@discount.Description">
+                                            <i class="fa fa-remove"></i>
+                                        </button>
+                                    </div>
+                                </td> *@
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- نمایش به صورت کارت (فقط موبایل) -->
+            <!-- نمایش به صورت کارت (فقط موبایل) -->
+            <div class="d-block d-md-none">
+                <div class="row g-3">
+                    @foreach (var discount in Model.Discounts)
+                    {
+                        <div class="col-12">
+                            <div class="card shadow-sm">
+                                <div class="card-body p-3">
+                                    <h6 class="card-title mb-2">@discount.Description</h6>
+
+                                    <div class="mb-1">
+                                        <strong>عنوان:</strong>
+                                        @if (discount.Item == "O")
+                                        {
+                                            <span>سفارش با اندازه دلخواه</span>
+                                        }
+                                        else if (discount.Item == "F")
+                                        {
+                                            <span>سفارش آماده</span>
+                                        }
+                                    </div>
+
+                                    <div class="mb-1"><strong>کد تخفیف:</strong> @discount.DiscountCode</div>
+                                    <div class="mb-1"><strong>درصد تخفیف:</strong> @discount.Percentage%</div>
+                                    <div class="mb-1"><strong>تعداد قابل استفاده:</strong> @discount.UseableCount</div>
+                                    <div class="mb-1"><strong>تاریخ شروع - پایان:</strong> @discount.StartDate.ToShamsi() - @discount.ExpiryDate.ToShamsi()</div>
+
+                                    <div class="d-flex justify-content-end mt-2 gap-2">
+                                        <a href="@Url.Action("Edit", "Discounts", new { area = "Admin", id = discount.Id })"
+                                           class="btn btn-warning btn-sm">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        <button class="btn btn-danger btn-sm"
+                                                data-id="@discount.Id"
+                                                data-url="@Url.Action("Delete", "Discounts", new { area = "Admin" })"
+                                                data-name="@discount.Description">
+                                            <i class="fa fa-remove"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+
+            <!-- صفحه‌بندی -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm flex-wrap justify-content-center mt-3">
+                    @* دکمه صفحه قبل *@
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("Index", "Discounts", new { area = "Admin", pageId = Model.CurrentPage - 1})">قبل</a>
+                    </li>
+
+                    @* صفحات وسطی *@
+                    @for (var i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Index", "Discounts", new { area = "Admin", pageId = i })">@i</a>
+                        </li>
+                    }
+
+                    @* دکمه صفحه بعد *@
+                    <li class="page-item @(Model.CurrentPage == Model.CountPage ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("Index", "Discounts", new { area = "Admin", pageId = Model.CurrentPage + 1})">بعد</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+<script>
+
+
+       document.querySelectorAll(".btn-danger").forEach(function(btn){
+
+        btn.addEventListener("click", function () {
+            const fullName = btn.dataset.name;
+            const userId = btn.dataset.id;
+            const url = btn.dataset.url + "/" + userId;
+            Swal.fire({
+                title: `آیا از حذف ${fullName} مطمئن هستید؟`,
+                text: 'این کار قابل بازگشت نیست!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'بله',
+                cancelButtonText: 'لغو',
+                heightAuto: false
+            }).then((result) => {
+                if(result.isConfirmed){
+                    fetch(url, {
+                        method: 'POST' // یا 'DELETE' بسته به کنترلر
+                    })
+                    .then(res => {
+                        if(res.ok){
+                            toastr.success(`${fullName} با موفقیت حذف شد`);
+                            // حذف ردیف جدول یا کارت
+                            btn.closest("tr")?.remove();
+                            btn.closest(".card")?.remove();
+                        } else {
+                            toastr.error('حذف انجام نشد');
+                        }
+                    })
+                    .catch(()=> toastr.error('حذف انجام نشد'));
+                }
+            });
+        });
+    });
+
+</script>

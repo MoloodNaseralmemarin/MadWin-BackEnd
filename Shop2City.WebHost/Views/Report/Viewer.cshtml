@@ -1,0 +1,16 @@
+﻿@using Stimulsoft.Report.Web;
+@using Stimulsoft.Report.Mvc;
+
+@{
+	ViewData["Title"] = "Report.mrt - Viewer";
+}
+
+@Html.StiNetCoreViewer(new StiNetCoreViewerOptions()
+{
+	Theme = StiViewerTheme.Office2022WhiteBlue,
+	Actions =
+	{
+		GetReport = "GetReportForOrder",
+		ViewerEvent = "ViewerEvent"
+	}
+})

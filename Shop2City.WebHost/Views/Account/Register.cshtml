@@ -1,0 +1,107 @@
+﻿@using Shop2City.WebHost.ViewModels.Account
+
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "ثبت نام";
+}
+<div class="container my-4">
+    <!-- Breadcrumb Start -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-controller="Home" asp-action="Index"><i class="fa fa-home"></i></a>
+            </li>
+            <li class="breadcrumb-item">حساب کاربری</li>
+            <li class="breadcrumb-item active" aria-current="page">ثبت نام</li>
+        </ol>
+    </nav>
+    <!-- Breadcrumb End -->
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-sm-10">
+            <form asp-action="Register"  method="post" class="card p-4 shadow-sm">
+
+                <h4 class="mb-4 text-center">ثبت اطلاعات شخصی شما</h4>
+     @*            <input type="hidden" id="toastrError" value="@TempData["ToastrError"]" />
+                <input type="hidden" id="toastrSuccess" value="@TempData["ToastrSuccess"]" /> *@
+                <div asp-validation-summary="All" class="text-danger mt-1"></div>
+                <div class="mb-3">
+                    <label asp-for="FirstName" class="form-label">نام </label>
+                    <input type="text"
+                           asp-for="FirstName"
+                           id="firstName"
+                           class="form-control form-control-md d-md-block"
+                           placeholder="محمد مهدی">
+                    
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="LastName" class="form-label">نام خانوادگی</label>
+                    <input type="text"
+                           asp-for="LastName"
+                           id="lastName"
+                           class="form-control form-control-md d-md-block"
+                           placeholder="مهدوی">
+                </div>
+                <div class="mb-3">
+                    <label asp-for="TelPhone" class="form-label">شماره ثابت </label>
+                    <input type="text"
+                           asp-for="TelPhone"
+                           id="telPhone"
+                           class="form-control form-control-md d-md-block"
+                           pattern="[0-9]*"
+                           inputmode="numeric"
+                           placeholder="08132530608">
+                </div>
+                <div class="mb-3">
+                    <label asp-for="CellPhone" class="form-label">شماره همراه </label>
+                    <input type="text"
+                           asp-for="CellPhone"
+                           id="cellPhone"
+                           class="form-control form-control-md d-md-block"
+                           pattern="[0-9]*"
+                           inputmode="numeric"
+                           placeholder="09370000000">
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Address" class="form-label">آدرس پستی</label>
+                    <input type="text"
+                           asp-for="Address"
+                           id="address"
+                           class="form-control form-control-md d-md-block"
+                           placeholder="همدان -همدان">
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label">کلمه عبور</label>
+                    <input type="Password"
+                           asp-for="Password"
+                            id="password"
+                           class="form-control form-control-md d-md-block"
+                           placeholder="کلمه عبور">
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ConfirmPassword" class="form-label">تکرار کلمه عبور</label>
+                    <input type="password"
+                           asp-for="ConfirmPassword"
+                           id="confirmPassword"
+                           class="form-control form-control-md d-md-block"
+                           placeholder="تکرار کلمه عبور">
+                </div>
+                <div class="mb-3">
+                    <a asp-controller="Account" asp-action="Login">قبلاْ ثبت نام کرده ام</a>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-md btn-lg w-100 d-md-block" onclick="return validateData();">
+                    ثبت نام
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/validation/user/validateDataUser.js"></script>
+    <script src="~/js/validation/user/validationInput.js"></script>
+}
+
