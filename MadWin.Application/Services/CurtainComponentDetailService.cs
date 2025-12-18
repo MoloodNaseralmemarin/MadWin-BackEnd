@@ -19,8 +19,9 @@ namespace MadWin.Application.Services
                 Count = count,
                 OrderId = orderId,
                 CurtainComponentId = curtainComponentId,
-                UnitCost= unitCost,
-                FinalCost= unitCost * count,
+                UnitCost = unitCost,
+                FinalCost = unitCost * count,
+                Description = "درج نشده است"
             };
             await _curtainComponentDetailRepository.AddAsync(model);
             await _curtainComponentDetailRepository.SaveChangesAsync();

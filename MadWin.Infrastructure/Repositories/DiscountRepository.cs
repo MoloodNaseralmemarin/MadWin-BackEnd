@@ -4,7 +4,7 @@ using MadWin.Core.Entities.Discounts;
 using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Lookups.Discounts;
-using MadWin.Infrastructure.Context;
+using MadWin.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace MadWin.Infrastructure.Repositories

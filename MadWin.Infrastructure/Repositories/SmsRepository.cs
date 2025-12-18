@@ -5,7 +5,7 @@ using MadWin.Core.DTOs.Users;
 using MadWin.Core.Entities.SentMessages;
 using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
-using MadWin.Infrastructure.Context;
+using MadWin.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace MadWin.Infrastructure.Repositories

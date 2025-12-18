@@ -2,7 +2,7 @@
 using MadWin.Core.Entities.Factors;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Lookups.Factors;
-using MadWin.Infrastructure.Context;
+using MadWin.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 

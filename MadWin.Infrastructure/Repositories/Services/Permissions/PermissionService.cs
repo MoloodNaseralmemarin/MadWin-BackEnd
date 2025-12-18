@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MadWin.Infrastructure.Context;
+using MadWin.Infrastructure.Data;
 using MadWin.Core.Entities.Permissions;
 using MadWin.Core.Entities.Users;
 using Microsoft.EntityFrameworkCore;

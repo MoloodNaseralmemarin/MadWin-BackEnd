@@ -2,6 +2,7 @@
 using MadWin.Core.DTOs.Users;
 using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
+using MadWin.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shop2City.Core.Generator;
@@ -50,7 +51,7 @@ namespace MadWin.Application.Services
         }
         public async Task<LoginResultDto?> LoginAsync(LoginResultDto loginDto)
         {
-            var hashPassword = _passwordHasher.HashPassword(loginDto.Password);
+            var hashPassword = _passwordHasher.Hash(loginDto.Password);
             var user = await _userRepository.GetUserByUsernameAsync(loginDto.UserName,hashPassword);
 
             if (user == null)
@@ -83,7 +84,7 @@ namespace MadWin.Application.Services
             if (user != null && !string.IsNullOrWhiteSpace(user.CellPhone) && user.CellPhone.Length >= 4)
             {
                 var newPassword = user.CellPhone.Substring(user.CellPhone.Length - 4);
-                var hashPassword = _passwordHasher.HashPassword(newPassword);
+                var hashPassword = _passwordHasher.Hash(newPassword);
                 user.Password = hashPassword;
                 user.Description = "کلمه عبور را تغییر داده است";
                 await _userRepository.SaveChangesAsync();
@@ -134,7 +135,7 @@ namespace MadWin.Application.Services
             user.FirstName = editUser.FirstName;
             user.LastName = editUser.LastName;
             if (!string.IsNullOrEmpty(editUser.Password))
-                editUser.Password = _passwordHasher.HashPassword(editUser.Password);
+                editUser.Password = _passwordHasher.Hash(editUser.Password);
             _userRepository.Update(user);
             await _userRepository.SaveChangesAsync();
         }

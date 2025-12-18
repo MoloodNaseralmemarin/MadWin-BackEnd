@@ -1,9 +1,6 @@
 ﻿using MadWin.Application.DTOs.Cart;
 using MadWin.Application.Services;
-using MadWin.Infrastructure.Context;
 using Microsoft.AspNetCore.Mvc;
-using Shop2City.Core.Services.Products;
-using Shop2City.WebHost.ViewModels.Cart;
 
 namespace Shop2City.WebHost.Controllers
 {

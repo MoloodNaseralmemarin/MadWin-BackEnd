@@ -1,16 +1,9 @@
-﻿using MadWin.Application.Services;
-using MadWin.Core.DTOs.ProductGroups;
-using MadWin.Core.DTOs.Products;
-using MadWin.Core.Entities.CommissionRates;
+﻿using MadWin.Core.DTOs.ProductGroups;
 using MadWin.Core.Entities.Products;
 using MadWin.Core.Interfaces;
-using MadWin.Infrastructure.Context;
+using MadWin.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace MadWin.Infrastructure.Repositories
 {

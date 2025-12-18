@@ -1,12 +1,12 @@
-﻿using MadWin.Application.Services;
-using MadWin.Core.DTOs.Factors;
+﻿using MadWin.Core.DTOs.Factors;
 using MadWin.Core.DTOs.Orders;
 using MadWin.Core.Entities.Common;
 using MadWin.Core.Entities.CurtainComponents;
 using MadWin.Core.Entities.Orders;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Lookups.Orders;
-using MadWin.Infrastructure.Context;
+using MadWin.Infrastructure.Convertors;
+using MadWin.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shop2City.Core.Convertors;
@@ -17,16 +17,14 @@ namespace MadWin.Infrastructure.Repositories
     {
         private readonly MadWinDBContext _context;
         private readonly ILogger<OrderRepository> _logger;
-        private readonly INumberRoundingService _numberRoundingService;
         private readonly IDiscountRepository _discountRepository;
         private readonly IDeliveryMethodRepository _deliveryMethodRepository;
         private readonly IOrderWidthPartRepository _orderWidthPartRepository;
         private readonly ICurtainComponentDetailRepository _curtainComponentDetailRepository;
-        public OrderRepository(MadWinDBContext context, ILogger<OrderRepository> logger, INumberRoundingService numberRoundingService, IDiscountRepository discountRepository, IDeliveryMethodRepository deliveryMethodRepository, IOrderWidthPartRepository orderWidthPartRepository, ICurtainComponentDetailRepository curtainComponentDetailRepository) : base(context)
+        public OrderRepository(MadWinDBContext context, ILogger<OrderRepository> logger,IDiscountRepository discountRepository, IDeliveryMethodRepository deliveryMethodRepository, IOrderWidthPartRepository orderWidthPartRepository, ICurtainComponentDetailRepository curtainComponentDetailRepository) : base(context)
         {
             _context = context;
             _logger = logger;
-            _numberRoundingService = numberRoundingService;
             _discountRepository = discountRepository;
             _deliveryMethodRepository = deliveryMethodRepository;
             _orderWidthPartRepository = orderWidthPartRepository;
@@ -41,13 +39,13 @@ namespace MadWin.Infrastructure.Repositories
         }
         public async Task UpdatePriceAndCommissionAsync(int orderId, decimal basePrice, int commissionFee, int commissionId)
         {
-            var resultBasePrice = _numberRoundingService.RoundLastThreeDigitsToZero(basePrice);
+            var resultBasePrice = NumberHelper.RoundLastThreeDigitsToZero(basePrice);
 
             const int FeePercentage = 100;
 
             decimal feeAmount = resultBasePrice * commissionFee / FeePercentage;
 
-            var resultfeeAmount = _numberRoundingService.RoundLastThreeDigitsToZero(feeAmount);
+            var resultfeeAmount = NumberHelper.RoundLastThreeDigitsToZero(feeAmount);
 
 
             var order = await GetByIdAsync(orderId);
@@ -612,6 +610,16 @@ namespace MadWin.Infrastructure.Repositories
             return result;
         }
         #endregion
+
+
+
+
+        public async Task<IEnumerable<Order>> GetAllByUserAndDateAsync(int userId, DateTime date)
+        {
+            return await GetQuery()
+                .Where(o => o.UserId == userId && o.CreateDate.Date == date.Date)
+                .ToListAsync();
+        }
 
     }
 }

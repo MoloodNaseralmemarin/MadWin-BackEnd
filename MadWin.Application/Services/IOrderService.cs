@@ -15,7 +15,7 @@ namespace MadWin.Application.Services
 
         Task UpdatePriceAndDeliveryAsync(int deliveryId, int orderId);
 
-        Task UpdateIsFinalyOrderAsync(int orderId);
+        Task UpdateIsFinalyOrderAsync(int userId);
         Task<Order> GetOrderByOrderIdAsync(int orderId);
 
         Task<int> CountOrders();
@@ -42,5 +42,7 @@ namespace MadWin.Application.Services
         Task AddDescriptionForOrder(int orderId, string description);
 
         Task<OrderDetailForPrint> GetOrderDetailForPrint(int orderId);
+
+        Task<List<DailyOrderSummaryDto>> GetDailyOrderSummaryAsync(OrderFilterParameter filter);
     }
 }

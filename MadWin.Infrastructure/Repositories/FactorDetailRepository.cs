@@ -2,7 +2,7 @@
 using MadWin.Core.Entities.Factors;
 using MadWin.Core.Entities.Orders;
 using MadWin.Core.Interfaces;
-using MadWin.Infrastructure.Context;
+using MadWin.Infrastructure.Data;
 using MadWin.Infrastructure.Convertors;
 using Microsoft.EntityFrameworkCore;
 using Shop2City.Core.Convertors;
@@ -279,15 +279,11 @@ namespace MadWin.Infrastructure.Repositories
                     CellPhone = f.User.CellPhone ?? "",
                     Address = f.User.Address ?? "",
                     CreateDate = f.CreateDate,
-<<<<<<< HEAD
+
 
                     DeliveryMethodName = f.DeliveryMethod != null ? f.DeliveryMethod.Name : "",
                     DeliveryMethodCost = f.DeliveryMethodAmount,
 
-=======
-                    DeliveryMethodName=f.DeliveryMethod.Name,
-                    DeliveryMethodCost = f.DeliveryMethodAmount,
->>>>>>> f99be209bd00a959536bd2503c41a4c308b467b4
                     DisTotal = f.DisTotal,
                     Discount = f.DisTotal,
                     TotalAmount = f.TotalAmount,

@@ -23,7 +23,11 @@ namespace Shop2City.Web.Areas.Admin.Controllers
             return View(result);
         }
 
-
+        public async Task<IActionResult> GetDailyOrderSummary(OrderFilterParameter filter, int pageId = 1)
+        {
+            var result = await _orderService.GetDailyOrderSummaryAsync(filter);
+            return View(result);
+        }
         public async Task<IActionResult> ShowOrderDetails(int id)
         {
             var getAllOrderDetails = await _curtainComponentDetailService.GetCurtainComponentDetailByOrderIdAsync(id);

@@ -1,6 +1,6 @@
 ﻿using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
-using MadWin.Infrastructure.Context;
+using MadWin.Infrastructure.Data;
 
 namespace MadWin.Infrastructure.Repositories
 {

@@ -1,5 +1,4 @@
-﻿
-@using Shop2City.WebHost.ViewModels.Orders
+﻿@using Shop2City.WebHost.ViewModels.Orders
 @model OrderViewModel
 @{
     ViewData["Title"] = "ثبت سفارش جدید با اندازه دلخواه";
@@ -171,7 +170,6 @@
 @section Scripts {
     <script>
         (function () {
-<<<<<<< HEAD
             // المان‌ها
             const form = document.getElementById('customSizeForm');
             const submitBtn = document.getElementById('submitBtn');
@@ -192,45 +190,8 @@
                 if (!el) return;
                 if (add) el.classList.add(className);
                 else el.classList.remove(className);
-=======
-          // المان‌ها
-          const form = document.getElementById('customSizeForm');
-          const submitBtn = document.getElementById('submitBtn');
-          const widthInput = document.getElementById('Width');
-          const heightInput = document.getElementById('Height');
-          const countInput = document.getElementById('Count');
-          const countErrorEl = form ? form.querySelector('.count-error') : null;
-          const inputContainer = document.getElementById('input-container');
-          const widthInputsWrapper = document.getElementById('width-inputs');
-          const widthErrorEl = document.querySelector('.width-error');
-          const categoryEl = document.getElementById('CategoryId');
-          const subSelect = document.getElementById('SubCategoryId');
-          const divisionErrorEl = document.getElementById('division-error');
-          const adhesiveError = document.getElementById('adhesive-error');
-
-          // helper ایمن برای تغییر کلاس
-          function safeToggleClass(el, className, add) {
-            if (!el) return;
-            if (add) el.classList.add(className);
-            else el.classList.remove(className);
-          }
-
-          function qAll(selector, ctx = document) {
-            return Array.from((ctx || document).querySelectorAll(selector));
-          }
-
-          function showInvalid(el, msg) {
-            if (!el) return;
-            el.classList.add('is-invalid');
-            let fb = el.parentNode.querySelector('.invalid-feedback');
-            if (!fb) {
-              fb = document.createElement('div');
-              fb.className = 'invalid-feedback';
-              el.parentNode.appendChild(fb);
->>>>>>> f99be209bd00a959536bd2503c41a4c308b467b4
             }
 
-<<<<<<< HEAD
             function qAll(selector, ctx = document) {
                 return Array.from((ctx || document).querySelectorAll(selector));
             }
@@ -270,29 +231,8 @@
                     const hint = input.parentNode.querySelector('.hint-feedback');
                     if (hint) hint.remove();
                 });
-=======
-          function hideInvalid(el) {
-            if (!el) return;
-            el.classList.remove('is-invalid');
-            const fb = el.parentNode.querySelector('.invalid-feedback');
-            if (fb) fb.textContent = '';
-          }
-
-          // hint هنگام فوکوس
-          [heightInput, widthInput].forEach(input => {
-            if (!input) return;
-            input.addEventListener('focus', () => {
-              let hint = input.parentNode.querySelector('.hint-feedback');
-              if (!hint) {
-                hint = document.createElement('div');
-                hint.className = 'hint-feedback text-primary small mt-1';
-                hint.textContent = 'مقدار باید بین ۵۰ تا ۴۰۰ سانتی‌متر باشد.';
-                input.parentNode.appendChild(hint);
-              }
->>>>>>> f99be209bd00a959536bd2503c41a4c308b467b4
             });
 
-<<<<<<< HEAD
             function validateForm() {
                 let valid = true;
 
@@ -333,80 +273,10 @@
                 if (!divChecked) {
                     valid = false;
                     if (divisionErrorEl) divisionErrorEl.classList.remove('d-none');
-=======
-          function validateForm() {
-            let valid = true;
-
-            // چک فیلدهای پایه
-            const fields = [
-              { el: categoryEl, msg: 'لطفا دسته را انتخاب کنید.' },
-              { el: subSelect, msg: 'لطفا زیر دسته را انتخاب کنید.' },
-              { el: heightInput, msg: 'ارتفاع باید بین ۵۰ تا ۴۰۰ باشد.' },
-              { el: widthInput, msg: 'عرض باید بین ۵۰ تا ۴۰۰ باشد.' }
-            ];
-
-            fields.forEach(f => {
-              if (!f.el || !f.el.value || String(f.el.value).trim() === '') {
-                valid = false;
-                showInvalid(f.el, f.msg);
-              } else {
-                if (f.el === heightInput || f.el === widthInput) {
-                  const val = Number(f.el.value);
-                  if (isNaN(val) || val < 50 || val > 400) {
-                    valid = false;
-                    showInvalid(f.el, f.msg);
-                  } else hideInvalid(f.el);
-                } else hideInvalid(f.el);
-              }
-            });
-
-            // validate adhesive (ایمن)
-            const adhesiveChecked = form ? form.querySelector('input[name="IsCurtainAdhesive"]:checked') : null;
-            if (!adhesiveChecked) {
-              valid = false;
-              if (adhesiveError) safeToggleClass(adhesiveError, 'd-none', false); // remove d-none
-            } else {
-              if (adhesiveError) safeToggleClass(adhesiveError, 'd-none', true); // add d-none
-            }
-
-            // division selection
-            const divChecked = form ? form.querySelector('input[name="division"]:checked') : null;
-            if (!divChecked) {
-              valid = false;
-              if (divisionErrorEl) divisionErrorEl.classList.remove('d-none');
-            } else {
-              if (divisionErrorEl) divisionErrorEl.classList.add('d-none');
-            }
-
-            // count validation
-            const cnt = parseInt(countInput ? countInput.value : '', 10);
-            if (!countInput || !countInput.value || isNaN(cnt) || cnt < 1 || cnt > 200) {
-              valid = false;
-              if (countInput) showInvalid(countInput, 'لطفا تعداد را بین ۱ تا ۲۰۰ وارد کنید.');
-              if (countErrorEl) countErrorEl.style.display = 'block';
-            } else {
-              if (countInput) hideInvalid(countInput);
-              if (countErrorEl) countErrorEl.style.display = 'none';
-            }
-
-            // width parts sum
-            const partEls = inputContainer ? qAll('.width-input', inputContainer) : [];
-            if (partEls.length) {
-              const total = Number(widthInput ? widthInput.value : 0) || 0;
-              let sum = 0;
-              let zeroOrEmpty = false;
-
-              partEls.forEach(pe => {
-                const val = Number(pe.value);
-                if (!val || val <= 0) {
-                  zeroOrEmpty = true;
-                  pe.classList.add('is-invalid');
->>>>>>> f99be209bd00a959536bd2503c41a4c308b467b4
                 } else {
                     if (divisionErrorEl) divisionErrorEl.classList.add('d-none');
                 }
 
-<<<<<<< HEAD
                 // count validation
                 const cnt = parseInt(countInput ? countInput.value : '', 10);
                 if (!countInput || !countInput.value || isNaN(cnt) || cnt < 1 || cnt > 200) {
@@ -433,51 +303,6 @@
                             pe.classList.remove('is-invalid');
                         }
                         sum += val;
-=======
-              if (zeroOrEmpty || Math.round(sum) !== Math.round(total)) {
-                valid = false;
-                if (widthErrorEl) widthErrorEl.style.display = 'block';
-              } else {
-                if (widthErrorEl) widthErrorEl.style.display = 'none';
-              }
-            }
-
-            if (submitBtn) submitBtn.disabled = !valid;
-            return valid;
-          }
-
-          // load subcategories (ایمن)
-          if (categoryEl) {
-            categoryEl.addEventListener('change', function () {
-              const catId = this.value;
-              if (!subSelect) return;
-              subSelect.innerHTML = '<option value="">در حال بارگذاری...</option>';
-              subSelect.disabled = true;
-
-              if (!catId) {
-                subSelect.innerHTML = '<option value="">ابتدا دسته را انتخاب کنید</option>';
-                subSelect.disabled = true;
-                validateForm();
-                return;
-              }
-
-              const url = '@Url.Action("GetSubCategories", "Orders")' + '?categoryId=' + encodeURIComponent(catId);
-              fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                .then(r => r.json())
-                .then(data => {
-                  const items = Array.isArray(data) ? data : data.items ?? data;
-                  subSelect.innerHTML = '<option value="">انتخاب کنید</option>';
-
-                  if (!items?.length) {
-                    subSelect.innerHTML = '<option value="">زیر دسته‌ای موجود نیست</option>';
-                    subSelect.disabled = true;
-                  } else {
-                    items.forEach(item => {
-                      const opt = document.createElement('option');
-                      opt.value = item.value ?? item.id ?? item.Value ?? item.Id ?? '';
-                      opt.textContent = item.text ?? item.name ?? item.Text ?? item.Name ?? opt.value;
-                      subSelect.appendChild(opt);
->>>>>>> f99be209bd00a959536bd2503c41a4c308b467b4
                     });
                     if (zeroOrEmpty || Math.round(sum) !== Math.round(total)) {
                         valid = false;
@@ -530,7 +355,6 @@
                             validateForm();
                         });
                 });
-<<<<<<< HEAD
             }
 
             // updateInputs
@@ -646,132 +470,6 @@
 
             // initial validation
             validateForm();
-=======
-            });
-          }
-
-          // updateInputs (ایجاد یا بروزرسانی فیلدهای بخش‌ها)
-          window.updateInputs = function (count, type) {
-            const total = Number(widthInput ? widthInput.value : 0) || 0;
-            if (!total || total <= 0) {
-              if (widthInput) showInvalid(widthInput, 'لطفا ابتدا عرض کل را وارد کنید.');
-              validateForm();
-              return;
-            }
-
-            if (form) {
-              const partCountInput = form.querySelector('[name="PartCount"]');
-              const isEqualInput = form.querySelector('[name="IsEqualParts"]');
-              const divisionTypeInput = form.querySelector('[name="DivisionType"]');
-              if (partCountInput) partCountInput.value = count;
-              if (isEqualInput) isEqualInput.value = (type === 'equal');
-              if (divisionTypeInput) divisionTypeInput.value = `${count}-${type}`;
-            }
-
-            if (!inputContainer || !widthInputsWrapper) return;
-            inputContainer.innerHTML = '';
-            widthInputsWrapper.style.display = 'block';
-
-            const labels = (count === 2) ? ['راست', 'چپ'] : ['راست', 'وسط', 'چپ'];
-
-            if (type === 'equal') {
-              const base = Math.floor(total / count);
-              const remainder = total - base * count;
-
-              for (let i = 0; i < count; i++) {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'mb-2';
-
-                const lbl = document.createElement('label');
-                lbl.className = 'form-label';
-                lbl.textContent = labels[i];
-
-                const inp = document.createElement('input');
-                inp.type = 'number';
-                inp.readOnly = true;
-                inp.className = 'form-control width-input';
-                inp.name = `WidthParts[${i}]`;
-
-                const extra = i < remainder ? 1 : 0;
-                inp.value = base + extra;
-
-                wrapper.appendChild(lbl);
-                wrapper.appendChild(inp);
-                inputContainer.appendChild(wrapper);
-              }
-            } else {
-              for (let i = 0; i < count; i++) {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'mb-2';
-
-                const lbl = document.createElement('label');
-                lbl.className = 'form-label';
-                lbl.textContent = labels[i];
-
-                const inp = document.createElement('input');
-                inp.type = 'number';
-                inp.className = 'form-control width-input';
-                inp.name = `WidthParts[${i}]`;
-                inp.min = 1;
-                inp.required = true;
-
-                wrapper.appendChild(lbl);
-                wrapper.appendChild(inp);
-                inputContainer.appendChild(wrapper);
-              }
-            }
-
-            validateForm();
-          };
-
-          // وقتی عرض تغییر می‌کند و تقسیم انتخاب شده مساوی است، مجدداً آپدیت کن
-          if (widthInput) {
-            widthInput.addEventListener('input', () => {
-              const checked = form ? form.querySelector('input[name="division"]:checked') : null;
-              if (!checked) return validateForm();
-
-              const [cntStr, type] = checked.value.split('-');
-              const count = Number(cntStr);
-
-              if (type === 'equal') updateInputs(count, 'equal');
-              else validateForm();
-            });
-          }
-
-          if (inputContainer) inputContainer.addEventListener('input', () => validateForm());
-
-          // modal reset — ایمن
-          const modalEl = document.getElementById('customSizeModal');
-          if (modalEl) {
-            modalEl.addEventListener('shown.bs.modal', () => {
-              if (form) form.reset();
-              document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-              if (inputContainer) inputContainer.innerHTML = '';
-              if (widthInputsWrapper) widthInputsWrapper.style.display = 'none';
-              if (widthErrorEl) widthErrorEl.style.display = 'none';
-              if (divisionErrorEl) divisionErrorEl.classList.add('d-none');
-              if (adhesiveError) adhesiveError.classList.add('d-none');
-              if (countErrorEl) countErrorEl.style.display = 'none';
-              if (submitBtn) submitBtn.disabled = true;
-            });
-          }
-
-          // submit و input handling
-          if (form) {
-            form.addEventListener('submit', e => {
-              if (!validateForm()) {
-                e.preventDefault();
-                e.stopPropagation();
-              }
-            });
-
-            form.addEventListener('input', validateForm);
-          }
-
-          // initial validation (اگر مودال باز نشد هم)
-          validateForm();
-
->>>>>>> f99be209bd00a959536bd2503c41a4c308b467b4
         })();
     </script>
 }

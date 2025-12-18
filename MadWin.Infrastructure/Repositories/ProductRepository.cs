@@ -4,7 +4,7 @@ using MadWin.Core.DTOs.Products;
 using MadWin.Core.Entities.Products;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Lookups.Products;
-using MadWin.Infrastructure.Context;
+using MadWin.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;

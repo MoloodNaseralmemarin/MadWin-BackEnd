@@ -149,6 +149,13 @@
                                     <span class="badge bg-danger ms-2">@unSettledOrdersCount</span>
                                 </a>
                                 </li>
+                            <li>
+                                <a asp-area="Admin" asp-controller="Orders" asp-action="GetDailyOrderSummary" class="d-block py-1 text-decoration-none">
+                                    پرده های سفارشی (جدید)
+                                    <span class="badge bg-success ms-2">@settledOrdersCount</span>
+                                    <span class="badge bg-danger ms-2">@unSettledOrdersCount</span>
+                                </a>
+                            </li>
                             <li><a asp-area="Admin" asp-controller="Factors" asp-action="Index" class="d-block py-1 text-decoration-none">
                                 پرده های آماده
                                     <span class="badge bg-success ms-2">@settledFactorsCount</span>
@@ -275,6 +282,7 @@
                         <div class="accordion-body p-0">
                             <ul class="list-unstyled ps-3">
                                 <li><a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="d-block py-1">پرده های سفارشی</a></li>
+                                <li><a asp-area="Admin" asp-controller="Factors" asp-action="Index" class="d-block py-1">پرده های سفارشی(جدید)</a></li>
                                 <li><a asp-area="Admin" asp-controller="Factors" asp-action="Index" class="d-block py-1">پرده آماده</a></li>
                             </ul>
                         </div>

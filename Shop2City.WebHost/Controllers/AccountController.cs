@@ -3,6 +3,7 @@ using MadWin.Application.Services;
 using MadWin.Core.Common;
 using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
+using MadWin.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -53,14 +54,8 @@ namespace Shop2City.WebHost.Controllers
                 ModelState.AddModelError("CellPhone", ErrorMessage.InvalidCellPhone);
                 return View(model);
             }
-            //if (await _userService.IsExistCellPhoneAsync(model.CellPhone))
-            //{
-            //    TempData["ToastrError"] = ErrorMessage.InvalidCellPhone;
-            //    return View(model);
-            //}
-
             #region Add User
-            model.Password = _passwordHasher.HashPassword(model.Password);
+            model.Password = _passwordHasher.Hash(model.Password);
             var user = new User
             {
                 Address = model.Address,

@@ -19,6 +19,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
         entity.LastUpdateDate = DateTime.Now;
         entity.CreateDate = DateTime.Now;
+        entity.Description = "";
         entity.IsDelete = false;
         await _dbSet.AddAsync(entity);
     }

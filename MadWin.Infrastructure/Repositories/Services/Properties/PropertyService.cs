@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using MadWin.Infrastructure.Context;
+using MadWin.Infrastructure.Data;
 using MadWin.Core.Entities.Properties;
 using Microsoft.EntityFrameworkCore;
 using MadWin.Core.DTOs.Properties;

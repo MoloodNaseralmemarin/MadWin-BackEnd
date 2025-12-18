@@ -1,11 +1,8 @@
-﻿using MadWin.Application.DTOs.Products;
-using MadWin.Core.DTOs.DeliveryMethods;
-using MadWin.Core.Entities.CommissionRates;
+﻿using MadWin.Core.DTOs.DeliveryMethods;
 using MadWin.Core.Entities.DeliveryMethods;
 using MadWin.Core.Interfaces;
-using MadWin.Core.Lookups.CommissionRates;
 using MadWin.Core.Lookups.DeliveryMethods;
-using MadWin.Infrastructure.Context;
+using MadWin.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace MadWin.Infrastructure.Repositories

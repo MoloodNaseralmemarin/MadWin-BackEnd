@@ -1,7 +1,7 @@
 ﻿using MadWin.Core.DTOs.Calculations;
 using MadWin.Core.Entities.CurtainComponents;
 using MadWin.Core.Interfaces;
-using MadWin.Infrastructure.Context;
+using MadWin.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 

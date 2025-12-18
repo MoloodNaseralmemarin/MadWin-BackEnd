@@ -5,7 +5,9 @@ using MadWin.Core.Entities.Common;
 using MadWin.Core.Entities.Orders;
 using MadWin.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
+using Shop2City.Core.Convertors;
 
 namespace MadWin.Application.Services
 {
@@ -49,7 +51,9 @@ namespace MadWin.Application.Services
                     var widthPart = new OrderWidthPart
                     {
                         OrderId = order.Id,
-                        WidthValue = width
+                        WidthValue = width,
+                        Description = "درج نشده است"
+
                     };
                     await _orderWidthPartRepository.AddAsync(widthPart);
                 }
@@ -81,20 +85,25 @@ namespace MadWin.Application.Services
         {
             return await _orderRepository.GetByIdAsync(orderId);
         }
-        public async Task UpdateIsFinalyOrderAsync(int orderId)
-        {
-            var order = await _orderRepository.GetByIdAsync(orderId);
-            if (order == null) return;
 
-            order.IsFinaly = true;
-            order.TotalAmount = order.PriceWithFee + order.DeliveryMethodAmount - order.DisTotal;
-            order.TotalCost = order.TotalAmount; //بعدااکش کن به درد نمیخوره
+
+        public async Task UpdateIsFinalyOrderAsync(int userId)
+        {
+            var today = DateTime.Today;
+
+            var orders = await _orderRepository.GetAllByUserAndDateAsync(userId, today);
+
+            if (orders == null || !orders.Any()) return;
+
+            foreach (var order in orders)
+            {
+                order.IsFinaly = true;
+                order.TotalAmount = order.PriceWithFee + order.DeliveryMethodAmount - order.DisTotal;
+                order.TotalCost = order.TotalAmount;
+            }
 
             await _orderRepository.SaveChangesAsync();
         }
-
-
-
         public async Task UpdatePriceAndDeliveryAsync(int deliveryId, int orderId)
         {
             try
@@ -244,6 +253,91 @@ namespace MadWin.Application.Services
                             !o.IsDelete)
                 .CountAsync();
         }
+
+
+        public async Task<List<DailyOrderSummaryDto>> GetDailyOrderSummaryAsync(OrderFilterParameter filter)
+        {
+            DateTime? fromDate = string.IsNullOrWhiteSpace(filter.FromDate)
+                ? null
+                : DateConvertor.ConvertPersianToGregorian(filter.FromDate);
+
+            DateTime? toDate = string.IsNullOrWhiteSpace(filter.ToDate)   // ← اصلاح شد، قبلاً اشتباه FromDate بود
+                ? null
+                : DateConvertor.ConvertPersianToGregorian(filter.ToDate); // شامل کل روز
+
+            var query = _orderRepository
+                .GetQuery()
+                .AsNoTracking()
+                .Include(o => o.User)
+                .Where(o => !o.IsDelete);
+
+            if (fromDate.HasValue)
+                query = query.Where(o => o.CreateDate >= fromDate.Value);
+
+            if (toDate.HasValue)
+                query = query.Where(o => o.CreateDate < toDate.Value);
+
+            var result = await query
+         .GroupBy(o => new
+         {
+             FullName = o.User != null
+                 ? (o.User.FirstName ?? "") + " " + (o.User.LastName ?? "")
+                 : "نامشخص",
+             Date = o.CreateDate.Date,
+             CellPhone= o.User != null
+                 ? (o.User.CellPhone ?? "")
+                 : "نامشخص",
+         })
+         .Select(g => new DailyOrderSummaryDto
+         {
+             FullName = g.Key.FullName,
+             Date = g.Key.Date,
+            
+             FinalOrderCount = g.Count(x => x.IsFinaly),
+             FinalTotalPrice = g.Where(x => x.IsFinaly).Sum(x => (decimal?)x.TotalCost) ?? 0,
+
+             OpenOrderCount = g.Count(x => !x.IsFinaly),
+             OpenTotalPrice = g.Where(x => !x.IsFinaly).Sum(x => (decimal?)x.TotalCost) ?? 0,
+
+             IsFinaly = g.Any(x => x.IsFinaly),
+
+             Orders = g.Select(x => new OrderDetailDto
+             {
+                 OrderId = x.Id,
+                 CreateDate = x.CreateDate,
+                 FullName = g.Key.FullName,
+                 CellPhone = x.User != null ? x.User.CellPhone : "",
+                 Address = x.User != null ? x.User.Address ?? "" : "نامشخص",
+                 DeliveryMethodName = x.DeliveryMethod.Name,
+                 DeliveryMethodCost = x.DeliveryMethodAmount,
+                 DisPercent = x.DisPercent,
+                 DisTotal = x.DisTotal,
+                 CategoryGroup =
+                     (x.OrderCategory != null ? x.OrderCategory.Title : "") +
+                     (x.OrderSubCategory != null && !string.IsNullOrEmpty(x.OrderSubCategory.Title)
+                         ? " / " + x.OrderSubCategory.Title
+                         : ""),
+                 Size = $"ارتفاع: {x.Height} - عرض: {x.Width}",
+                 Count = x.Count,
+                 IsCurtainAdhesive = x.IsCurtainAdhesive,
+                 IsEqualParts=x.IsEqualParts,
+                 BasePrice = x.BasePrice,
+                 TotalPrice = x.TotalCost,
+                 IsFinaly = x.IsFinaly,
+                 Description = x.Description,
+                 WidthParts = x.WidthParts.Select(w => new OrderWidthPartDto
+                 {
+                     WidthValue = w.WidthValue
+                 }).ToList()
+             }).ToList()
+         })
+         .OrderByDescending(x => x.Date)
+         .ThenBy(x => x.FullName)
+         .ToListAsync();
+
+            return result;
+        }
+
     }
 
 }

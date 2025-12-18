@@ -3,9 +3,9 @@ using MadWin.Application.Services;
 using MadWin.Core.Convertors;
 using MadWin.Core.Interfaces;
 using MadWin.Core.Settings;
-using MadWin.Infrastructure.Context;
+using MadWin.Infrastructure.Data;
 using MadWin.Infrastructure.Repositories;
-using MadWin.Infrastructure.Repositories.Services;
+using MadWin.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -35,7 +35,7 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
     .WriteTo.MSSqlServer(
-        connectionString: builder.Configuration.GetConnectionString("Development"),
+        connectionString: builder.Configuration.GetConnectionString("Production"),
         sinkOptions: new MSSqlServerSinkOptions
         {
             TableName = "Logs",
@@ -62,7 +62,7 @@ builder.Host.UseSerilog();
 // ────── Database Context ──────
 builder.Services.AddDbContext<MadWinDBContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("Development");
+    var connectionString = builder.Configuration.GetConnectionString("Production");
     if (string.IsNullOrWhiteSpace(connectionString))
         throw new ArgumentNullException(nameof(connectionString), "Connection string is null or empty.");
     options.UseSqlServer(connectionString);
@@ -133,6 +133,7 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ISmsRepository, SmsRepository>();
 builder.Services.AddScoped<ISmsSenderService, SmsSenderService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 // ────── Settings Bindings ──────
 builder.Services.Configure<SmsSettings>(builder.Configuration.GetSection("SmsSettings"));
@@ -155,21 +156,17 @@ builder.Services.AddHttpClient();
 var app = builder.Build();
 
 // ────── Error Handling ──────
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
-else
+if (app.Environment.IsProduction())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
+ 
 }
-<<<<<<< HEAD
+else
+{
+    app.UseDeveloperExceptionPage();
+}
 
-=======
->>>>>>> f99be209bd00a959536bd2503c41a4c308b467b4
-
-// ────── Middleware ──────
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -191,21 +188,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
-
-
-
-//app.Use(async (context, next) =>
-//{
-//    try
-//    {
-//        await next();
-//    }
-//    catch (Exception ex)
-//    {
-//        await File.AppendAllTextAsync("log.txt", ex.ToString());
-//        throw;
-//    }
-//});
 
 // ────── Run ──────
 app.Run();

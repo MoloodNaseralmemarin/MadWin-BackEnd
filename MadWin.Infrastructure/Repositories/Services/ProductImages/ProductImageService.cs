@@ -1,4 +1,4 @@
-﻿using MadWin.Infrastructure.Context;
+﻿using MadWin.Infrastructure.Data;
 using MadWin.Core.Entities.Products;
 using Microsoft.EntityFrameworkCore;
 

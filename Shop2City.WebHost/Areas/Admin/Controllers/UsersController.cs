@@ -2,6 +2,7 @@
 using MadWin.Core.Common;
 using MadWin.Core.DTOs.Users;
 using MadWin.Core.Entities.Users;
+using MadWin.Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shop2City.WebHost.ViewModels.Account;
@@ -39,7 +40,7 @@ namespace Shop2City.WebHost.Areas.Admin.Controllers
                 ModelState.AddModelError("CellPhone", ErrorMessage.InvalidCellPhone);
                 return View(model);
             }
-            model.Password = _passwordHasher.HashPassword(model.Password);
+            model.Password = _passwordHasher.Hash(model.Password);
             var user = new User
             {
                 Address = model.Address,

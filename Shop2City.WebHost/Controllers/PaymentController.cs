@@ -24,7 +24,6 @@ namespace Shop2City.WebHost.Controllers
         private readonly IFactorService _factorService;
         private readonly IOrderService _orderService;
         private readonly ISmsSenderService _smsSenderService;
-        private readonly IFactorDetailService _factorDetailService;
         private readonly ILogger<PaymentController> _logger;
 
         public PaymentController(
@@ -33,8 +32,7 @@ namespace Shop2City.WebHost.Controllers
             IFactorService factorService,
             IOrderService orderService,
             ISmsSenderService smsSenderService,
-            ILogger<PaymentController> logger,
-            IFactorDetailService factorDetailService)
+            ILogger<PaymentController> logger)
         {
             _userService = userService;
             _transactionService = transactionService;
@@ -43,7 +41,6 @@ namespace Shop2City.WebHost.Controllers
             _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(300) };
             _smsSenderService = smsSenderService;
             _logger = logger;
-            _factorDetailService = factorDetailService;
         }
 
         [HttpPost]
@@ -130,112 +127,123 @@ namespace Shop2City.WebHost.Controllers
            // }
         }
 
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Verify()
         {
-            try
-            {
-                if (!Request.HasFormContentType)
-                {
-                    _logger.LogWarning("Verify: درخواست بدون فرم دریافت شد.");
-                    return BadRequest("داده‌های فرم نادرست دریافت شده است.");
-                }
 
-                var source = Request.Query["source"].ToString();
-                var deliveryIdQuery = Request.Query["deliveryId"].ToString();
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                // اگر می‌خوای اجباری نباشه، می‌تونی این را برداری. الان برای امنیت بررسی می‌کنیم.
+                return Json(new { success = false, message = "کاربر نامعتبر" });
+            }
+
+            //try
+            //{
+            //    if (!Request.HasFormContentType)
+            //    {
+            //        _logger.LogWarning("Verify: درخواست بدون فرم دریافت شد.");
+            //        return BadRequest("داده‌های فرم نادرست دریافت شده است.");
+            //    }
+
+            //    var source = Request.Query["source"].ToString();
+            //    var deliveryIdQuery = Request.Query["deliveryId"].ToString();
 
   
 
-                ////parse invoiceId safely
-                if (!int.TryParse(Request.Form["InvoiceId"], out int invoiceId))
-                {
-                    _logger.LogWarning("InvoiceId در پاسخ درگاه معتبر نیست.");
-                    return BadRequest("InvoiceId معتبر نیست.");
-                }
+            //    ////parse invoiceId safely
+            //    if (!int.TryParse(Request.Form["InvoiceId"], out int invoiceId))
+            //    {
+            //        _logger.LogWarning("InvoiceId در پاسخ درگاه معتبر نیست.");
+            //        return BadRequest("InvoiceId معتبر نیست.");
+            //    }
 
-                var amountStr = Request.Form["Amount"].ToString();
-                var digitalReceipt = Request.Form["DigitalReceipt"].ToString();
-                var datePaidStr = Request.Form["DatePaid"].ToString();
-                var terminalId = Request.Form["TerminalId"].ToString();
-                var cardNumber = Request.Form["CardNumber"].ToString();
-                var payload = Request.Form["Payload"].ToString();
-                var rrn = Request.Form["Rrn"].ToString();
-                var respMsg = Request.Form["RespMsg"].ToString();
-                var traceNumber = Request.Form["TraceNumber"].ToString();
-                var respCode = Request.Form["RespCode"].ToString();
-                var issuerBank = Request.Form["IssuerBank"].ToString();
+            //    var amountStr = Request.Form["Amount"].ToString();
+            //    var digitalReceipt = Request.Form["DigitalReceipt"].ToString();
+            //    var datePaidStr = Request.Form["DatePaid"].ToString();
+            //    var terminalId = Request.Form["TerminalId"].ToString();
+            //    var cardNumber = Request.Form["CardNumber"].ToString();
+            //    var payload = Request.Form["Payload"].ToString();
+            //    var rrn = Request.Form["Rrn"].ToString();
+            //    var respMsg = Request.Form["RespMsg"].ToString();
+            //    var traceNumber = Request.Form["TraceNumber"].ToString();
+            //    var respCode = Request.Form["RespCode"].ToString();
+            //    var issuerBank = Request.Form["IssuerBank"].ToString();
 
-                // ارسال درخواست Advice برای تایید نهایی تراکنش
-                var url = "https://sepehr.shaparak.ir:8081/V1/PeymentApi/Advice";
-                var advice = new
-                {
-                    digitalreceipt = digitalReceipt,
-                    Tid = terminalId
-                };
+            //    // ارسال درخواست Advice برای تایید نهایی تراکنش
+            //    var url = "https://sepehr.shaparak.ir:8081/V1/PeymentApi/Advice";
+            //    var advice = new
+            //    {
+            //        digitalreceipt = digitalReceipt,
+            //        Tid = terminalId
+            //    };
 
-                var jsonData = JsonSerializer.Serialize(advice);
-                var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+            //    var jsonData = JsonSerializer.Serialize(advice);
+            //    var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
-                HttpResponseMessage adviceResponse;
-                try
-                {
-                    adviceResponse = await _httpClient.PostAsync(url, content);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "خطا در ارسال درخواست Advice به درگاه");
-                    // در صورت خطای شبکه، بهتر است کاربر رو به صفحه خطا هدایت کنیم
-                    return RedirectToAction("PaymentFailed", "Payment");
-                }
+            //    HttpResponseMessage adviceResponse;
+            //    try
+            //    {
+            //        adviceResponse = await _httpClient.PostAsync(url, content);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        _logger.LogError(ex, "خطا در ارسال درخواست Advice به درگاه");
+            //        // در صورت خطای شبکه، بهتر است کاربر رو به صفحه خطا هدایت کنیم
+            //        return RedirectToAction("PaymentFailed", "Payment");
+            //    }
 
-                if (!adviceResponse.IsSuccessStatusCode)
-                {
-                    _logger.LogWarning("Advice پاسخ غیرموفق داد. StatusCode: {StatusCode}", adviceResponse.StatusCode);
-                    return RedirectToAction("PaymentFailed", "Payment");
-                }
+            //    if (!adviceResponse.IsSuccessStatusCode)
+            //    {
+            //        _logger.LogWarning("Advice پاسخ غیرموفق داد. StatusCode: {StatusCode}", adviceResponse.StatusCode);
+            //        return RedirectToAction("PaymentFailed", "Payment");
+            //    }
 
-                var adviceResponseData = await adviceResponse.Content.ReadAsStringAsync();
-                var adviceJson = JObject.Parse(adviceResponseData);
+            //    var adviceResponseData = await adviceResponse.Content.ReadAsStringAsync();
+            //    var adviceJson = JObject.Parse(adviceResponseData);
 
-                var adviceModel = new AdviceModel
-                {
-                    Status = adviceJson["Status"]?.ToString(),
-                    ReturnId = adviceJson["ReturnId"]?.ToString(),
-                    Message = adviceJson["Message"]?.ToString(),
-                };
+            //    var adviceModel = new AdviceModel
+            //    {
+            //        Status = adviceJson["Status"]?.ToString(),
+            //        ReturnId = adviceJson["ReturnId"]?.ToString(),
+            //        Message = adviceJson["Message"]?.ToString(),
+            //    };
 
-                await _transactionService.AddAdvice(adviceModel);
+            //    await _transactionService.AddAdvice(adviceModel);
 
-                // بررسی وضعیت Advice — فقط در صورت Status == "200" (یا هر مقدار موفق مستندات درگاه) ادامه می‌دهیم
-                if (adviceModel.Status != "Ok")
-                {
-                    _logger.LogWarning("Advice برگشتی وضعیت موفق ندارد. Status: {Status}, Message: {Message}", adviceModel.Status, adviceModel.Message);
-                    return RedirectToAction("PaymentFailed", "Payment");
-                }
+            //    // بررسی وضعیت Advice — فقط در صورت Status == "200" (یا هر مقدار موفق مستندات درگاه) ادامه می‌دهیم
+            //    if (adviceModel.Status != "Ok")
+            //    {
+            //        _logger.LogWarning("Advice برگشتی وضعیت موفق ندارد. Status: {Status}, Message: {Message}", adviceModel.Status, adviceModel.Message);
+            //        return RedirectToAction("PaymentFailed", "Payment");
+            //    }
 
-                // ثبت تراکنش در جدول تراکنش‌ها
-                var transactionModel = new TransactionModel
-                {
-                    DigitalReceipt = digitalReceipt,
-                    Amount = amountStr,
-                    CardNumber = cardNumber,
-                    DatePaid = datePaidStr,
-                    InvoiceId = invoiceId,
-                    IssuerBank = issuerBank,
-                    Payload = payload,
-                    RespCode = respCode,
-                    RespMsg = respMsg,
-                    Rrn = rrn,
-                    TerminalId = terminalId,
-                    TraceNumber = traceNumber
-                };
-                await _transactionService.AddTransaction(transactionModel);
+            //    // ثبت تراکنش در جدول تراکنش‌ها
+            //    var transactionModel = new TransactionModel
+            //    {
+            //        DigitalReceipt = digitalReceipt,
+            //        Amount = amountStr,
+            //        CardNumber = cardNumber,
+            //        DatePaid = datePaidStr,
+            //        InvoiceId = invoiceId,
+            //        IssuerBank = issuerBank,
+            //        Payload = payload,
+            //        RespCode = respCode,
+            //        RespMsg = respMsg,
+            //        Rrn = rrn,
+            //        TerminalId = terminalId,
+            //        TraceNumber = traceNumber
+            //    };
+            //    await _transactionService.AddTransaction(transactionModel);
 
                 // --- اکنون تراکنش موفق است: انجام عملیات نهایی روی Order/Factor و ارسال پیامک ---
                 // ابتدا پارس deliveryId (که از ProcessPayment در querystring فرستاده شده)
-                int deliveryId = 0;
-                if (!string.IsNullOrEmpty(deliveryIdQuery))
-                    int.TryParse(deliveryIdQuery, out deliveryId);
+                int deliveryId = 1;
+            //if (!string.IsNullOrEmpty(deliveryIdQuery))
+            //    int.TryParse(deliveryIdQuery, out deliveryId);
+
+            int invoiceId = 1594;
+            var source = "order";
 
                 if (source == "order")
                 {
@@ -252,7 +260,7 @@ namespace Shop2City.WebHost.Controllers
                             return RedirectToAction("PaymentFailed", "Payment");
                         }
 
-                        await _orderService.UpdateIsFinalyOrderAsync(order.Id);
+                        await _orderService.UpdateIsFinalyOrderAsync(userId);
 
                         // شماره مشتری را تلاش می‌کنیم از سرویس کاربر بگیریم (اگر order شامل UserId باشد)
                         string cellPhone = null;
@@ -349,12 +357,12 @@ namespace Shop2City.WebHost.Controllers
 
                 _logger.LogWarning("پارامتر source نامعتبر در Verify: {Source}", source);
                 return BadRequest("پارامتر source نامعتبر است.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "خطا در Verify");
-                return RedirectToAction("PaymentFailed", "Payment");
-            }
+           // }
+            //catch (Exception ex)
+            //{
+            //    _logger.LogError(ex, "خطا در Verify");
+            //    return RedirectToAction("PaymentFailed", "Payment");
+            //}
         }
 
         public IActionResult PaymentFailed()

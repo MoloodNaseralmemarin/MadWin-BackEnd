@@ -1,6 +1,6 @@
 ﻿
 
-using MadWin.Infrastructure.Context;
+using MadWin.Infrastructure.Data;
 using MadWin.Core.Entities.Advices;
 using MadWin.Core.Entities.Transactions;
 

@@ -1,6 +1,6 @@
 ﻿using MadWin.Core.Entities.CurtainComponents;
 using MadWin.Core.Interfaces;
-using MadWin.Infrastructure.Context;
+using MadWin.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

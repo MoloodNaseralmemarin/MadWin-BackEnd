@@ -1,19 +1,15 @@
 ﻿
+using MadWin.Core.Common;
 using System.ComponentModel.DataAnnotations;
 namespace MadWin.Core.Entities.Common
 {
     public class BaseEntity
     {
-        public BaseEntity()
-        {
-            CreateDate = DateTime.Now;
-            LastUpdateDate = DateTime.Now;
-            IsDelete = false;
-        }
         [Key]
         public int Id { get; set; }
 
-        public string? Description { get; set; }
+        [MaxLength(500, ErrorMessage = ErrorMessage.MaxLength)]
+        public string Description { get; set; } = default!;
 
         public bool IsDelete { get; set; }
 

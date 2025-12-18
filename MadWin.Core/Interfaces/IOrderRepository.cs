@@ -36,5 +36,10 @@ namespace MadWin.Core.Interfaces
         Task<OrderSummaryForAdminItemDto> GetOrdersByOrderIdAsync(int orderId);
 
         Task<OrderDetailForPrint> GetOrderDetailForPrint(int orderId);
+
+
+
+        Task<IEnumerable<Order>> GetAllByUserAndDateAsync(int userId, DateTime date);
+    
     }
 }

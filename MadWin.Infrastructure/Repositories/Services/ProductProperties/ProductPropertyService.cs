@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shop2City.Core.DTOs.ProductPropertise;
-using MadWin.Infrastructure.Context;
+using MadWin.Infrastructure.Data;
 
 namespace Shop2City.Core.Services.ProductProperties
 {
