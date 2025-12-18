@@ -1,0 +1,154 @@
+﻿@using MadWin.Core.DTOs.Orders
+@using Shop2City.Core.Convertors
+@model DailyOrderSummaryDto
+
+<div class="modal fade" id="ordersModal-@Model.FullName.Replace(" ", "")-@Model.Date?.ToString("yyyyMMdd")" tabindex="-1" aria-labelledby="ordersModalLabel-@Model.FullName.Replace(" ", "")-@Model.Date?.ToString("yyyyMMdd")" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="mb-3">
+                    <p>
+                        <strong>نام مشتری:</strong> @Model.FullName &nbsp; | &nbsp;
+                        <strong>شماره تماس:</strong> @Model.Orders.FirstOrDefault()?.CellPhone &nbsp; | &nbsp;
+                        <strong>آدرس:</strong> @Model.Orders.FirstOrDefault()?.Address &nbsp; | &nbsp;
+                        <strong>تاریخ:</strong> @Model.Date?.ToShamsi()
+                    </p>
+                </div>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    @foreach (var item in Model.Orders)
+                    {
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-header text-white
+                                @(item.IsFinaly ? "bg-success" : "bg-secondary") rounded-top">
+                                    <h5 class="mb-0">کد سفارش:@item.OrderId</h5>
+                                </div>
+                                <div class="card-body">
+
+                                    <!-- دکمه‌ها در بالا سمت چپ -->
+                                    <div class="d-flex justify-content-start gap-2 mb-3">
+
+                                        <button class="btn btn-outline-primary btn-sm"
+                                                data-bs-toggle="tooltip" title="مشاهده جزئیات"
+                                                onclick="showOrderDetails(@item.OrderId)">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+
+                                        <a class="btn btn-primary btn-sm"
+                                           data-bs-toggle="tooltip" title="چاپ فاکتور"
+                                           asp-area=""
+                                           asp-controller="Report"
+                                           asp-action="Viewer"
+                                           asp-route-orderId="@item.OrderId">
+                                            <i class="fas fa-print"></i>
+                                        </a>
+
+                                    </div>
+
+                                    <h6 class="text-primary fw-bold">@item.FullName (@item.CellPhone)</h6>
+                                    <p class="text-muted small">@item.CreateDate.ToShamsi() - @item.CreateDate.ToString("HH:mm")</p>
+
+                                    <p>
+                                        <strong>نوع:</strong> @item.CategoryGroup
+                                        @if (item.IsCurtainAdhesive)
+                                        {
+                                            <span class="badge bg-success ms-1">چسب بغل کامل</span>
+                                        }
+                                    </p>
+
+                                    <p><strong>ابعاد:</strong> @item.Size</p>
+                                    <p><strong>تعداد:</strong> @item.Count</p>
+
+                                    @if (item.WidthParts != null && item.WidthParts.Any())
+                                    {
+                                        <div class="mb-2">
+                                            <strong>تکه‌ها:</strong>
+                                            <span class="badge bg-info text-dark">
+                                                @(item.IsEqualParts ? "قطعات مساوی" : "قطعات متفاوت")
+                                            </span>
+                                        </div>
+
+                                        <div class="small bg-light p-2 rounded">
+                                            @for (int i = 0; i < item.WidthParts.Count; i++)
+                                            {
+                                                string position = item.WidthParts.Count == 3
+                                                ? (i == 0 ? "چپ" : i == 1 ? "وسط" : "راست")
+                                                : (i % 2 == 0 ? "راست" : "چپ");
+
+                                                <div>
+                                                    <strong>@position:</strong> @item.WidthParts[i].WidthValue cm
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+
+                                    <hr />
+
+                                    <p><strong>قیمت پایه:</strong> @item.BasePrice.ToString("N0") ریال</p>
+                                    <p><strong>تخفیف:</strong> @item.DisTotal.ToString("N0") ریال (@item.DisPercent%)</p>
+                                    <p class="fw-bold text-primary"><strong>قیمت کل:</strong> @item.TotalPrice.ToString("N0") ریال</p>
+
+                                    <p><strong>آدرس:</strong> @item.Address</p>
+                                    <p><strong>شیوه ارسال:</strong> @item.DeliveryMethodName (@item.DeliveryMethodCost.ToString("N0")ریال)</p>
+                                    <p><strong>توضیحات:</strong> @item.Description</p>
+                                    <p>
+                                        <strong>وضعیت:</strong>
+                                        @if (item.IsFinaly)
+                                        {
+                                            <span class="text-success fw-bold">تسویه شده</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-danger fw-bold">تسویه نشده</span>
+                                        }
+                                    </p>
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal جزئیات سفارش -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderDetailsModalLabel">مشخصات کامل و متعلقات پرده</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="orderDetailsContent"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+        function showOrderDetails(orderId) {
+            const loader = `<div class="text-center my-4"><div class="spinner-border" role="status"></div></div>`;
+            document.getElementById("orderDetailsContent").innerHTML = loader;
+
+            fetch(`/Admin/Orders/ShowOrderDetails?id=${orderId}`)
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById("orderDetailsContent").innerHTML = html;
+                    new bootstrap.Modal(document.getElementById('orderDetailsModal')).show();
+                })
+                .catch(() => {
+                    document.getElementById("orderDetailsContent").innerHTML = "<div class='text-danger text-center'>خطا در بارگذاری اطلاعات</div>";
+                });
+        }
+    </script>
