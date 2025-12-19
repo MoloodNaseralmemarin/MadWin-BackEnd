@@ -19,6 +19,6 @@ namespace MadWin.Application.DTOs.CommissionRates
 
         public bool IsDelete { get; set; }
 
-        public DateTime LastUpdateDate { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 }

@@ -75,7 +75,7 @@ namespace MadWin.Infrastructure.Repositories
                 Id = item.Id,
                 Name=item.Name,
                 Cost=item.Cost,
-                LastUpdateDate = item.LastUpdateDate,
+                UpdatedAt = item.UpdatedAt,
             });
         }
 

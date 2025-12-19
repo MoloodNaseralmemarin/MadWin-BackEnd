@@ -6,10 +6,10 @@
 @inject IPermissionService PermissionService
 @{
     int userId = 0;
-    SideBarUserPanelViewModel user = null;
+    SideBarUserPanelDto user = null;
     if (int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out userId) && userId > 0)
     {
-      user = await UserPanelService.GetSideBarUserPanelDataAsync(userId);
+      user = await UserPanelService.GetSideBarUserPanelAsync(userId);
     }
     var linkController = User.Identity.IsAuthenticated ? "Orders" : "Account";
     var linkAction = User.Identity.IsAuthenticated ? "CreateOrder" : "Login";

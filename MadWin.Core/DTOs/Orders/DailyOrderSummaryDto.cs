@@ -25,7 +25,7 @@ namespace MadWin.Core.DTOs.Orders
     public class OrderDetailDto
     {
         public int OrderId { get; set; }
-        public DateTime CreateDate { get; set; }
+        public DateTime CreatedAt { get; set; }
         public string FullName { get; set; }
         public string CellPhone { get; set; }
         public string Address { get; set; }

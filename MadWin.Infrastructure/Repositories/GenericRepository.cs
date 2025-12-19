@@ -17,8 +17,8 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 
     public async Task AddAsync(T entity)
     {
-        entity.LastUpdateDate = DateTime.Now;
-        entity.CreateDate = DateTime.Now;
+        entity.UpdatedAt = DateTime.Now;
+        entity.CreatedAt = DateTime.Now;
         entity.Description = "";
         entity.IsDelete = false;
         await _dbSet.AddAsync(entity);

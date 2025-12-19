@@ -130,7 +130,7 @@ namespace MadWin.Infrastructure.Repositories
                         FirstName = u.FirstName,
                         LastName = u.LastName,
                         CellPhone=u.CellPhone,
-                        CreateDate=u.CreateDate,
+                        CreatedAt=u.CreatedAt,
                         OrderCount = u.Orders.Count(),
                         FactorCount = u.Factors.Count()
                     })

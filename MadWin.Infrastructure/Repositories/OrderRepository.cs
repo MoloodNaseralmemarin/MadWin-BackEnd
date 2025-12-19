@@ -135,7 +135,7 @@ namespace MadWin.Infrastructure.Repositories
         public async Task<decimal> GetTodayTotalOrdersPriceAsync()
         {
             return await _context.Orders
-              .Where(o => o.IsFinaly && !o.IsDelete && o.CreateDate.Date==DateTime.Now.Date)
+              .Where(o => o.IsFinaly && !o.IsDelete && o.CreatedAt.Date==DateTime.Now.Date)
               .SumAsync(o => o.TotalAmount);
         }
 
@@ -181,7 +181,7 @@ namespace MadWin.Infrastructure.Repositories
         private void MarkAsDeleted(BaseEntity entity)
         {
             entity.IsDelete = true;
-            entity.LastUpdateDate = DateTime.Now;
+            entity.UpdatedAt = DateTime.Now;
             entity.Description = "توسط کاربر حذف شده است.";
         }
 
@@ -208,8 +208,8 @@ namespace MadWin.Infrastructure.Repositories
                 .Include(o => o.OrderCategory)
                 .Include(o => o.OrderSubCategory)
                 .Where(o => !o.IsDelete
-                            && o.CreateDate >= today
-                            && o.CreateDate < tomorrow
+                            && o.CreatedAt >= today
+                            && o.CreatedAt < tomorrow
                             && o.UserId == userId
                             && !o.IsFinaly); 
 
@@ -221,7 +221,7 @@ namespace MadWin.Infrastructure.Repositories
                     .Select(o => new OrderSummaryForAdminItemDto
                     {
                         OrderId = o.Id,
-                        CreateDate = o.CreateDate,
+                        CreateDate = o.CreatedAt,
                         FullName = (o.User != null
                             ? (o.User.FirstName ?? "") + " " + (o.User.LastName ?? "")
                             : "نامشخص"),
@@ -309,12 +309,12 @@ namespace MadWin.Infrastructure.Repositories
 
             if (FromDate.HasValue)
             {
-                query = query.Where(o => o.CreateDate >= FromDate);
+                query = query.Where(o => o.CreatedAt >= FromDate);
             }
 
             if (ToDate.HasValue)
             {
-                query = query.Where(o => o.CreateDate <= ToDate);
+                query = query.Where(o => o.CreatedAt <= ToDate);
             }
 
             if (filter.FromPrice.HasValue)
@@ -335,13 +335,13 @@ namespace MadWin.Infrastructure.Repositories
                 CurrentPage = pageId,
                 CountPage = (int)Math.Ceiling(query.Count() / (double)take),
                 OrderSummary = await query
-                    .OrderByDescending(u => u.CreateDate)
+                    .OrderByDescending(u => u.CreatedAt)
                     .Skip(skip)
                     .Take(take)
                     .Select(o => new OrderSummaryForAdminItemDto
                     {
                         OrderId = o.Id,
-                        CreateDate = o.CreateDate,
+                        CreateDate = o.CreatedAt,
                         FullName = (o.User != null
                             ? (o.User.FirstName ?? "") + " " + (o.User.LastName ?? "")
                             : "نامشخص"),
@@ -435,12 +435,12 @@ namespace MadWin.Infrastructure.Repositories
 
             if (FromDate.HasValue)
             {
-                query = query.Where(o => o.CreateDate >= FromDate);
+                query = query.Where(o => o.CreatedAt >= FromDate);
             }
 
             if (ToDate.HasValue)
             {
-                query = query.Where(o => o.CreateDate <= ToDate);
+                query = query.Where(o => o.CreatedAt <= ToDate);
             }
 
             if (filter.FromPrice.HasValue)
@@ -467,7 +467,7 @@ namespace MadWin.Infrastructure.Repositories
                     .Select(o => new OrderSummaryForAdminItemDto
                     {
                         OrderId = o.Id,
-                        CreateDate = o.CreateDate,
+                        CreateDate = o.CreatedAt,
                         FullName = (o.User != null
                             ? (o.User.FirstName ?? "") + " " + (o.User.LastName ?? "")
                             : "نامشخص"),
@@ -537,7 +537,7 @@ namespace MadWin.Infrastructure.Repositories
                 .Select(o => new OrderSummaryForAdminItemDto
                 {
                     OrderId = o.Id,
-                    CreateDate = o.CreateDate,
+                    CreateDate = o.CreatedAt,
                     FullName = (o.User != null
                         ? (o.User.FirstName ?? "") + " " + (o.User.LastName ?? "")
                         : "نامشخص"),
@@ -617,7 +617,7 @@ namespace MadWin.Infrastructure.Repositories
         public async Task<IEnumerable<Order>> GetAllByUserAndDateAsync(int userId, DateTime date)
         {
             return await GetQuery()
-                .Where(o => o.UserId == userId && o.CreateDate.Date == date.Date)
+                .Where(o => o.UserId == userId && o.CreatedAt.Date == date.Date)
                 .ToListAsync();
         }
 

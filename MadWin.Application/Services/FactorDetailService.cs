@@ -35,7 +35,7 @@ namespace MadWin.Application.Services
             foreach (var detail in factorDetailsToDelete)
             {
                 detail.IsDelete = true;
-                detail.LastUpdateDate = DateTime.Now;
+                detail.UpdatedAt = DateTime.Now;
                 detail.Description = "توسط کاربر حذف شده است.";
                 _factorDetailRepository.Update(detail);
             }
@@ -56,7 +56,7 @@ namespace MadWin.Application.Services
                 if (factor != null)
                 {
                     factor.SubTotal = sumPrice;
-                    factor.LastUpdateDate = DateTime.Now;
+                    factor.UpdatedAt = DateTime.Now;
                     factor.Description = "تغییر قیمت رخ داد چون ایتمی توسط کاربر حذف شده است";
                     _factorRepository.Update(factor);
                 }

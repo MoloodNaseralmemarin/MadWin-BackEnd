@@ -62,7 +62,7 @@
                                 <td>@user.Id</td>
                                 <td>@user.FirstName @user.LastName</td>
                                 <td>@user.CellPhone</td>
-                                <td>@user.CreateDate.ToShamsi()- @user.CreateDate.ToString("HH:mm:ss")</td>
+                                <td>@user.CreatedAt.ToShamsi()- @user.CreatedAt.ToString("HH:mm:ss")</td>
                                 <td>@user.OrderCount</td>
                                 <td>@user.FactorCount</td>
                                 <td>
@@ -96,7 +96,7 @@
                                     <h6 class="card-title">@user.FirstName @user.LastName</h6>
                                     <p class="card-text mb-1"><strong>شناسه:</strong> @user.Id</p>
                                     <p class="card-text mb-1"><strong>شماره همراه:</strong> @user.CellPhone</p>
-                                    <p class="card-text mb-1"><strong>تاریخ ثبت‌نام:</strong> @user.CreateDate.ToShamsi()</p>
+                                    <p class="card-text mb-1"><strong>تاریخ ثبت‌نام:</strong> @user.CreatedAt.ToShamsi()</p>
                                     <p class="card-text mb-1"><strong>تعداد سفارش:</strong> @user.OrderCount</p>
                                     <p class="card-text mb-1"><strong>تعدا فاکتور</strong> @user.FactorCount</p>
                                     <div class="d-flex justify-content-end mt-2">

@@ -78,7 +78,7 @@ namespace MadWin.Infrastructure.Repositories
                     .Select(o => new FactorSummaryForAdminItemDto
                     {
                         FactorId = o.Factor.Id,
-                        CreateDate = o.CreateDate,
+                        CreatedAt = o.CreatedAt,
                         SubTotal = o.Factor.SubTotal,
 
                         FactorDetails = o.Factor.FactorDetails
@@ -163,10 +163,10 @@ namespace MadWin.Infrastructure.Repositories
                 query = query.Where(f => f.Id == filter.FactorId.Value);
 
             if (FromDate.HasValue)
-                query = query.Where(f => f.CreateDate >= FromDate);
+                query = query.Where(f => f.UpdatedAt >= FromDate);
 
             if (ToDate.HasValue)
-                query = query.Where(f => f.CreateDate <= ToDate);
+                query = query.Where(f => f.UpdatedAt <= ToDate);
 
             if (filter.FromPrice.HasValue)
                 query = query.Where(f => f.TotalAmount >= filter.FromPrice.Value);
@@ -193,7 +193,7 @@ namespace MadWin.Infrastructure.Repositories
                         : "نامشخص",
                     CellPhone = f.User.CellPhone ?? "",
                     Address = f.User.Address ?? "",
-                    CreateDate = f.CreateDate,
+                    CreatedAt = f.CreatedAt,
                     DeliveryMethodName=f.DeliveryMethod.Name,
                     DeliveryMethodCost = f.DeliveryMethodAmount,
                     SubTotal=f.SubTotal,
@@ -244,10 +244,10 @@ namespace MadWin.Infrastructure.Repositories
                 query = query.Where(f => f.Id == filter.FactorId.Value);
 
             if (FromDate.HasValue)
-                query = query.Where(f => f.CreateDate >= FromDate);
+                query = query.Where(f => f.CreatedAt >= FromDate);
 
             if (ToDate.HasValue)
-                query = query.Where(f => f.CreateDate <= ToDate);
+                query = query.Where(f => f.CreatedAt <= ToDate);
 
             if (filter.FromPrice.HasValue)
                 query = query.Where(f => f.TotalAmount >= filter.FromPrice.Value);
@@ -278,7 +278,7 @@ namespace MadWin.Infrastructure.Repositories
                     IsFinaly = f.IsFinaly,
                     CellPhone = f.User.CellPhone ?? "",
                     Address = f.User.Address ?? "",
-                    CreateDate = f.CreateDate,
+                    CreateDate = f.CreatedAt,
 
 
                     DeliveryMethodName = f.DeliveryMethod != null ? f.DeliveryMethod.Name : "",

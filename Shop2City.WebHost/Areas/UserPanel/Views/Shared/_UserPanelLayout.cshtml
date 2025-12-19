@@ -13,7 +13,7 @@
     <main class="container">
         <div class="row">
 
-            <partial name="_SideBar"/>
+            @await Component.InvokeAsync("UserSidebarComponent")
             <div class="col-9">
                 @RenderBody()
             </div>

@@ -20,7 +20,7 @@ namespace MadWin.Application.Services
 
             existing.Name = curtainComponent.Name;
             existing.Cost = curtainComponent.Cost;
-            existing.LastUpdateDate = DateTime.UtcNow;
+            existing.UpdatedAt = DateTime.UtcNow;
 
             await _curtainComponentRepository.SaveChangesAsync();
             return true;
@@ -34,7 +34,7 @@ namespace MadWin.Application.Services
                 Cost = c.Cost,
                 Description = c.Description,
                 IsDelete = c.IsDelete,
-                LastUpdateDate = c.LastUpdateDate,
+                UpdatedAt = c.UpdatedAt,
                 Name= c.Name
             });
         }

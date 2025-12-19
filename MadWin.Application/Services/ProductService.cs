@@ -22,7 +22,7 @@ namespace Shop2City.Core.Services.Products
             if (existing == null) return false;
 
             existing.IsStatus = isStatus;
-            existing.LastUpdateDate = DateTime.Now;
+            existing.UpdatedAt = DateTime.Now;
             existing.Description = "وضعیت محصول تغییر کرد.";
             await _productRepository.SaveChangesAsync();
             return true;
@@ -35,7 +35,7 @@ namespace Shop2City.Core.Services.Products
 
             existing.Title = editProduct.Title;
             existing.Price = editProduct.Price;
-            existing.LastUpdateDate = DateTime.Now;
+            existing.UpdatedAt = DateTime.Now;
             existing.ShortDescription = editProduct.ShortDescription;
 
             await _productRepository.SaveChangesAsync();

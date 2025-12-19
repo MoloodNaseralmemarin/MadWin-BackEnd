@@ -87,7 +87,7 @@ namespace MadWin.Infrastructure.Repositories
                     .Select(d => new DiscountForAdminItemViewModel
                     {
                         Id = d.Id,
-                        CreateDate = d.CreateDate,
+                        CreateDate = d.UpdatedAt,
                         DiscountCode = d.DiscountCode,
                         ExpiryDate = d.ExpiryDate,
                         Item = d.Item,

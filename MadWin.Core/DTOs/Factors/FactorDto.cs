@@ -7,7 +7,7 @@ public class FactorSummaryForAdminItemDto
 {
     public int FactorId { get; set; }
 
-    public DateTime CreateDate { get; set; }
+    public DateTime CreatedAt { get; set; }
     public string FullName { get; set; }
 
     

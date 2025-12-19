@@ -13,8 +13,8 @@ namespace MadWin.Core.Entities.Common
 
         public bool IsDelete { get; set; }
 
-        public DateTime CreateDate { get; set; } 
+        public DateTime CreatedAt { get; set; } 
 
-        public DateTime LastUpdateDate { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 }

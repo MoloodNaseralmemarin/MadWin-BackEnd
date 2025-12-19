@@ -15,7 +15,7 @@ namespace MadWin.Core.DTOs.Users
 
         public string CellPhone { get; set; }
 
-        public DateTime CreateDate { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         public int OrderCount { get; set; }
         public int FactorCount { get; set; }

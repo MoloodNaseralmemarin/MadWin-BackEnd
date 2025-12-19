@@ -14,8 +14,8 @@ namespace MadWin.Core.Entities.Products
         #region ctor
         public Product()
         {
-            CreateDate=DateTime.Now;
-            LastUpdateDate=DateTime.Now;
+            CreatedAt = DateTime.Now;
+            CreatedAt = DateTime.Now;
             IsDelete = false;
         }
         #endregion

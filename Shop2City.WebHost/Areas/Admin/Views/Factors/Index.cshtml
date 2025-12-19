@@ -96,7 +96,7 @@
                             </div>
 
                             <h6 class="text-primary fw-bold">@item.FullName (@item.CellPhone)</h6>
-                            <p class="text-muted small">@item.CreateDate.ToShamsi() - @item.CreateDate.ToString("HH:mm")</p>
+                            <p class="text-muted small">@item.CreatedAt.ToShamsi() - @item.CreatedAt.ToString("HH:mm")</p>
                             <p><strong>تعداد اقلام:</strong> @item.FactorDetailItemCount</p>
                             <p><strong>مبلغ اقلام:</strong> @item.SubTotal.ToString("N0") ریال</p>
                             <p><strong>تخفیف:</strong> @item.DisTotal.ToString("N0") ریال (@item.DisPercent%)</p>

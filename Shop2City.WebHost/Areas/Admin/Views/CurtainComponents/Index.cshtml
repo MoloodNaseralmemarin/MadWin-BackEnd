@@ -26,7 +26,7 @@
                         @foreach (var item in Model)
                         {
                             <tr>
-                                <td>@item.LastUpdateDate.ToShamsi()</td>
+                                <td>@item.UpdatedAt.ToShamsi()</td>
                                 <td>@item.Name</td>
                                 <td>@item.Cost.ToString("N0")ریال</td>
                                 <td>@item.Description</td>
@@ -48,7 +48,7 @@
                     <div class="card mb-3 shadow-sm">
                         <div class="card-body">
                             <h5 class="card-title">@item.Name</h5>
-                            <p class="card-text"><strong>تاریخ:</strong> @item.LastUpdateDate.ToShamsi()</p>
+                            <p class="card-text"><strong>تاریخ:</strong> @item.UpdatedAt.ToShamsi()</p>
                             <p class="card-text"><strong>قیمت:</strong> @item.Cost.ToString("N0")ریال</p>
                             <p class="card-text"><strong>توضیحات:</strong> @item.Description</p>
                             <div class="d-flex flex-wrap gap-2 mt-2">

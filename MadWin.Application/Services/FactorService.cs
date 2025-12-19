@@ -166,7 +166,7 @@ namespace MadWin.Application.Services
     var dto = new FactorSummaryForAdminItemDto
     {
         FactorId = factor.Id,
-        CreateDate = factor.CreateDate,
+        CreatedAt = factor.CreatedAt,
         FullName = factor.User?.FirstName + factor.User?.LastName ?? "نامشخص",
         CellPhone = factor.User?.CellPhone ?? "-",
         Address = factor.User ?.Address ?? "-",
@@ -214,7 +214,7 @@ namespace MadWin.Application.Services
 
             return await _factorRepository.GetQuery()
                 .Where(o => o.IsFinaly &&
-                            o.CreateDate.Date == today &&
+                            o.CreatedAt.Date == today &&
                             !o.IsDelete)
                 .CountAsync();
         }
@@ -226,7 +226,7 @@ namespace MadWin.Application.Services
 
             return await _factorRepository.GetQuery()
                 .Where(o => !o.IsFinaly &&
-                            o.CreateDate.Date == today &&
+                            o.CreatedAt.Date == today &&
                             !o.IsDelete)
                 .CountAsync();
         }

@@ -22,7 +22,7 @@ namespace MadWin.Infrastructure.Repositories
         public async Task<IEnumerable<Sms>> GetRecentSmsAsync(int count)
         {
             return await _context.SentMessages
-                .OrderByDescending(s => s.CreateDate)
+                .OrderByDescending(s => s.CreatedAt)
                 .Take(count)
                 .ToListAsync();
         }
@@ -91,7 +91,7 @@ namespace MadWin.Infrastructure.Repositories
                     .Select(u => new SendSmsForAdminItemViewModel
                     {
                         Id = u.Id,
-                        CreateDate = u.CreateDate,
+                        CreateDate = u.CreatedAt,
                         Template = u.Template,
                         Contact = u.Contact,
                         FactorId = u.FactorId,

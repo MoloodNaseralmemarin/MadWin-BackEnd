@@ -45,7 +45,7 @@ namespace MadWin.Application.Repositories
 
             existing.Name = editDeliveryMethod.Name;
             existing.Cost = editDeliveryMethod.Cost;
-            existing.LastUpdateDate = DateTime.Now;
+            existing.UpdatedAt = DateTime.Now;
 
             await _deliveryMethodRepository.SaveChangesAsync();
             return true;

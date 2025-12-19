@@ -5,7 +5,6 @@ using MadWin.Core.Entities.Common;
 using MadWin.Core.Entities.Orders;
 using MadWin.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 using Shop2City.Core.Convertors;
 
@@ -172,7 +171,7 @@ namespace MadWin.Application.Services
         private void MarkAsDeleted(BaseEntity entity)
         {
             entity.IsDelete = true;
-            entity.LastUpdateDate = DateTime.Now;
+            entity.UpdatedAt = DateTime.Now;
             entity.Description = "توسط کاربر حذف شده است.";
         }
 
@@ -185,7 +184,7 @@ namespace MadWin.Application.Services
             var orders = allOrders
                 .Where(o => orderIds.Contains(o.Id) &&
                             o.UserId == userId &&
-                            o.CreateDate >= today && o.CreateDate < tomorrow);
+                            o.CreatedAt >= today && o.CreatedAt < tomorrow);
 
             return orders.Sum(o => o.PriceWithFee);
         }
@@ -237,7 +236,7 @@ namespace MadWin.Application.Services
 
             return await _orderRepository.GetQuery()
                 .Where(o => o.IsFinaly &&
-                            o.CreateDate.Date == today &&
+                            o.CreatedAt.Date == today &&
                             !o.IsDelete)
                 .CountAsync();
         }
@@ -249,7 +248,7 @@ namespace MadWin.Application.Services
 
             return await _orderRepository.GetQuery()
                 .Where(o => !o.IsFinaly &&
-                            o.CreateDate.Date == today &&
+                            o.CreatedAt.Date == today &&
                             !o.IsDelete)
                 .CountAsync();
         }
@@ -272,10 +271,10 @@ namespace MadWin.Application.Services
                 .Where(o => !o.IsDelete);
 
             if (fromDate.HasValue)
-                query = query.Where(o => o.CreateDate >= fromDate.Value);
+                query = query.Where(o => o.CreatedAt >= fromDate.Value);
 
             if (toDate.HasValue)
-                query = query.Where(o => o.CreateDate < toDate.Value);
+                query = query.Where(o => o.CreatedAt < toDate.Value);
 
             var result = await query
          .GroupBy(o => new
@@ -283,7 +282,7 @@ namespace MadWin.Application.Services
              FullName = o.User != null
                  ? (o.User.FirstName ?? "") + " " + (o.User.LastName ?? "")
                  : "نامشخص",
-             Date = o.CreateDate.Date,
+             Date = o.CreatedAt.Date,
              CellPhone= o.User != null
                  ? (o.User.CellPhone ?? "")
                  : "نامشخص",
@@ -304,7 +303,7 @@ namespace MadWin.Application.Services
              Orders = g.Select(x => new OrderDetailDto
              {
                  OrderId = x.Id,
-                 CreateDate = x.CreateDate,
+                 CreatedAt = x.CreatedAt,
                  FullName = g.Key.FullName,
                  CellPhone = x.User != null ? x.User.CellPhone : "",
                  Address = x.User != null ? x.User.Address ?? "" : "نامشخص",

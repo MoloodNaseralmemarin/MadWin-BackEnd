@@ -143,7 +143,7 @@ namespace MadWin.Application.Services
         {
             var user = await _userRepository.GetByIdAsync(id);
             user.IsDelete = true;
-            user.LastUpdateDate = DateTime.UtcNow;
+            user.UpdatedAt = DateTime.UtcNow;
             user.Description = "توسط آقای نادری حذف شده است.";
             _userRepository.Remove(user);
             await _userRepository.SaveChangesAsync();

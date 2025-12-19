@@ -10,7 +10,7 @@ namespace MadWin.Core.DTOs.DeliveryMethods
     public class DeliveryMethodForAdmin
     {
         public int Id { get; set; }
-        public DateTime LastUpdateDate { get; set; }
+        public DateTime UpdatedAt { get; set; }
 
         public string Name { get; set; }
 

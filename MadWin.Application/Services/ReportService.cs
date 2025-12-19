@@ -37,7 +37,7 @@ namespace MadWin.Application.Services
                 ProductName =$"result.FactorDetails.Select(d => d.Product.Title)".Trim(),
                 FullName = $"{result.User?.FirstName} {result.User?.LastName}".Trim(),
                 Address = result.User?.Address,
-                CreatedAt = result.CreateDate,
+                CreatedAt = result.CreatedAt,
             };
         }
         
@@ -60,7 +60,7 @@ namespace MadWin.Application.Services
                 OrderName = $"{result.OrderCategory?.Title} {result.OrderSubCategory?.Title}".Trim(),
                 FullName = $"{result.User?.FirstName} {result.User?.LastName}".Trim(),
                 Address = result.User?.Address,
-                CreatedAt=result.CreateDate,
+                CreatedAt=result.CreatedAt,
             };
         }
     }

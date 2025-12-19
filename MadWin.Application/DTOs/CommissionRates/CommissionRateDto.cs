@@ -13,6 +13,6 @@ namespace MadWin.Application.DTOs.CommissionRates
         public bool IsEqualParts { get; set; }          // آیا تکه‌ها مساوی‌اند؟
         public int CommissionPercent { get; set; }   // درصد کارمزد
 
-        public DateTime LastUpdateDate { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 }

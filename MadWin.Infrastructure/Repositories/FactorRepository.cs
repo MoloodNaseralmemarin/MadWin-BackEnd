@@ -147,7 +147,7 @@ namespace MadWin.Infrastructure.Repositories
         public async Task<decimal> GetTodayTotalFactorsPriceAsync()
         {
             return await _context.Factors
-              .Where(o => o.IsFinaly && !o.IsDelete && o.CreateDate.Date == DateTime.Now.Date)
+              .Where(o => o.IsFinaly && !o.IsDelete && o.CreatedAt.Date == DateTime.Now.Date)
               .SumAsync(o => o.TotalAmount);
         }
         public async Task<int> GetLastFactorId(int userId)

@@ -40,7 +40,7 @@ namespace MadWin.Application.Services
 
             existing.ParentId = productGroup.ParentId;
             existing.Title = productGroup.Title;
-            existing.LastUpdateDate = DateTime.Now;
+            existing.UpdatedAt = DateTime.Now;
 
             await _productGroupRepository.SaveChangesAsync();
             return true;

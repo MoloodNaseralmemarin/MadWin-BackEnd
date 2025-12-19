@@ -19,7 +19,7 @@ namespace MadWin.Application.Services
             if (existing == null) return false;
 
             existing.CommissionPercent = commissionRate.CommissionPercent;
-            existing.LastUpdateDate = DateTime.UtcNow;
+            existing.UpdatedAt = DateTime.UtcNow;
 
             await _commissionRateRepository.SaveChangesAsync();
             return true;
@@ -30,7 +30,7 @@ namespace MadWin.Application.Services
             return commissionRate.Select(cr => new CommissionRateDto
             {
                Id=cr.Id,
-               LastUpdateDate= cr.LastUpdateDate,
+                UpdatedAt = cr.UpdatedAt,
                PartCount= cr.PartCount,
                IsEqualParts=cr.IsEqualParts,
                CommissionPercent= cr.CommissionPercent

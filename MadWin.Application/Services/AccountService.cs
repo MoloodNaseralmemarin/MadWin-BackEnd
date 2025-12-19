@@ -1,11 +1,8 @@
-﻿using Ghasedak.Core.Interfaces;
-using MadWin.Application.DTOs.Account;
+﻿using MadWin.Application.DTOs.Account;
 using MadWin.Core.Entities.Users;
 using MadWin.Core.Interfaces;
 using MadWin.Infrastructure.Data;
-using MadWin.Infrastructure.Repositories;
 using MadWin.Infrastructure.Security;
-using Microsoft.EntityFrameworkCore;
 
 namespace MadWin.Application.Services
 {

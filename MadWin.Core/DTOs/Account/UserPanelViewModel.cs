@@ -11,7 +11,7 @@ namespace MadWin.Core.DTOs.Account
         public string? userName { get; set; }
         public string email { get; set; }
         public string cellPhone { get; set; }
-        public DateTime registerDate { get; set; }
+        public DateTime CreatedAt { get; set; }
         public int Wallet { get; set; }
     }
     #endregion
@@ -21,7 +21,7 @@ namespace MadWin.Core.DTOs.Account
     {
         public string imageName { get; set; }
         public string fullName { get; set; }
-        public DateTime registerDate { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
     #endregion
 
